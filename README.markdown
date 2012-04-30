@@ -1,6 +1,6 @@
-﻿Context Model
+﻿<h1>Context Model</h1>
 
-Development environment
+<h2>Development environment</h2>
 
 The development environment for this project is very rudimentary at present,
 and uses make.  Here are the contents:
