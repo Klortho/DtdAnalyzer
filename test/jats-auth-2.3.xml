@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD Article Authoring DTD v2.3 20070202//EN"
+                  "../dtd/articleauthoring.dtd">
+
+<!--
+  This is a sample file for authoring/2.3.  Except for this comment, it is the
+  same as the one for authoring/2.1.
+-->
+
+<article>
+<!-- SYSTEM:  Archiving and Interchange DTD Suite    -->
+<!-- November 2002 An archival journal article with minimal 
+Front Matter, a Table, and Citations for testing         -->
+<!-- =============== Front Matter (Metadata) =========== -->
+<front>
+<article-meta>
+<title-group>
+<article-title>Archival DTD Test Article</article-title>
+<subtitle>(Just a small subtitle for parsing)</subtitle>
+</title-group>
+<contrib-group>
+<contrib>
+<name>
+<surname>Public</surname>
+<given-names>John Delancey Q.</given-names>
+<prefix>Rev.</prefix>
+</name>
+<degrees>LHSd</degrees>
+<role>Editor in Chief</role>
+<aff>
+<institution>The Q Continuum</institution>
+<addr-line>East of the Sun and West of the Moon</addr-line>
+</aff>
+<bio><p> A man was born, he lived, he died.</p></bio>
+</contrib>
+</contrib-group>
+<permissions>
+<copyright-statement>&copy; 2005 Mulberry Technologies, Inc.</copyright-statement>
+<copyright-year>2005</copyright-year>
+</permissions>
+<abstract><title>Really Short Teaser Abstract</title>
+<p>I built it and they came.</p>
+</abstract>
+<kwd-group kwd-group-type="author">
+<kwd>XML</kwd>
+<kwd>XSLT</kwd>
+<kwd>parsing</kwd>
+<kwd>document validation</kwd>
+</kwd-group>
+</article-meta>
+</front>
+<!-- =============== Body Matter (Content) =========== -->
+<body>
+<p>This following is an XHTML table, inside a
+Table Wrapper %lt;table-wrap&gt; wrapper.</p>
+<!-- AN XHTML Table for testing -->
+<table-wrap id="table-wrap-XHTML" position="anchor">
+<caption><title>XHTML Table</title>
+<p>Additional caption material</p>
+</caption>
+<table>
+<tbody>
+<tr>
+<td>A cell!</td>
+<td>Another</td>
+<td>Still a third&gt;</td>
+</tr>
+<tr>
+<td>2 A cell!</td>
+<td>An xref: <xref ref-type="statement" rid="statement16">See the 
+statement</xref></td>
+<td>2 Still a third&gt;</td>
+</tr>
+</tbody>
+</table>
+</table-wrap>
+<sec sec-type="methods">
+<title>There be statements here.</title>
+<statement id="statement11">
+<p>The IDREFs need to point to something</p>
+</statement>
+<statement id="statement15">
+<p>No Matter How Wise You Get, Wet Birds Don't 
+Fly at Night</p>
+</statement>
+<statement id="statement16">
+<p>Post Hoc Propter Ergo Hoc</p>
+</statement>
+</sec>
+</body>
+<!-- =============== Back Matter (Ancillary) ======= -->
+<back>
+<ack><p>We thank you all.</p></ack>
+<ref-list>
+<title>Bibliography</title>
+<p>Just a reference or two for testing:</p>
+<ref>
+<citation>A citation ain't nothing but a 
+sandwich &mdash; personal communication 
+</citation>
+</ref>
+<ref>
+<citation>
+<name>
+<surname>Piggy</surname> 
+<prefix>Ms.</prefix></name>
+<article-title>Can't Help Lovin&rsquo; That 
+Frog of Mine</article-title>;
+<source>Swine Review</source>, <issue>145</issue>:
+<fpage>12</fpage>&ndash;<lpage>24</lpage>; 
+<year>2003</year>. 
+<trans-title xml:lang="x-PigLatin">Ant-cay Elp-hay 
+Ovin&rsquo;-lay At-thay Og-fray of-ay Ine-may</trans-title>
+</citation>
+</ref>
+</ref-list>
+</back>
+</article>
