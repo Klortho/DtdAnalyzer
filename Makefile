@@ -1,12 +1,12 @@
-all: clean build doc t
+all: clean bin doc t
 
 clean:
 	-rm -r doc
-	-rm -r class
+	-rm -r bin
 
-build:
-	-mkdir class
-	javac -d class src/pmctools/*.java
+bin:
+	-mkdir bin
+	javac -d bin src/pmctools/*.java
 
 doc:
 	javadoc -d doc src/pmctools/*.java
