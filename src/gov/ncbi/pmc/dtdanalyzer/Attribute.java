@@ -4,7 +4,7 @@
  * Created on February 5, 2005, 4:44 PM
  */
 
-package pmctools;
+package gov.ncbi.pmc.dtdanalyzer;
 
 /**
  *

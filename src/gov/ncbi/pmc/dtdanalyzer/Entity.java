@@ -4,7 +4,7 @@
  * Created on January 17, 2005, 2:23 PM
  */
 
-package pmctools;
+package gov.ncbi.pmc.dtdanalyzer;
 
 /**
  * Holds  Entity information and provides getter and setter methods.

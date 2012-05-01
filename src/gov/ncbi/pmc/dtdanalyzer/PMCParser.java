@@ -4,7 +4,7 @@
  * Created on November 14, 2005, 3:01 PM
  */
 
-package pmctools;
+package gov.ncbi.pmc.dtdanalyzer;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -38,7 +38,7 @@ public class PMCParser implements org.xml.sax.ErrorHandler {
         String xmlSysId = null;
     
     if ( (args.length < 1) || (args.length > 2) ){
-        System.err.println("Usage: java pmctools.PMCParser [xml file] {catalog}");
+        System.err.println("Usage: java gov.ncbi.pmc.dtdanalyzer.PMCParser [xml file] {catalog}");
         System.exit(1);
     }
             

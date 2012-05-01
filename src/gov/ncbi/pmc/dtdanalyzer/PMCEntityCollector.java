@@ -4,7 +4,7 @@
  * Created on January 17, 2005, 2:16 PM
  */
 
-package pmctools;
+package gov.ncbi.pmc.dtdanalyzer;
 
 import org.xml.sax.*;
 import org.xml.sax.ext.*;

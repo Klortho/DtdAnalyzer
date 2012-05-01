@@ -4,7 +4,7 @@
  * Created on February 5, 2005, 4:55 PM
  */
 
-package pmctools;
+package gov.ncbi.pmc.dtdanalyzer;
 
 import  java.util.*;
 
@@ -94,7 +94,7 @@ public class Element {
        context.add( elementName );
     }
 
-    void addAttribute(pmctools.Attribute attribute) {
+    void addAttribute(gov.ncbi.pmc.dtdanalyzer.Attribute attribute) {
         if ( ! attributes.containsKey( attribute.getName() )) {
             attributes.put( attribute.getName(), attribute );
         } // if

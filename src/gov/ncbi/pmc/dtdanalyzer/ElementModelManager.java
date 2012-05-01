@@ -4,7 +4,7 @@
  * Created on February 5, 2005, 4:06 PM
  */
 
-package pmctools;
+package gov.ncbi.pmc.dtdanalyzer;
 
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
@@ -82,8 +82,8 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
      */
     public void attributeDecl(String eName, String aName, String type, String valueDefault,
        String value) throws SAXException {
-       pmctools.Element e;
-       pmctools.Attribute att = new pmctools.Attribute();
+       gov.ncbi.pmc.dtdanalyzer.Element e;
+       gov.ncbi.pmc.dtdanalyzer.Attribute att = new gov.ncbi.pmc.dtdanalyzer.Attribute();
        att.setName(aName);
        att.setElementName(eName);
        att.setType(type);
@@ -97,10 +97,10 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
        }
 
         if ( elements.containsKey(eName)) {
-           e = (pmctools.Element)elements.get(eName);
+           e = (gov.ncbi.pmc.dtdanalyzer.Element)elements.get(eName);
        }
        else {
-           e = new pmctools.Element( eName );
+           e = new gov.ncbi.pmc.dtdanalyzer.Element( eName );
            elements.put(eName, e);
        }
 
@@ -137,16 +137,16 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
      * @exception SAXException The application may raise an exception.
      */
     public void elementDecl(String name, String model) throws SAXException {
-        pmctools.Element e;
+        gov.ncbi.pmc.dtdanalyzer.Element e;
 
         counter++; // Count how many elements there are so we know the order
                    // in which they are declared.
 
         if ( elements.containsKey( name ) ) {
-           e = (pmctools.Element)elements.get( name );
+           e = (gov.ncbi.pmc.dtdanalyzer.Element)elements.get( name );
         } // if
         else {
-           e = new pmctools.Element( name );
+           e = new gov.ncbi.pmc.dtdanalyzer.Element( name );
            elements.put( name, e );
         } // else
 
@@ -162,7 +162,7 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
         // Every element name needs to be added as an element and this
         // element needs to be added to the context
         StringTokenizer tokens = new StringTokenizer( model, " \n\t\r,|+?*()");
-        pmctools.Element newElement;
+        gov.ncbi.pmc.dtdanalyzer.Element newElement;
 
         while ( tokens.hasMoreTokens() ) {
            String elName = tokens.nextToken();
@@ -170,11 +170,11 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
            if ( (elName != "") && (! elName.equals("#PCDATA"))) {
               // Check if this element already exists
               if ( elements.containsKey( elName )) {
-                  newElement = (pmctools.Element)elements.get( elName );
+                  newElement = (gov.ncbi.pmc.dtdanalyzer.Element)elements.get( elName );
               } //if
               else {
                   // make a new element and add it since we need to store info
-                  newElement = new pmctools.Element( elName );
+                  newElement = new gov.ncbi.pmc.dtdanalyzer.Element( elName );
                   elements.put( elName, newElement);
               } // else
 
@@ -222,7 +222,7 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
 
     public void getInfo(java.io.OutputStream out) {
         Iterator iter = elements.values().iterator();
-        pmctools.Element e;
+        gov.ncbi.pmc.dtdanalyzer.Element e;
         OutputStreamWriter writer;
         BufferedOutputStream bufferedOut;
 
@@ -232,7 +232,7 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
            writer.write("<?xml version='1.0' encoding='UTF-8' ?><elements>");
 
            while (iter.hasNext() ) {
-              e = (pmctools.Element)iter.next();
+              e = (gov.ncbi.pmc.dtdanalyzer.Element)iter.next();
               writer.write("<element ");
               writer.write("name='" + e.getName() + "' ");
               writer.write("dtdOrder='" + e.getDTDOrder() + "' ");
@@ -258,9 +258,9 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
               if ( ! attributes.isEmpty() ) {
                  writer.write("\n<attributes>\n");
                  Iterator i = attributes.values().iterator();
-                 pmctools.Attribute a;
+                 gov.ncbi.pmc.dtdanalyzer.Attribute a;
                  while (i.hasNext()){
-                     a = (pmctools.Attribute)i.next();
+                     a = (gov.ncbi.pmc.dtdanalyzer.Attribute)i.next();
                      writer.write("<attribute ");
                      writer.write("attName='");
                      writer.write(a.getName() + "' mode='" + escape(a.getMode()) + "' type='" + escape(a.getType()) + "'>");
@@ -357,7 +357,7 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
        String fullComment = new String(text, start, length).trim();
        String elementName;
        StringTokenizer tokens;
-       pmctools.Element element;
+       gov.ncbi.pmc.dtdanalyzer.Element element;
 
        // Make sure this is a "pmc" comment
        if ( fullComment.trim().startsWith("~")) {
@@ -366,7 +366,7 @@ public class ElementModelManager implements DeclHandler, LexicalHandler, ErrorHa
           elementName = fullComment.substring(1, nextTilde).trim();
 
           if (elements.containsKey(elementName)) {
-			 element = (pmctools.Element)elements.get(elementName);
+			 element = (gov.ncbi.pmc.dtdanalyzer.Element)elements.get(elementName);
              tokens = new StringTokenizer( fullComment.substring(nextTilde + 1), "~" );
 
              while ( tokens.hasMoreTokens() ) {

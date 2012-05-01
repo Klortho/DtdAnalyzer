@@ -4,7 +4,7 @@
  * Created on January 17, 2005, 2:16 PM
  */
 
-package pmctools;
+package gov.ncbi.pmc.dtdanalyzer;
 
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class EntityCollector implements DeclHandler {
     private HashMap entities;
-    private pmctools.Entity currentEntity;
+    private gov.ncbi.pmc.dtdanalyzer.Entity currentEntity;
     private XMLReader parser;
     private boolean grabNextComment;
     
@@ -40,7 +40,7 @@ public class EntityCollector implements DeclHandler {
      */
     public void getEntities(OutputStream os) {
         Iterator iter = entities.values().iterator();
-        pmctools.Entity ent;
+        gov.ncbi.pmc.dtdanalyzer.Entity ent;
         OutputStreamWriter out;
         BufferedOutputStream bufferedOut;
         
@@ -50,7 +50,7 @@ public class EntityCollector implements DeclHandler {
            out.write("<?xml version='1.0' encoding='UTF-8' ?><entities>");
         
            while (iter.hasNext() ) {
-              ent = (pmctools.Entity)iter.next();
+              ent = (gov.ncbi.pmc.dtdanalyzer.Entity)iter.next();
               out.write("<entity ");
               out.write("name='" + escape(ent.getName()) + "' ");
               out.write("value='" + escape(ent.getValue()) + "'/>");

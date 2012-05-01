@@ -1,4 +1,4 @@
-package pmctools;
+package gov.ncbi.pmc.dtdanalyzer;
 
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
@@ -17,10 +17,10 @@ provide the location of a suitable XML catalog so that all PUBLIC and
 SYSTEM identifiers can be resolved.
 
    NOTE: You MUST set two required system properties and have the option of setting 2 others, as follows:
-         -pmctools.PMCTransformer.xsl = (required) fully-qualified path to stylesheet
-         -pmctools.PMCTransformer.xml = (required) fully-qualified path to XML instance
-         -pmctools.PMCTransformer.catalog = (optional) fully-qualified path to XML catalog to resolve PUBLIC identifiers
-         -pmctools.PMCTransformer.params = (optional) string listing name and values of parameters to pass to the stylesheet. Format must be
+         -gov.ncbi.pmc.dtdanalyzer.PMCTransformer.xsl = (required) fully-qualified path to stylesheet
+         -gov.ncbi.pmc.dtdanalyzer.PMCTransformer.xml = (required) fully-qualified path to XML instance
+         -gov.ncbi.pmc.dtdanalyzer.PMCTransformer.catalog = (optional) fully-qualified path to XML catalog to resolve PUBLIC identifiers
+         -gov.ncbi.pmc.dtdanalyzer.PMCTransformer.params = (optional) string listing name and values of parameters to pass to the stylesheet. Format must be
 	                                    name1::value1;name2::value2; . . .nameN::valueN
 
 Author: Demian Hess
@@ -29,10 +29,10 @@ Date: January 25, 2005
 
 public class PMCTransformer {
    private static String xslName = "", xmlName = "", catalogName = "", params = "";
-   private static String XMLKEY = "pmctools.PMCTransformer.xml",
-                               XSLKEY = "pmctools.PMCTransformer.xsl",
-			       CATALOGKEY = "pmctools.PMCTransformer.catalog",
-			       PARAMSKEY = "pmctools.PMCTransformer.params";
+   private static String XMLKEY = "gov.ncbi.pmc.dtdanalyzer.PMCTransformer.xml",
+                               XSLKEY = "gov.ncbi.pmc.dtdanalyzer.PMCTransformer.xsl",
+			       CATALOGKEY = "gov.ncbi.pmc.dtdanalyzer.PMCTransformer.catalog",
+			       PARAMSKEY = "gov.ncbi.pmc.dtdanalyzer.PMCTransformer.params";
 
    public static void main ( String args [] ) {
       Source xml, xsl;
@@ -42,9 +42,9 @@ public class PMCTransformer {
 
       // Xsl and xml locations must have been set as system properties
       if ( xslName.length() == 0 || xmlName.length() == 0 ) {
-         System.err.println("The system properties pmctools.PMCTransformer.xml and/or pmctools.PMCTransformer.xsl are not set.");
+         System.err.println("The system properties gov.ncbi.pmc.dtdanalyzer.PMCTransformer.xml and/or gov.ncbi.pmc.dtdanalyzer.PMCTransformer.xsl are not set.");
 	 System.err.println("Typical invocation:");
-	 System.err.println("   java -Dpmctools.PMCTransformer.xml=file.xml -Dpmctools.PMCTransformer.xsl=file.xsl [-DpmcTools.PMCTransformer.catalog=catolog.xml -Dpmctools.PMCTransformer.params=name1::value1;name2::value2] pmctools.PMCTransformer");
+	 System.err.println("   java -Dgov.ncbi.pmc.dtdanalyzer.PMCTransformer.xml=file.xml -Dgov.ncbi.pmc.dtdanalyzer.PMCTransformer.xsl=file.xsl [-Dgov.ncbi.pmc.dtdanalyzer.PMCTransformer.catalog=catolog.xml -Dgov.ncbi.pmc.dtdanalyzer.PMCTransformer.params=name1::value1;name2::value2] gov.ncbi.pmc.dtdanalyzer.PMCTransformer");
 	 System.exit(1);
       } // if
 
