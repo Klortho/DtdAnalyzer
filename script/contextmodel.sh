@@ -16,7 +16,7 @@ if [ ! $2 ]
 fi
 
 java -Dorg.xml.sax.driver=org.apache.xerces.parsers.SAXParser \
-  pmctools.ElementContextApplication $1 $cat
+  gov.ncbi.pmc.dtdanalyzer.ElementContextApplication $1 $cat
 
 #java -classpath /pmc/JAVA/pmctools/pmctools.jar:$CLASSPATH \
 #  -Dorg.xml.sax.driver=org.apache.xerces.parsers.SAXParser pmctools.ElementContextApplication $1 $cat

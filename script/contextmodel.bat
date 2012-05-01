@@ -13,5 +13,5 @@ rem fi
 rem Catalog not working under Windows yet.
 set CAT=M:\JATS\Sourceforge-nlm-jats\trunk\jatspacks\catalog.xml
 
-java -Dorg.xml.sax.driver=org.apache.xerces.parsers.SAXParser pmctools.ElementContextApplication %1 %CAT%
+java -Dorg.xml.sax.driver=org.apache.xerces.parsers.SAXParser gov.ncbi.pmc.dtdanalyzer.ElementContextApplication %1 %CAT%
 
