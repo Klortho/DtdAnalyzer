@@ -3,6 +3,7 @@ all: clean bin doc t
 clean:
 	-rm -r doc
 	-rm -r bin
+	-rm test/*.model.xml
 
 bin:
 	-mkdir bin
