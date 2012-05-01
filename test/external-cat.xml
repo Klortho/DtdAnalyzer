@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This sample requires the use of a catalog (test-catalog.xml) to resolve the DTD, since the 
+  system identifier points to nothing.
+-->
+<!DOCTYPE banana PUBLIC "-//NLM//external dtd dummy public id//EN" "doesnt-exist.dtd">
+  
+
+<banana/>

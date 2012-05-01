@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This sample does not need a catalog to resolve the external DTD, since the system identifier
+  is correct.
+-->
+<!DOCTYPE banana SYSTEM "external.dtd">
+  
+
+<banana/>
