@@ -50,6 +50,11 @@ and uses make.  Here are the contents:
 
   - test/*.xml - a few samples files
 
+<h2>Dependencies</h2>
+
+This utility is dependent on the <a href='http://xerces.apache.org/xerces2-j/'>Apache
+Xerces2 Java parser</a>, version 2.4.0 or later.
+
 <h2>Public domain</h2>
 
 This work is in the public domain and may be used and reproduced without special permission.
