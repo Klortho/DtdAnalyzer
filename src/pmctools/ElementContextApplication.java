@@ -22,8 +22,8 @@ public class ElementContextApplication {
     try {
       if (args.length < 2) {
         System.err.println("Need two arguments. Usage: java ElementContextApplication [xml instance] [xml catalog]");
-	System.exit(1);
-      } // if
+        System.exit(1);
+      }
       
       XMLReader parser = XMLReaderFactory.createXMLReader();
       PMCResolver resolver = new PMCResolver(args[1]); // Command line argument points to catalog location
