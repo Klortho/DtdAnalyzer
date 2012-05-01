@@ -50,3 +50,6 @@ and uses make.  Here are the contents:
 
   - test/*.xml - a few samples files
 
+<h2>Public domain</h2>
+
+This work is in the public domain and may be used and reproduced without special permission.
