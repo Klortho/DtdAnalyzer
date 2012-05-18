@@ -55,6 +55,11 @@ and uses make.  Here are the contents:
 This utility is dependent on the <a href='http://xerces.apache.org/xerces2-j/'>Apache
 Xerces2 Java parser</a>, version 2.4.0 or later.
 
+<h2>Discussion forum / mailing list</h2>
+
+Please join the <a href='http://dtdanalyzer.25130.n6.nabble.com/'>discussion forum / mailing 
+list</a> on Nabble.
+
 <h2>Public domain</h2>
 
 This work is in the public domain and may be used and reproduced without special permission.
