@@ -57,8 +57,8 @@ Xerces2 Java parser</a>, version 2.4.0 or later.
 
 <h2>Discussion forum / mailing list</h2>
 
-Please join the <a href='http://dtdanalyzer.25130.n6.nabble.com/'>discussion forum / mailing 
-list</a> on Nabble.
+Please join the <a href='https://groups.google.com/d/forum/dtdanalyzer'>DtdAnalyzer Google group</a>
+for discussions.
 
 <h2>Public domain</h2>
 
