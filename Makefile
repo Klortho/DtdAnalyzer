@@ -7,10 +7,11 @@ clean:
 
 bin:
 	-mkdir bin
-	javac -d bin src/pmctools/*.java
+	javac -d bin src/gov/ncbi/pmc/dtdanalyzer/*.java
 
 doc:
-	javadoc -d doc src/pmctools/*.java
+	javadoc -d doc src/gov/ncbi/pmc/dtdanalyzer/*.java
 
 t:
 	cd test; contextmodel.sh jats-auth-2.3.xml > jats-auth-2.3.model.xml
+
