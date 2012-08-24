@@ -1,0 +1,77 @@
+<!-- ** declarations ** -->
+<!-- Root element -->
+<!ELEMENT declarations (elements, attributes?, parameterEntities?, generalEntities?)>
+
+<!-- ** elements ** -->
+<!-- Wraps all element information -->
+<!ELEMENT elements (element+)>
+
+<!-- ** attributes ** -->
+<!-- Wraps all attribute information information -->
+<!ELEMENT attributes (attribute+)>
+
+<!-- ** parameterEntities ** -->
+<!-- Wraps all parameter entity information -->
+<!ELEMENT parameterEntities (entity+)>
+
+<!-- ** generalEntities ** -->
+<!-- Wraps all general entity (those entities that are not parameter entity) information -->
+<!ELEMENT generalEntities (entity+)>
+
+<!-- ** element ** -->
+<!-- Information about a single element declaration. This does not contain any attribute
+information as attributes are declared separately. An element may not have a context if, 
+for example, it is a root element or its declaration is never used inside another element in a DTD -->
+<!ELEMENT element (declaredIn, context?)>
+<!ATTLIST element 
+   name CDATA #REQUIRED
+   model CDATA #REQUIRED     
+   dtdOrder CDATA #REQUIRED>
+
+<!-- ** attribute ** -->
+<!-- Wrapper for all attributes of a given name; content of this element
+indicates where attributes are declared. -->
+<!ELEMENT attribute (attributeDeclaration+)>
+<!ATTLIST attribute name CDATA #REQUIRED>
+
+<!-- ** attributeDeclaration ** -->
+<!-- Information about a specific attribute declaration in an element -->
+<!ELEMENT attributeDeclaration (declaredIn)>
+<!ATTLIST attributeDeclaration
+   element CDATA #REQUIRED
+   mode CDATA #IMPLIED
+   type CDATA #REQUIRED
+   defaultValue CDATA #IMPLIED>
+
+<!-- ** entity ** -->
+<!-- Information about an entity declaration. Parameter Entities will be children of the
+parameterEntities element, while general entities will be children of generalEntities.
+@systemId and @publicId will only be set for external entities. -->
+<!ELEMENT entity (declaredIn, value?)>
+<!ATTLIST entity
+   name CDATA #REQUIRED
+   systemId CDATA #IMPLIED
+   publicId CDATA #IMPLIED>
+
+<!-- ** value ** -->
+<!-- Holds value of an entity -->
+<!ELEMENT value (#PCDATA)>
+
+<!-- ** declaredIn ** -->
+<!-- Location information indicates where a declaration occured inside a DTD. The @systemId is the 
+filename of the DTD, while the @publicId is an optional "logical" name for the file. @lineNumber
+is the line number where the the declaration was completed. -->
+<!ELEMENT declaredIn EMPTY>
+<!ATTLIST declaredIn
+   systemId CDATA #REQUIRED
+   publicId CDATA #IMPLIED
+   lineNumber CDATA #REQUIRED>
+   
+<!-- ** context ** -->
+<!-- Wraps the list of parent element names -->
+<!ELEMENT context (parent+)>
+
+<!-- ** parent ** -->
+<!-- Name of a parent element -->
+<!ELEMENT parent EMPTY>
+<!ATTLIST parent name CDATA #REQUIRED>
