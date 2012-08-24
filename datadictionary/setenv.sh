@@ -10,5 +10,6 @@ CLASSPATH=$CLASSPATH:/pmc/JAVA/xmlsh_1_1_7/lib/xercesImpl.jar
 CLASSPATH=$CLASSPATH:/pmc/JAVA/jing-20030619/bin/xml-apis.jar
 export CLASSPATH
 
+export PATH=$PROJ_HOME/script:$PATH
 
 
