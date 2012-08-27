@@ -4,7 +4,7 @@
  * Created on November 9, 2005, 3:36 PM
  */
 
-package gov.pubmedcentral.dtd.documentation;
+package gov.ncbi.pmc.dtdanalyzer;
 
 /**
  * Records where a declaration appears inside a DTD file. The public id

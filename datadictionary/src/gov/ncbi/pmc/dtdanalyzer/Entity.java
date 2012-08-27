@@ -4,7 +4,7 @@
  * Created on November 14, 2005, 11:58 AM
  */
 
-package gov.pubmedcentral.dtd.documentation;
+package gov.ncbi.pmc.dtdanalyzer;
 
 /**
  * Holds all the information associated with an entity declaration in the DTD. Class

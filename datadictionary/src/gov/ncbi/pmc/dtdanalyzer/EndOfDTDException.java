@@ -4,7 +4,7 @@
  * Created on November 14, 2005, 1:55 PM
  */
 
-package gov.pubmedcentral.dtd.documentation;
+package gov.ncbi.pmc.dtdanalyzer;
 
 /**
  * Signals that the parser has reached the end of the DTD

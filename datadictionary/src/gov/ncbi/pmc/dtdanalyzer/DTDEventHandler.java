@@ -4,7 +4,7 @@
  * Created on November 9, 2005, 2:03 PM
  */
 
-package gov.pubmedcentral.dtd.documentation;
+package gov.ncbi.pmc.dtdanalyzer;
 
 import org.xml.sax.*;
 import org.xml.sax.ext.*;

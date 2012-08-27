@@ -4,7 +4,7 @@
  * Created on November 14, 2005, 5:25 PM
  */
 
-package gov.pubmedcentral.dtd.documentation;
+package gov.ncbi.pmc.dtdanalyzer;
 
 import java.util.*;
 import java.net.*;

@@ -4,7 +4,7 @@
  * Created on November 23, 2005, 9:04 AM
  */
 
-package gov.pubmedcentral.xml.parser;
+package gov.ncbi.pmc.xml;
 
 import java.util.HashMap;
 import org.xml.sax.InputSource;
