@@ -9,61 +9,109 @@ of an XML DTD.
 
     java -jar dtdanalyzer.jar [xml] [xsl] [output] {optional: catalog}
 
+or
+
     java gov.ncbi.pmc.dtdanalyzer.Application  [xml] [xsl] [output] {optional: catalog}
 
 Where:
-   xml     = xml instance filename
-   xsl     = xsl instance
-   output  = file to which output will be written
-   catalog = OASIS catalog for entity resolution
+* xml     = xml instance filename
+* xsl     = xsl instance
+* output  = file to which output will be written
+* catalog = OASIS catalog for entity resolution
 
 This generates an XML representation of the DTD specified in the DOCTYPE declaration
 in the XML instance file.
 
 <h2>XML Structure</h2>
 
-    elements
-        element+
-            @name @dtdOrder @model @note @modelNote @group
-        attributes?
-            attribute+
-                @attName @mode @type [content is the attribute value]
-        context
-            parent*
+The format of the output of this tool is defined in etc/dtd-information.dtd, and summarized
+here:  [Question:  why not document this DTD using the tool reflexively?]
 
-<h2>Development environment</h2>
+  declarations
+    elements
+      element+
+        @name
+        @dtdOrder
+        @model
+        declaredIn
+        context?
+          parent+
+            @name
+    attributes?
+      attribute+
+        @name
+        attributeDeclaration
+          @element
+          @mode
+          @type
+          @defaultValue
+          declaredIn
+            @systemId
+            @publidId
+            @lineNumber
+    parameterEntities?
+      entity+
+        @name
+        @systemId
+        @publicId
+        declaredIn - [see above]
+        value?
+    generalEntities?
+      entity+ - [see above]
+
+<h2>Development environment / getting started</h2>
 
 The development environment for this project is very rudimentary at present,
-and uses make.  Here are the contents:
+and uses make.  To use the scripts that come with the package, first set the
+environment variable $DTDANALYZER_HOME to the root of the git repository.
+For example (Unix):
 
-  - Makefile - targets are:
+  git clone git://github.com/Klortho/DtdAnalyzer.git
+  cd DtdAnalyzer
+  export DTDANALZER_HOME=`pwd`
 
-        * all - default target, everything below.
-        * clean - deletes intermediate files
-        * build - compiles all .java → .class; results go into 'class' directory
-        * doc - builds javadocs; puts results into 'doc'
-        * t - runs the script over the test file in the 'test' directory
+Next, set up your environment using either the
+setenv.sh or setenv.bat scripts in the scripts directory.  On Unix,
 
-  - setenv.sh - sets up PATH and CLASSPATH to point to the (hard-coded) development
-    directories
+  . script/setenv.sh
 
-  - bin - directory containing the script contextmodel.sh
+On Windows,
 
-  - src/pmctools/*.java - the Java source files
+  script\setenv
 
-  - test/*.xml - a few samples files
+Next, you'll want to download all the dependencies into the lib directory.  This
+script is only available for Unix.  On Windows, you'll have to do it manually.
+
+  getlibs.sh
+
+See below for a list of the dependencies.
+
+To build the project, use make.  The Makefile targets are:
+* all - default target, everything below.
+* clean - deletes intermediate files
+* bin - compiles all .java → .class; results go into 'class' directory
+* doc - builds javadocs; puts results into 'doc'
+* t - runs the script over the test file in the 'test' directory
+
+To run, from the test directory, for example,
+
+  dtdanalyzer.sh archiving-3.0.xml ../xslt/identity.xsl out.xml
+
 
 <h2>Dependencies</h2>
 
-The following jar files are required.  If you execute this as a jar file (with the "-jar"
-option) then these need to be in the same directory as the datadictionaryapplication.jar.
-  - resolver.jar
-  - saxon.jar
-  - xercesImpl.jar
-  - xml-apis.jar
+The following jar files are required.  You can use the script getlibs.sh to download and
+unpack these, if you like.
 
-This utility is dependent on the <a href='http://xerces.apache.org/xerces2-j/'>Apache
-Xerces2 Java parser</a>, version 2.4.0 or later.
+* Apache XML commons resolver, version 1.2
+  * resolver.jar
+
+* Apache Xerces2 Java parser, version 2.11.0
+  * xml-apis.jar
+  * xercesImpl.jar
+
+* Saxon Home Edition, version 6.5.5
+  * saxon.jar
 
 <h2>Discussion forum / mailing list</h2>
 
