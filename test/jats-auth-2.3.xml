@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE article PUBLIC "-//NLM//DTD Article Authoring DTD v2.3 20070202//EN"
-                  "../dtd/articleauthoring.dtd">
+                  "http://dtd.nlm.nih.gov/articleauthoring/2.3/articleauthoring.dtd">
 
 <!--
   This is a sample file for authoring/2.3.  Except for this comment, it is the
@@ -9,7 +9,7 @@
 
 <article>
 <!-- SYSTEM:  Archiving and Interchange DTD Suite    -->
-<!-- November 2002 An archival journal article with minimal 
+<!-- November 2002 An archival journal article with minimal
 Front Matter, a Table, and Citations for testing         -->
 <!-- =============== Front Matter (Metadata) =========== -->
 <front>
@@ -67,7 +67,7 @@ Table Wrapper %lt;table-wrap&gt; wrapper.</p>
 </tr>
 <tr>
 <td>2 A cell!</td>
-<td>An xref: <xref ref-type="statement" rid="statement16">See the 
+<td>An xref: <xref ref-type="statement" rid="statement16">See the
 statement</xref></td>
 <td>2 Still a third&gt;</td>
 </tr>
@@ -80,7 +80,7 @@ statement</xref></td>
 <p>The IDREFs need to point to something</p>
 </statement>
 <statement id="statement15">
-<p>No Matter How Wise You Get, Wet Birds Don't 
+<p>No Matter How Wise You Get, Wet Birds Don't
 Fly at Night</p>
 </statement>
 <statement id="statement16">
@@ -95,21 +95,21 @@ Fly at Night</p>
 <title>Bibliography</title>
 <p>Just a reference or two for testing:</p>
 <ref>
-<citation>A citation ain't nothing but a 
-sandwich &mdash; personal communication 
+<citation>A citation ain't nothing but a
+sandwich &mdash; personal communication
 </citation>
 </ref>
 <ref>
 <citation>
 <name>
-<surname>Piggy</surname> 
+<surname>Piggy</surname>
 <prefix>Ms.</prefix></name>
-<article-title>Can't Help Lovin&rsquo; That 
+<article-title>Can't Help Lovin&rsquo; That
 Frog of Mine</article-title>;
 <source>Swine Review</source>, <issue>145</issue>:
-<fpage>12</fpage>&ndash;<lpage>24</lpage>; 
-<year>2003</year>. 
-<trans-title xml:lang="x-PigLatin">Ant-cay Elp-hay 
+<fpage>12</fpage>&ndash;<lpage>24</lpage>;
+<year>2003</year>.
+<trans-title xml:lang="x-PigLatin">Ant-cay Elp-hay
 Ovin&rsquo;-lay At-thay Og-fray of-ay Ine-may</trans-title>
 </citation>
 </ref>

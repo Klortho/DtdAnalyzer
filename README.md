@@ -29,43 +29,6 @@ Where:
 This generates an XML representation of the DTD specified in the DOCTYPE declaration
 in the XML instance file.
 
-<h2>XML Structure</h2>
-
-The format of the output of this tool is defined in etc/dtd-information.dtd, and summarized
-here:  [Question:  why not document this DTD using the tool reflexively?]
-
-    declarations
-        elements
-            element+
-                @name
-                @dtdOrder
-                @model
-                declaredIn
-                context?
-                    parent+
-                        @name
-        attributes?
-            attribute+
-                @name
-                attributeDeclaration
-                    @element
-                    @mode
-                    @type
-                    @defaultValue
-                    declaredIn
-                        @systemId
-                        @publidId
-                        @lineNumber
-        parameterEntities?
-            entity+
-                @name
-                @systemId
-                @publicId
-                declaredIn - [see above]
-                value?
-        generalEntities?
-            entity+ - [see above]
-
 <h2>Development environment / getting started</h2>
 
 The development environment for this project is very rudimentary at present,
@@ -104,6 +67,43 @@ To build the project, use make.  The Makefile targets are:
 To run, from the test directory, for example,
 
     dtdanalyzer.sh archiving-3.0.xml ../xslt/identity.xsl out.xml
+
+<h2>Output format</h2>
+
+The format of the output of this tool is defined in etc/dtd-information.dtd, and summarized
+here:  [Question:  why not document this DTD using the tool reflexively?]
+
+    declarations
+        elements
+            element+
+                @name
+                @dtdOrder
+                @model
+                declaredIn
+                context?
+                    parent+
+                        @name
+        attributes?
+            attribute+
+                @name
+                attributeDeclaration
+                    @element
+                    @mode
+                    @type
+                    @defaultValue
+                    declaredIn
+                        @systemId
+                        @publidId
+                        @lineNumber
+        parameterEntities?
+            entity+
+                @name
+                @systemId
+                @publicId
+                declaredIn - [see above]
+                value?
+        generalEntities?
+            entity+ - [see above]
 
 
 <h2>Dependencies</h2>
