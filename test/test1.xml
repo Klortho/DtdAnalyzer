@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This sample tests various features of the DtdAnalyzer.
+-->
+<!DOCTYPE root SYSTEM "test1.dtd">
+  
+
+<root>
+  <empty></empty>
+  <empty/>
+
+  <pcdata>Jackdaws love my big sphinx of quartz.</pcdata>
+  
+  <mixed><empty/>Jackdaws love my big sphinx of <pcdata>quartz</pcdata>.</mixed>
+  
+  <choice1>
+    <chapter/><appendix/><appendix/><chapter/> 
+  </choice1>
+  <choice2><chapter/></choice2>
+  <choice2><appendix/></choice2>
+  <choice3/>
+  <choice4><chapter/></choice4>
+  <choice4>
+    <choice1><chapter/></choice1>
+    <choice2/>
+    <choice1><appendix/></choice1>
+  </choice4>
+  
+  <seq1><chapter/><chapter/><appendix/></seq1>
+  <seq2><chapter/><chapter/><choice2/><seq1><chapter/><appendix/></seq1></seq2>
+</root>

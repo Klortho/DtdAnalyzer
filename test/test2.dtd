@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT foo1    ANY   >
+
+<!--
+<content-model spec='any'
+               orig='ANY'
+               pretty='ANY'/>
+-->
+
+<!ELEMENT foo2   EMPTY  >
+
+<!--
+<content-model spec='empty'
+               orig='EMPTY'
+               pretty='EMPTY'/>
+-->
+
+
+<!ELEMENT foo3 (#PCDATA)>
+
+<!--
+<content-model spec='text'
+               orig='(#PCDATA)'
+               pretty='( #PCDATA )'/>
+-->
+
+
+<!ELEMENT foo4 (#PCDATA  | day |month)*>
+
+<!--
+<content-model spec='mixed'
+               orig='(#PCDATA|day|month)*'
+               pretty='( #PCDATA | day | month )*'>
+  <mixed>
+    <element>day</element>
+    <element>month</element>
+  </mixed>
+</content-model>
+-->
+
+
+<!ELEMENT foo5 (chapter|appendix)+>
+
+<!--
+<content-model spec='element'  
+               orig='(chapter|appendix)+'
+               pretty='( chapter | appendix )+'>
+  <choice q='+'>
+    <element>chapter</element>
+    <element>year</element>
+  </choice>
+</content-model>
+-->
+
+
+<!ELEMENT foo6 (chapter+|(section+|appendix?|glossary)+)>
+
+<!--
+<content-model spec='element'  
+               orig='(chapter+|(section+|appendix?|glossary)+)'
+               pretty='( chapter+ | ( section+ | appendix? | glossary )+ )'>
+  <choice>
+    <element q='+'>chapter</element>
+    <choice q='+'>
+      <element q='+'>section</element>
+      <element q='?'>appendix</element>
+      <element>glossary</element>
+    </choice>
+  </choice>
+</content-model>
+-->
+
+
+<!ELEMENT foo7 (abstract?,(intro|preface),section+)?>
+
+<!--
+<content-model spec='element'  
+               orig='(abstract?,(intro|preface),section+)?'
+               pretty='( abstract?, ( intro | preface ), section+ )?'>
+  <seq q='?'>
+    <element q='?'>abstract</element>
+    <choice>
+      <element>intro</element>
+      <element>preface</element>
+    </choice>
+    <element q='+'>section</element>
+  </seq>
+</content-model>
+-->
+
+<!ELEMENT foo8 (a)>
+
+<!--
+Note that a choice of one is the same as a sequence of one.  So we
+arbitrarily choose <choice> in this case.
+  
+<content-model spec='element' 
+               orig='(a)'
+               pretty='( a )'>
+  <choice>
+    <element>a</element>
+  </choice>
+</content-model>
+-->
+
+<!ELEMENT foo9 (a|(b+ , ( c   |  d ))? )? >
+
+<!-- 
+<content-model spec="element" orig="(a|(b+,(c|d))?)?">
+  <choice q="?">
+    <element>a</element>
+    <seq q="?">
+      <element q="+">b</element>
+      <choice>
+        <element>c</element>
+        <element>d</element>
+      </choice>
+    </seq>
+  </choice>
+</content-model>
+-->
+
+
+
+
+
+<!ELEMENT day EMPTY >
+<!ELEMENT month EMPTY >
+<!ELEMENT chapter EMPTY >
+<!ELEMENT appendix EMPTY >
+<!ELEMENT section EMPTY >
+<!ELEMENT glossary EMPTY >
+<!ELEMENT abstract EMPTY >
+<!ELEMENT intro EMPTY >
+<!ELEMENT preface EMPTY >
+
