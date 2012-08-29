@@ -3,39 +3,37 @@
 <!ELEMENT foo1    ANY   >
 
 <!--
-<content-model spec='any'
-               orig='ANY'
-               pretty='ANY'/>
+<content-model spec="any" 
+               minified="ANY" 
+               spaced="ANY"/>
 -->
 
 <!ELEMENT foo2   EMPTY  >
 
 <!--
-<content-model spec='empty'
-               orig='EMPTY'
-               pretty='EMPTY'/>
+<content-model spec="empty" 
+               minified="EMPTY" 
+               spaced="EMPTY"/>
 -->
 
 
 <!ELEMENT foo3 (#PCDATA)>
 
 <!--
-<content-model spec='text'
-               orig='(#PCDATA)'
-               pretty='( #PCDATA )'/>
+<content-model spec="text" 
+               minified="(#PCDATA)" 
+               spaced="( #PCDATA )"/>
 -->
 
 
 <!ELEMENT foo4 (#PCDATA  | day |month)*>
 
 <!--
-<content-model spec='mixed'
-               orig='(#PCDATA|day|month)*'
-               pretty='( #PCDATA | day | month )*'>
-  <mixed>
-    <element>day</element>
-    <element>month</element>
-  </mixed>
+<content-model spec="mixed" 
+               minified="(#PCDATA|day|month)*" 
+               spaced="( #PCDATA | day | month )">
+  <child>day</child>
+  <child>month</child>
 </content-model>
 -->
 
@@ -43,12 +41,12 @@
 <!ELEMENT foo5 (chapter|appendix)+>
 
 <!--
-<content-model spec='element'  
-               orig='(chapter|appendix)+'
-               pretty='( chapter | appendix )+'>
-  <choice q='+'>
-    <element>chapter</element>
-    <element>year</element>
+<content-model spec="element" 
+               minified="(chapter|appendix)+" 
+               spaced="( chapter | appendix )+">
+  <choice q="+">
+    <child>chapter</child>
+    <child>appendix</child>
   </choice>
 </content-model>
 -->
@@ -57,15 +55,15 @@
 <!ELEMENT foo6 (chapter+|(section+|appendix?|glossary)+)>
 
 <!--
-<content-model spec='element'  
-               orig='(chapter+|(section+|appendix?|glossary)+)'
-               pretty='( chapter+ | ( section+ | appendix? | glossary )+ )'>
+<content-model spec="element" 
+               minified="(chapter+|(section+|appendix?|glossary)+)"
+               spaced="( chapter+ | ( section+ | appendix? | glossary )+ )">
   <choice>
-    <element q='+'>chapter</element>
-    <choice q='+'>
-      <element q='+'>section</element>
-      <element q='?'>appendix</element>
-      <element>glossary</element>
+    <child q="+">chapter</child>
+    <choice q="+">
+      <child q="+">section</child>
+      <child q="?">appendix</child>
+      <child>glossary</child>
     </choice>
   </choice>
 </content-model>
@@ -75,16 +73,16 @@
 <!ELEMENT foo7 (abstract?,(intro|preface),section+)?>
 
 <!--
-<content-model spec='element'  
-               orig='(abstract?,(intro|preface),section+)?'
-               pretty='( abstract?, ( intro | preface ), section+ )?'>
-  <seq q='?'>
-    <element q='?'>abstract</element>
+<content-model spec="element" 
+               minified="(abstract?,(intro|preface),section+)?"
+               spaced="( abstract?, ( intro | preface ), section+ )?">
+  <seq q="?">
+    <child q="?">abstract</child>
     <choice>
-      <element>intro</element>
-      <element>preface</element>
+      <child>intro</child>
+      <child>preface</child>
     </choice>
-    <element q='+'>section</element>
+    <child q="+">section</child>
   </seq>
 </content-model>
 -->
@@ -95,11 +93,11 @@
 Note that a choice of one is the same as a sequence of one.  So we
 arbitrarily choose <choice> in this case.
   
-<content-model spec='element' 
-               orig='(a)'
-               pretty='( a )'>
+<content-model spec="element" 
+               minified="(a)" 
+               spaced="( a )">
   <choice>
-    <element>a</element>
+    <child>a</child>
   </choice>
 </content-model>
 -->
@@ -107,14 +105,16 @@ arbitrarily choose <choice> in this case.
 <!ELEMENT foo9 (a|(b+ , ( c   |  d ))? )? >
 
 <!-- 
-<content-model spec="element" orig="(a|(b+,(c|d))?)?">
+<content-model spec="element" 
+               minified="(a|(b+,(c|d))?)?" 
+               spaced="( a | ( b+, ( c | d ) )? )?">
   <choice q="?">
-    <element>a</element>
+    <child>a</child>
     <seq q="?">
-      <element q="+">b</element>
+      <child q="+">b</child>
       <choice>
-        <element>c</element>
-        <element>d</element>
+        <child>c</child>
+        <child>d</child>
       </choice>
     </seq>
   </choice>
