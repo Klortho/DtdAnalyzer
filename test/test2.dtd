@@ -121,6 +121,7 @@ arbitrarily choose <choice> in this case.
 </content-model>
 -->
 
+<!ELEMENT foo10 ( a, (b|c), a+, (d|a) )>
 
 
 
