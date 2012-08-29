@@ -158,11 +158,11 @@ public class Application {
     * Outputs usage message
     */
    public static void showUsage(){
-       System.err.println("Usage: java gov.ncbi.pmc.dtdanalyzer.Application [xml] [xsl] [output location] {optional: catalog}");
+       System.err.println("Usage: java gov.ncbi.pmc.dtdanalyzer.Application [xml] [xsl] [output] {catalog}");
        System.err.println("   where:");
        System.err.println("   xml = path to xml instance");
        System.err.println("   xsl = path to xsl stylesheet");
-       System.err.println("   output location = filename for output");
+       System.err.println("   output = filename for output");
        System.err.println("   catalog = optional parameter specifying location of OASIS catalog for DTD lookup.");
        System.err.println("             If no catalog is specified, then all DTDs will be located based on the system id in the instance.");
    }

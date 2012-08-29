@@ -135,7 +135,7 @@ public class ModelBuilder {
         ElementIterator elit = elements.getElementIterator();        
         while ( elit.hasNext() ){
             Element el = elit.next();
-            parseModel(el.getName(), el.getModel());
+            parseModel(el.getName(), el.getMinifiedModel());
         } // while        
     }
 }

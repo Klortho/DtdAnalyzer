@@ -302,13 +302,124 @@ public class XMLWriter {
      */
     private void writeElementInfo( Element e ){               
         openStartTag("element");
-        makeAttribute("name", e.getName());
-        makeAttribute("model", e.getModel());
-        makeAttribute("dtdOrder", Integer.toString(e.getDTDOrder()));
-        closeStartTag();                
-        writeDeclaredInInfo( e.getLocation() );  
-        writeContextInfo(model.getContext(e.getName()));        
+          makeAttribute("name", e.getName());
+          makeAttribute("dtdOrder", Integer.toString(e.getDTDOrder()));
+        closeStartTag();
+          writeDeclaredInInfo( e.getLocation() );  
+          writeContentModel( e.getContentModel() );
+          writeContextInfo(model.getContext(e.getName()));        
         makeEndTag("element");                
+    }
+    
+    /**
+     * Creates the "content-model" element
+     */
+    private void writeContentModel(ContentModel cm) {
+        openStartTag("content-model");
+          makeAttribute("spec", cm.getSpec());
+          makeAttribute("minified", cm.getMinifiedModel());
+          makeAttribute("spaced", makeSpacedModel(cm));
+        closeStartTag();
+
+        String spec = cm.getSpec();
+        if (spec.equals("mixed")) {
+            Iterator kids = cm.getKids().iterator();
+            while (kids.hasNext()) {
+                String kid = (String) kids.next();
+                buffer.write("<child>" + kid + "</child>");
+            }
+        }
+        else if (spec.equals("element")) {
+            NameChoiceSeq cs = cm.getChoiceOrSeq();
+            writeNameChoiceSeq(cs);
+        }
+        makeEndTag("content-model");
+    }
+
+    /**
+     * Constructs the @spaced version of the content model, for pretty-printing.
+     */
+    private String makeSpacedModel(ContentModel cm) {
+        String spec = cm.getSpec();
+        
+        String sm;
+        if (spec.equals("any") || spec.equals("empty")) {
+            sm = cm.getMinifiedModel();
+        }
+        else if (spec.equals("text")) {
+            sm = "( #PCDATA )";
+        }
+        else if (spec.equals("mixed")) {
+            sm = "( #PCDATA | ";
+            Iterator kids = cm.getKids().iterator();
+            while (kids.hasNext()) {
+                String kid = (String) kids.next();
+                sm += kid + " ";
+                if (kids.hasNext()) sm += "| ";
+            }
+            sm += ")";
+        }
+        else {  // element content
+            sm = makeSpacedModel(cm.getChoiceOrSeq());
+        }
+        return sm;
+    }
+    
+    /**
+     * Constructs the spaced-model version specifically for a name, choice, or sequence,
+     * within 'element' type content models.
+     */
+    private String makeSpacedModel(NameChoiceSeq cs) {
+        String sm;
+        int type = cs.getType();
+        if (type == 0) {   // name
+            sm = cs.getName();
+        }
+        else {
+            sm = "( ";
+            Iterator kids = cs.getKids().iterator();
+            while (kids.hasNext()) {
+                NameChoiceSeq kid = (NameChoiceSeq) kids.next();
+                sm += makeSpacedModel(kid);
+                if (kids.hasNext()) {
+                    if (type == 1) sm += " | ";
+                    else sm += ", ";
+                }
+            }
+            sm += " )";
+        }
+        
+        // Add the qualifier if there is one.
+        sm += cs.getQ();
+        return sm;
+    }
+    
+    /**
+     * Creates either an <element>, <choice>, or <seq>, in the detailed
+     * content-model section.  Recurses through the children.
+     */
+    private void writeNameChoiceSeq(NameChoiceSeq cs) {
+        int type = cs.getType();
+        String q = cs.getQ();
+        String tagName = (type == 0) ? "child" :
+                         (type == 1) ? "choice" :
+                                       "seq";
+        openStartTag(tagName);
+          if (!q.equals("")) {
+              makeAttribute("q", q);
+          }
+        closeStartTag();
+        if (type == 0) {
+            buffer.write(cs.getName());
+        }
+        else {
+            Iterator kids = cs.getKids().iterator();
+            while (kids.hasNext()) {
+                NameChoiceSeq kid = (NameChoiceSeq) kids.next();
+                writeNameChoiceSeq(kid);
+            }
+        }
+        makeEndTag(tagName);
     }
 
     /**

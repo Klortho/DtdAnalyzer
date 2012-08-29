@@ -87,10 +87,11 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
      *
      * @throws SAXException Indicates problem occurred during processing */    
     public void startDocument() throws org.xml.sax.SAXException {
+        //System.out.println("startDocument\n");
         allAttributes = new Attributes();
         allElements = new Elements();  
         allEntities = new Entities();
-        numOfElements = 0;        
+        numOfElements = 0;       
     }
 
     /**

@@ -20,10 +20,10 @@ import java.util.*;
  */
 public class Element {
     
-    private String name = null;                   // Element name
-    private String model = null;                  // Content model
-    private int dtdOrder = 0;                     // Order declared in the DTD
-    private Location location;                    // Location inside the DTD
+    private String name = null;     // Element name
+    private ContentModel cmodel;    // Content model
+    private int dtdOrder = 0;       // Order declared in the DTD
+    private Location location;      // Location inside the DTD
     
     /**
      * Creates a new instance of the class
@@ -34,7 +34,7 @@ public class Element {
      */    
     public Element( String eName, String eModel, int order ){
        name = eName;
-       model = eModel;
+       cmodel = new ContentModel(eModel);
        dtdOrder = order;
     }
     
@@ -58,11 +58,20 @@ public class Element {
     }      
     
     /**
-     * Returns the content model for the element declaration
+     * Returns the ContentModel object associated with this element definition.
      *
-     * @return  Content model */    
-    public String getModel(){
-        return model;
+     * @return Content model object
+     */
+    public ContentModel getContentModel() {
+        return cmodel;
+    }
+
+    /**
+     * Returns the minified content model string for the element declaration
+     *
+     * @return  Content model string */    
+    public String getMinifiedModel(){
+        return cmodel.getMinifiedModel();
     }
     
     /**
@@ -82,5 +91,6 @@ public class Element {
      */    
     public void setLocation( Location loc ){
         location = loc;
-    }    
+    }
+    
 }
