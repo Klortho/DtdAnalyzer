@@ -1,5 +1,5 @@
-# This script should be sourced while the current working directory is
-# the directory in which this resides.
+# This script sets up the environment for working with the DtdAnalyzer.
+# It assumes you have set the environment variable DTDANALYZER_HOME.
 
 if [ "x$DTDANALYZER_HOME" = "x" ] ; then
   echo Please set the DTDANALYZER_HOME environment variable to the project home, and try again.
