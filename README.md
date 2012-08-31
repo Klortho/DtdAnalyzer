@@ -1,35 +1,52 @@
-﻿<h1>DtdAnalyzer</h1>
+﻿#DtdAnalyzer
 
-<h2>Overview</h2>
+##Overview
 
 This tool will create an XML representation (using elements and attributes)
 of an XML DTD.
 
-<h2>Usage</h2>
+##Usage
 
-Unix:
+*Note:  this is written up according to what the usage __will be__, not what it __is__.*
 
-    dtdanalyzer.sh [xml] [xsl] [output] {optional: catalog}
+Unix or Windows:
 
-Windows:
-
-    dtdanalyzer [xml] [xsl] [output] {optional: catalog}
+    dtdanalyzer [options] [<output file>]
 
 Or using Java directly:
 
-    java gov.ncbi.pmc.dtdanalyzer.Application  [xml] [xsl] [output] {optional: catalog}
+    java gov.ncbi.pmc.dtdanalyzer.Application [options]
 
+The options are all in the "long form", meaning they start with two dashes.  The list of
+possible options is
 
 Where:
-* xml     = xml instance filename
-* xsl     = xsl instance
-* output  = file to which output will be written
-* catalog = OASIS catalog for entity resolution
+* --xml [xml file] - Specify an XML file used to find the DTD.  This could be just a "stub"
+  file, that contains nothing other than the doctype declaration and a root element.  This
+  file doesn't need to be valid according to the DTD.
+* --system [system id of dtd] - Use the given system identifier to find the DTD.  This could
+  be a relative pathname, if the DTD exists in a file on your system, or an HTTP URL.
+* --public [public id of dtd] - Use the given public identifier to find the DTD.  This would
+  be used in conjunction with an OASIS catalog file.
+* --catalog [catalog file] - Specify a file to use as the OASIS catalog, to resolve public
+  identifiers
+* --xslt [xslt file] - An XSLT script to run to post-process the output.  This is optional.
+* <output file> - Name of the file to write the output to.  If this argument is not given,
+  the output is written to standard out.
 
-This generates an XML representation of the DTD specified in the DOCTYPE declaration
-in the XML instance file.
+One and only one of --xml, --system, or --public must be given, in order to specify the
+DTD to process.  The others are optional.
 
-<h2>Development environment / getting started</h2>
+##Examples
+
+Process the NISO JATS Journal Archiving and Interchange DTD, and write the output to a
+file:
+
+    dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
+      --out JATS-archivearticle1.daz.xml
+
+
+##Development environment / getting started
 
 The development environment for this project is very rudimentary at present,
 and uses make.  To use the scripts that come with the package, first set the
@@ -66,9 +83,9 @@ To build the project, use make.  The Makefile targets are:
 
 To run, from the test directory, for example,
 
-    dtdanalyzer.sh archiving-3.0.xml ../xslt/identity.xsl out.xml
+    dtdanalyzer --xml archiving-3.0.xml --xslt ../xslt/identity.xsl --out out.xml
 
-<h2>Output format</h2>
+##Output format
 
 The format of the output of this tool is defined in etc/dtd-information.dtd, and summarized
 here:  [Question:  why not document this DTD using the tool reflexively?]
@@ -106,7 +123,7 @@ here:  [Question:  why not document this DTD using the tool reflexively?]
             entity+ - [see above]
 
 
-<h2>Dependencies</h2>
+##Dependencies
 
 The following jar files are required.  You can use the script getlibs.sh to download and
 unpack these, if you like.
@@ -119,11 +136,11 @@ unpack these, if you like.
 * Saxon Home Edition, version 6.5.5
   * saxon.jar
 
-<h2>Discussion forum / mailing list</h2>
+##Discussion forum / mailing list
 
 Please join the <a href='https://groups.google.com/d/forum/dtdanalyzer'>DtdAnalyzer Google group</a>
 for discussions.
 
-<h2>Public domain</h2>
+##Public domain
 
 This work is in the public domain and may be used and reproduced without special permission.
