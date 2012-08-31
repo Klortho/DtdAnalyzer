@@ -31,7 +31,7 @@ Where:
 * --catalog [catalog file] - Specify a file to use as the OASIS catalog, to resolve public
   identifiers
 * --xslt [xslt file] - An XSLT script to run to post-process the output.  This is optional.
-* <output file> - Name of the file to write the output to.  If this argument is not given,
+* &lt;output file> - Name of the file to write the output to.  If this argument is not given,
   the output is written to standard out.
 
 One and only one of --xml, --system, or --public must be given, in order to specify the
