@@ -5,24 +5,23 @@
   for $attr in /declarations/attributes/attribute
       let $name := $attr/@name
       let $declarations := $attr/attributeDeclaration
-      let $decl1 := $declarations[1]
-      let $numMismatches := 
-          count(
-              for $declx in $declarations
-                  return 
-                      if ($decl1/@type != $declx/@type or
-                          $decl1/@mode != $declx/@mode) 
-                      then (1)
-                      else ()
-          )
+      let $declStrs := distinct-values(
+          for $d in $declarations
+          return concat("type = '", $d/@type, "'; mode = '", $d/@mode, "'")
+      )
+      let $numUniqueDecls := count($declStrs) 
       order by $name
       return 
-          if ($numMismatches != 0)
+          if ($numUniqueDecls != 1)
           then 
-            <span>
+            <div>
               <a href='{concat($docbase, $name)}'>{string($name)}</a>
-              has {$numMismatches} mismatches.<br/>
-            </span>
+              has {$numUniqueDecls} unique declarations:
+              <ul>{
+                for $d in $declStrs
+                return <li>{$d}</li>
+              }</ul>
+            </div>
           else ()
 }
 </body></html>
