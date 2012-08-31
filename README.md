@@ -83,7 +83,7 @@ To build the project, use make.  The Makefile targets are:
 
 To run, from the test directory, for example,
 
-    dtdanalyzer --xml archiving-3.0.xml --xslt ../xslt/identity.xsl --out out.xml
+    dtdanalyzer --xml archiving-3.0.xml --xslt ../xslt/identity.xsl out.xml
 
 ##Output format
 
