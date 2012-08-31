@@ -43,7 +43,7 @@ Process the NISO JATS Journal Archiving and Interchange DTD, and write the outpu
 file:
 
     dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
-      --out JATS-archivearticle1.daz.xml
+        JATS-archivearticle1.daz.xml
 
 
 ##Development environment / getting started
