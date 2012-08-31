@@ -13,5 +13,5 @@ doc:
 	javadoc -d doc src/gov/ncbi/pmc/dtdanalyzer/*.java
 
 t:
-	cd test; contextmodel.sh jats-auth-2.3.xml > jats-auth-2.3.model.xml
+	cd ../test; contextmodel.sh jats-auth-2.3.xml > jats-auth-2.3.cm.xml
 
