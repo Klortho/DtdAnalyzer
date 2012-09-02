@@ -9,33 +9,25 @@ of an XML DTD.
 
 *Note:  this is written up according to what the usage __will be__, not what it __is__.*
 
-Unix or Windows:
-
     dtdanalyzer [options] [<output file>]
 
-Or using Java directly:
+Each option has a short and a long form.   At least one option must be given that specifies
+the DTD that is to be processed; i.e. one of (-x | --xml), (-s | --system), or (-p | --public).
 
-    java gov.ncbi.pmc.dtdanalyzer.Application [options]
+The list of possible options and arguments is:
 
-The options are all in the "long form", meaning they start with two dashes.  The list of
-possible options is
-
-Where:
-* --xml [xml file] - Specify an XML file used to find the DTD.  This could be just a "stub"
+* -x | --xml *xml-file* - Specify an XML file used to find the DTD.  This could be just a "stub"
   file, that contains nothing other than the doctype declaration and a root element.  This
   file doesn't need to be valid according to the DTD.
-* --system [system id of dtd] - Use the given system identifier to find the DTD.  This could
+* -s | --system *system-id* - Use the given system identifier to find the DTD.  This could
   be a relative pathname, if the DTD exists in a file on your system, or an HTTP URL.
-* --public [public id of dtd] - Use the given public identifier to find the DTD.  This would
+* -p | --public *public-id* - Use the given public identifier to find the DTD.  This would
   be used in conjunction with an OASIS catalog file.
-* --catalog [catalog file] - Specify a file to use as the OASIS catalog, to resolve public
+* -c | --catalog *catalog-file* - Specify a file to use as the OASIS catalog, to resolve public
   identifiers
-* --xslt [xslt file] - An XSLT script to run to post-process the output.  This is optional.
+* -t | --xslt *xslt-file* - An XSLT script to run to post-process the output.  This is optional.
 * &lt;output file> - Name of the file to write the output to.  If this argument is not given,
   the output is written to standard out.
-
-One and only one of --xml, --system, or --public must be given, in order to specify the
-DTD to process.  The others are optional.
 
 ##Examples
 

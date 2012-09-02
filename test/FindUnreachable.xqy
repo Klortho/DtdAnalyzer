@@ -1,5 +1,5 @@
-let $elems := //element
-return
+let $elems := //element[not(annotations//tag="root")]
+return 
     if (exists($elems[content-model/@spec = "any"]))
     then ()
     else 
@@ -11,4 +11,3 @@ return
                 if (exists($sibs[contains(content-model/@minified, $name)]))
                 then ()
                 else $name
-
