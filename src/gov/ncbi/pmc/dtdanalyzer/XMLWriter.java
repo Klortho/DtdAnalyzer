@@ -18,11 +18,11 @@ import java.io.*;
  * @author  Demian Hess
  */
 public class XMLWriter {
-    /**
+    /* * cfm, removed this.
      * Location of the DTD used for declarations. This will be written into
      * each instance as an internal DTD.
      */
-    public final static String DTD_LOCATION="/gov/pubmedcentral/etc/dtd-information.dtd";
+    //public final static String DTD_LOCATION="/gov/pubmedcentral/etc/dtd-information.dtd";
     
     private ModelBuilder model;          // Holds all the model information
     private Elements elements;           // All element declarations
@@ -38,6 +38,7 @@ public class XMLWriter {
      */
     public XMLWriter(ModelBuilder mb) {
         // Retrieve the internal DTD
+      /* cfm, removed this - I hate DTDs!
         try{
             InputStream is = this.getClass().getResourceAsStream(DTD_LOCATION);
             InputStreamReader isr = new InputStreamReader(is);
@@ -53,6 +54,7 @@ public class XMLWriter {
             //Couldn't read the dtd; report but otherwise continue
             System.err.println("Could not process the DTD. The XML will not have an internal DTD declared.");
         }//catch
+      */
         model = mb;
         buildXML();
     }

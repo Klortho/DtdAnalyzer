@@ -9,7 +9,7 @@ of an XML DTD.
 
     dtdanalyzer [options] [<output file>]
 
-Most options have a short and a long form.   At least one option must be given that specifies
+All options have a short and a long form.   At least one option must be given that specifies
 the DTD that is to be processed:
 * -s, --system *system-id* - Use the given system identifier to find the DTD.  This could
   be a relative pathname, if the DTD exists in a file on your system, or an HTTP URL.
