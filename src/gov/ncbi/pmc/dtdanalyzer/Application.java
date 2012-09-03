@@ -27,12 +27,19 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class Application {
     
     // CONSTANTS
-    public static final String SAX_DRIVER_PROPERTY = "org.xml.sax.driver";                               // ID for SAX driver
-    public static final String SAX_DRIVER_DEFAULT = "org.apache.xerces.parsers.SAXParser";               // SAX driver implementation
-    public static final String TRANSFORMER_FACTORY_PROPERTY = "javax.xml.transform.TransformerFactory";  // ID for transformer
-    public static final String TRANSFORMER_FACTORY_DEFAULT = "com.icl.saxon.TransformerFactoryImpl";     // Transformer implementation
-    public static final String OASIS_DTD = "/org/apache/xml/resolver/etc/catalog.dtd";                   // Path to reach OASIS dtd
-    public static final String OASIS_PUBLIC_ID = "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN";  // Public id of Oasis DTD
+    
+    // ID for SAX driver
+    public static final String SAX_DRIVER_PROPERTY = "org.xml.sax.driver";                               
+    // SAX driver implementation
+    public static final String SAX_DRIVER_DEFAULT = "org.apache.xerces.parsers.SAXParser";               
+    // ID for transformer
+    public static final String TRANSFORMER_FACTORY_PROPERTY = "javax.xml.transform.TransformerFactory";  
+    // Transformer implementation
+    public static final String TRANSFORMER_FACTORY_DEFAULT = "com.icl.saxon.TransformerFactoryImpl";     
+    // Path to reach OASIS dtd
+    public static final String OASIS_DTD = "/org/apache/xml/resolver/etc/catalog.dtd";                   
+    // Public id of Oasis DTD
+    public static final String OASIS_PUBLIC_ID = "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN";  
     
     /**
      * Main execution point. Checks arguments, then converts the DTD into XML.

@@ -1,10 +1,10 @@
-all: clean bin doc t
+all: clean build doc t
 
 clean:
 	-rm -r doc
 	-rm -r build
 
-bin:
+build:
 	-mkdir build
 	javac -d build src/gov/ncbi/pmc/dtdanalyzer/*.java
 	javac -d build src/gov/ncbi/pmc/xml/*.java

@@ -280,7 +280,7 @@ public class DtdAnalyzer {
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
         formatter.setSyntaxPrefix("Usage:  ");
-        OptionComparator c = new OptionComparator("hdspcxt");
+        OptionComparator c = new OptionComparator("hsdpcxt");
         formatter.setOptionComparator(c);
 
         formatter.printHelp(

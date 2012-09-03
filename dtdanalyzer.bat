@@ -3,7 +3,7 @@ set DTDANALYZER_ROOT=%~p0
 set CP="%DTDANALYZER_ROOT%build"
 call :findjars "%DTDANALYZER_ROOT%lib"
 set LOGCONFIG=file:%DTDANALYZER_ROOT%etc/log4j.properties
-java -cp %CP% -Xmx1G "-Dlog4j.configuration=%LOGCONFIG%" gov.ncbi.pmc.dtdanalyzer.Application %*
+java -cp %CP% -Xmx1G "-Dlog4j.configuration=%LOGCONFIG%" gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer %*
 exit /B
 
 :findjars
