@@ -2,12 +2,12 @@ all: clean bin doc t
 
 clean:
 	-rm -r doc
-	-rm -r bin
+	-rm -r build
 
 bin:
-	-mkdir bin
-	javac -d bin src/gov/ncbi/pmc/dtdanalyzer/*.java
-	javac -d bin src/gov/ncbi/pmc/xml/*.java
+	-mkdir build
+	javac -d build src/gov/ncbi/pmc/dtdanalyzer/*.java
+	javac -d build src/gov/ncbi/pmc/xml/*.java
 
 doc:
 	javadoc -d doc src/gov/ncbi/pmc/dtdanalyzer/*.java src/gov/ncbi/pmc/xml/*.java
