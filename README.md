@@ -11,21 +11,22 @@ of an XML DTD.
 
     dtdanalyzer [options] [<output file>]
 
-Each option has a short and a long form.   At least one option must be given that specifies
-the DTD that is to be processed; i.e. one of (-x | --xml), (-s | --system), or (-p | --public).
-
-The list of possible options and arguments is:
-
-* -x | --xml *xml-file* - Specify an XML file used to find the DTD.  This could be just a "stub"
+Most options have a short and a long form.   At least one option must be given that specifies
+the DTD that is to be processed:
+* {-x | --xml} *xml-file* - Specify an XML file used to find the DTD.  This could be just a "stub"
   file, that contains nothing other than the doctype declaration and a root element.  This
   file doesn't need to be valid according to the DTD.
-* -s | --system *system-id* - Use the given system identifier to find the DTD.  This could
+* {-s | --system} *system-id* - Use the given system identifier to find the DTD.  This could
   be a relative pathname, if the DTD exists in a file on your system, or an HTTP URL.
-* -p | --public *public-id* - Use the given public identifier to find the DTD.  This would
+* {-p | --public} *public-id* - Use the given public identifier to find the DTD.  This would
   be used in conjunction with an OASIS catalog file.
-* -c | --catalog *catalog-file* - Specify a file to use as the OASIS catalog, to resolve public
+
+Other possible options and arguments are:
+* {-c | --catalog} *catalog-file* - Specify a file to use as the OASIS catalog, to resolve public
   identifiers
-* -t | --xslt *xslt-file* - An XSLT script to run to post-process the output.  This is optional.
+* {-t | --xslt} *xslt-file* - An XSLT script to run to post-process the output.  This is optional.
+* --title *dtd-title* - Specify the title of this DTD.  This will be output within a &lt;title>
+  element under the root &lt;declarations> element of the output XML.
 * &lt;output file> - Name of the file to write the output to.  If this argument is not given,
   the output is written to standard out.
 
