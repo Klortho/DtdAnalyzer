@@ -827,6 +827,416 @@
                         <String xml:space="preserve">scenarios.load.from.project</String>
                         <Boolean xml:space="preserve">true</Boolean>
                     </entry>
+                    <entry>
+                        <String xml:space="preserve">validation.scenario.associations</String>
+                        <scenarioAssociation-array>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">split-example-instance</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../gist-3548832/split-example-instance.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">personal.rng</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/Computer/XML/XProc/Practice/MultiValidate/personal.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">Default_engine_scenario_name_1254902349626</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">Default_engine_scenario_type_1254902349626</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/JATS/Examples/coffeebrk/coffeebrk.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">book-rng-2.3</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/JATS/Sampler.bxml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">book-rng-2.3</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/JATS/coffeebrk.bxml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">book-rng-2.3</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/JATS/HelloWorld.bxml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">book-dtd-2.3</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/JATS/coffeebrk.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">book-xsd-2.3</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/JATS/coffeebrk/coffeebrk.bxml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">Default_engine_scenario_name_1254902349626</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">Default_engine_scenario_type_1254902349626</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/JATS/Schema/authoring-bare/2.3/dtd/articleauthcustom-mixes.ent</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">Default_engine_scenario_name_1254902349626</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">Default_engine_scenario_type_1254902349626</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/Computer/XML/RelaxNG/Examples/MyFirstRelaxNG/People.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                        </scenarioAssociation-array>
+                    </entry>
+                    <entry>
+                        <String xml:space="preserve">validation.scenarios</String>
+                        <validationScenario-array>
+                            <validationScenario>
+                                <field name="pairs">
+                                    <list/>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">Default_engine_scenario_type_1254902349626</String>
+                                </field>
+                                <field name="name">
+                                    <String xml:space="preserve">Default_engine_scenario_name_1254902349626</String>
+                                </field>
+                            </validationScenario>
+                            <validationScenario>
+                                <field name="pairs">
+                                    <list>
+                                    <validationUnit>
+                                    <field name="validationType">
+                                    <validationUnitType>
+                                    <field name="validationInputType">
+                                    <String xml:space="preserve">text/xml</String>
+                                    </field>
+                                    </validationUnitType>
+                                    </field>
+                                    <field name="url">
+                                    <String xml:space="preserve">${currentFileURL}</String>
+                                    </field>
+                                    <field name="validationEngine">
+                                    <validationEngine>
+                                    <field name="engineType">
+                                    <String xml:space="preserve">&lt;Default engine&gt;</String>
+                                    </field>
+                                    <field
+                                    name="allowsAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    </validationEngine>
+                                    </field>
+                                    <field
+                                    name="allowAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    <field name="extensions">
+                                    <null/>
+                                    </field>
+                                    <field name="validationSchema">
+                                    <validationUnitSchema>
+                                    <field name="dtdSchemaPublicID">
+                                    <String xml:space="preserve"></String>
+                                    </field>
+                                    <field name="type">
+                                    <Integer xml:space="preserve">1</Integer>
+                                    </field>
+                                    <field name="uri">
+                                    <String xml:space="preserve">file:/F:/Gaia/WorkComputers/snowman/JATS/archive_dtd/books/2.3/book-dtd-2.3/book.dtd</String>
+                                    </field>
+                                    </validationUnitSchema>
+                                    </field>
+                                    </validationUnit>
+                                    </list>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="name">
+                                    <String xml:space="preserve">book-dtd-2.3</String>
+                                </field>
+                            </validationScenario>
+                            <validationScenario>
+                                <field name="pairs">
+                                    <list>
+                                    <validationUnit>
+                                    <field name="validationType">
+                                    <validationUnitType>
+                                    <field name="validationInputType">
+                                    <String xml:space="preserve">text/xml</String>
+                                    </field>
+                                    </validationUnitType>
+                                    </field>
+                                    <field name="url">
+                                    <String xml:space="preserve">${currentFileURL}</String>
+                                    </field>
+                                    <field name="validationEngine">
+                                    <validationEngine>
+                                    <field name="engineType">
+                                    <String xml:space="preserve">&lt;Default engine&gt;</String>
+                                    </field>
+                                    <field
+                                    name="allowsAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    </validationEngine>
+                                    </field>
+                                    <field
+                                    name="allowAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    <field name="extensions">
+                                    <null/>
+                                    </field>
+                                    <field name="validationSchema">
+                                    <validationUnitSchema>
+                                    <field name="dtdSchemaPublicID">
+                                    <null/>
+                                    </field>
+                                    <field name="type">
+                                    <Integer xml:space="preserve">4</Integer>
+                                    </field>
+                                    <field name="uri">
+                                    <String xml:space="preserve">file:/F:/Gaia/WorkComputers/snowman/JATS/archive_dtd/books/2.3/book-rng-2.3/book.rng</String>
+                                    </field>
+                                    </validationUnitSchema>
+                                    </field>
+                                    </validationUnit>
+                                    </list>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="name">
+                                    <String xml:space="preserve">book-rng-2.3</String>
+                                </field>
+                            </validationScenario>
+                            <validationScenario>
+                                <field name="pairs">
+                                    <list>
+                                    <validationUnit>
+                                    <field name="validationType">
+                                    <validationUnitType>
+                                    <field name="validationInputType">
+                                    <String xml:space="preserve">text/xml</String>
+                                    </field>
+                                    </validationUnitType>
+                                    </field>
+                                    <field name="url">
+                                    <String xml:space="preserve">${currentFileURL}</String>
+                                    </field>
+                                    <field name="validationEngine">
+                                    <validationEngine>
+                                    <field name="engineType">
+                                    <String xml:space="preserve">&lt;Default engine&gt;</String>
+                                    </field>
+                                    <field
+                                    name="allowsAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    </validationEngine>
+                                    </field>
+                                    <field
+                                    name="allowAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    <field name="extensions">
+                                    <null/>
+                                    </field>
+                                    <field name="validationSchema">
+                                    <validationUnitSchema>
+                                    <field name="dtdSchemaPublicID">
+                                    <null/>
+                                    </field>
+                                    <field name="type">
+                                    <Integer xml:space="preserve">2</Integer>
+                                    </field>
+                                    <field name="uri">
+                                    <String xml:space="preserve">file:/F:/Gaia/WorkComputers/snowman/JATS/archive_dtd/books/2.3/book-xsd-2.3/book.xsd</String>
+                                    </field>
+                                    </validationUnitSchema>
+                                    </field>
+                                    </validationUnit>
+                                    </list>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="name">
+                                    <String xml:space="preserve">book-xsd-2.3</String>
+                                </field>
+                            </validationScenario>
+                            <validationScenario>
+                                <field name="pairs">
+                                    <list>
+                                    <validationUnit>
+                                    <field name="validationType">
+                                    <validationUnitType>
+                                    <field name="validationInputType">
+                                    <String xml:space="preserve">text/xml</String>
+                                    </field>
+                                    </validationUnitType>
+                                    </field>
+                                    <field name="url">
+                                    <String xml:space="preserve">${currentFileURL}</String>
+                                    </field>
+                                    <field name="validationEngine">
+                                    <validationEngine>
+                                    <field name="engineType">
+                                    <String xml:space="preserve">&lt;Default engine&gt;</String>
+                                    </field>
+                                    <field
+                                    name="allowsAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    </validationEngine>
+                                    </field>
+                                    <field
+                                    name="allowAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    <field name="extensions">
+                                    <null/>
+                                    </field>
+                                    <field name="validationSchema">
+                                    <validationUnitSchema>
+                                    <field name="dtdSchemaPublicID">
+                                    <null/>
+                                    </field>
+                                    <field name="type">
+                                    <Integer xml:space="preserve">4</Integer>
+                                    </field>
+                                    <field name="uri">
+                                    <String xml:space="preserve">file:/C:/Gaia/Computer/XML/XProc/Practice/MultiValidate/personal.rng</String>
+                                    </field>
+                                    </validationUnitSchema>
+                                    </field>
+                                    </validationUnit>
+                                    </list>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="name">
+                                    <String xml:space="preserve">personal.rng</String>
+                                </field>
+                            </validationScenario>
+                            <validationScenario>
+                                <field name="pairs">
+                                    <list>
+                                    <validationUnit>
+                                    <field name="validationType">
+                                    <validationUnitType>
+                                    <field name="validationInputType">
+                                    <String xml:space="preserve">text/xml</String>
+                                    </field>
+                                    </validationUnitType>
+                                    </field>
+                                    <field name="url">
+                                    <String xml:space="preserve">${currentFileURL}</String>
+                                    </field>
+                                    <field name="validationEngine">
+                                    <validationEngine>
+                                    <field name="engineType">
+                                    <String xml:space="preserve">&lt;Default engine&gt;</String>
+                                    </field>
+                                    <field
+                                    name="allowsAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    </validationEngine>
+                                    </field>
+                                    <field
+                                    name="allowAutomaticValidation">
+                                    <Boolean xml:space="preserve">true</Boolean>
+                                    </field>
+                                    <field name="extensions">
+                                    <null/>
+                                    </field>
+                                    <field name="validationSchema">
+                                    <validationUnitSchema>
+                                    <field name="dtdSchemaPublicID">
+                                    <null/>
+                                    </field>
+                                    <field name="type">
+                                    <Integer xml:space="preserve">7</Integer>
+                                    </field>
+                                    <field name="uri">
+                                    <String xml:space="preserve">file:/C:/git/gist-3548832/schematron-output.sch</String>
+                                    </field>
+                                    </validationUnitSchema>
+                                    </field>
+                                    </validationUnit>
+                                    </list>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">text/xml</String>
+                                </field>
+                                <field name="name">
+                                    <String xml:space="preserve">split-example-instance</String>
+                                </field>
+                            </validationScenario>
+                        </validationScenario-array>
+                    </entry>
+                    <entry>
+                        <String xml:space="preserve">validation.scenarios.load.from.project</String>
+                        <Boolean xml:space="preserve">true</Boolean>
+                    </entry>
                 </map>
             </serialized>
         </options>

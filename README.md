@@ -20,6 +20,7 @@ the DTD that is to be processed:
   be used in conjunction with an OASIS catalog file.
 
 Other possible options and arguments are:
+* -h,--help - Print usage information and exit.
 * -c, --catalog *catalog-file* - Specify a file to use as the OASIS catalog, to resolve public
   identifiers
 * -x, --xslt *xslt-file* - An XSLT script to run to post-process the output.  This is optional.
@@ -74,7 +75,7 @@ To build the project, use make.  The Makefile targets are:
 
 To run, from the test directory, for example,
 
-    dtdanalyzer --xml archiving-3.0.xml --xslt ../xslt/identity.xsl out.xml
+    dtdanalyzer --doc archiving-3.0.xml out.xml
 
 
 ##Dependencies

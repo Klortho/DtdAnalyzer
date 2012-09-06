@@ -12,6 +12,8 @@ build:
 doc:
 	javadoc -d doc src/gov/ncbi/pmc/dtdanalyzer/*.java src/gov/ncbi/pmc/xml/*.java
 
+# This only works on Unix.  We will move away from makefile soon, and maybe start
+# using junit.
 t:
-	cd test; dtdanalyzer.sh jats-auth-2.3.xml ../xslt/identity.xsl jats-auth-2.3.daz.xml
+	cd test; dtdanalyzer --doc archiving-3.0.xml out.xml
 
