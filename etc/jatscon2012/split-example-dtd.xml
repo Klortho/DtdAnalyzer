@@ -1,0 +1,24 @@
+<!--~~ <split>
+Specifies the main ingredients of a banana split.
+Remember the following:
+* One banana,
+* Two banana,
+* Three banana,
+* Four.
+
+~~ model
+Four bananas make a bunch and so do many more.
+
+~~ tags
+root rock-group mess-of-fun
+
+~~ examples
+    <split>
+      <banana instrument='guitar'>Fleegle</banana>
+      <banana instrument='drums'>Bingo</banana>
+      <banana instrument='bass'>Drooper</banana>
+      <banana instrument='keyboard'>Snorky</banana>
+    </split>
+~~-->
+
+<!ELEMENT split (banana)*>

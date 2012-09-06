@@ -1,0 +1,9 @@
+<generalEntities>
+  <entity name="Implies">
+    <declaredIn systemId="http://jats.nlm.nih.gov/articleauthoring/1.0/mathml/mmlalias.ent"
+                publicId="-//W3C//ENTITIES Aliases for MathML 2.0//EN"
+                lineNumber="200"/>
+      <value>⇒</value>
+  </entity>
+  ...
+</generalEntities>

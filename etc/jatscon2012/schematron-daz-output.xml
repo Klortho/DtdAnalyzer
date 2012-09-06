@@ -1,0 +1,42 @@
+<element name='split' dtdOrder='1'>
+  ...
+  <annotations>
+    <annotation type='note'>
+      <p>You need four bananas to make a bunch.  Many more is okay, too.</p>
+    </annotation>
+    <annotation type='schematron'>
+      <report test='count(banana) &lt; 4'>
+        You need four bananas to make a bunch.  Many more is okay, too.
+      </report>
+    </annotation>
+  </annotations>
+</element>
+
+<element name="banana" dtdOrder="62">
+  ...
+  <annotations>
+    <annotation type='note'>
+      <p>Describes a banana in a split.</p>
+    </annotation>
+    <annotation type="schematron">
+      <assert test="@instrument != 'drums' or . = 'Bingo'">
+        If he plays the drums, he must be Bingo!
+      </assert>
+    </annotation>
+  </annotations>
+</element>
+
+<attribute name="instrument">
+  ...
+  <annotations>
+    <annotation type="note">
+      <p>Describes a banana's instrument.</p>
+    </annotation>
+    <annotation type="schematron">
+      <assert test="not(parent::banana) or
+                    . = 'guitar' or . = 'drums' or . = 'bass' or . = 'keyboard'">
+        Bananas can only play guitar, drums, bass, or keyboard.
+      </assert>
+    </annotation>
+  </annotations>
+</attribute>

@@ -1,0 +1,23 @@
+<!--~~ !dtd
+... annotation relevant to the DTD as a whole
+~~-->
+
+<!--~~ !module
+... annotation about this particular module
+~~-->
+
+<!--~~ <split>
+... describe the <split> element
+~~-->
+
+<!--~~ @instrument
+... describe the @instrument attribute
+~~-->
+
+<!--~~ %adventure;
+... describe the "adventure" parameter entity
+~~-->
+
+<!--~~ &fleegle;
+... describe the "fleegle" general entity
+~~-->

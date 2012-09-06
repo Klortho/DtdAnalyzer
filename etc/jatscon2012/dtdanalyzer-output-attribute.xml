@@ -1,0 +1,8 @@
+<attribute name="rspace">
+   <attributeDeclaration element="mml:mo" type="CDATA" mode="#IMPLIED">
+      <declaredIn systemId="file:///publishing30/mathml2.dtd" lineNumber="341"/>
+   </attributeDeclaration>
+   <attributeDeclaration element="mml:mstyle" type="CDATA" mode="#IMPLIED">
+      <declaredIn systemId="file:///publishing30/mathml2.dtd" lineNumber="402"/>
+   </attributeDeclaration>
+</attribute>

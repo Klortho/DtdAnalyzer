@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document [
+
+  <!ENTITY annotations-alltypes SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=annotations-alltypes.xml">
+  <!ENTITY dtdanalyzer-output-attribute SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=dtdanalyzer-output-attribute.xml">
+  <!ENTITY dtdanalyzer-output-element SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=dtdanalyzer-output-element.xml">
+  <!ENTITY dtdanalyzer-output-genent SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=dtdanalyzer-output-genent.xml">
+  <!ENTITY dtdanalyzer-output-parament SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=dtdanalyzer-output-parament.xml">
+  <!ENTITY dtdanalyzer-output-top-level SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=dtdanalyzer-output-top-level.xml">
+  <!ENTITY find-inconsistent-attrs SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=find-inconsistent-attrs.xqy">
+  <!ENTITY find-inconsistent-attrs-out. SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=find-inconsistent-attrs-out.html">
+  <!ENTITY find-unreachable SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=find-unreachable.xqy">
+  <!ENTITY schematron-daz-output SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=schematron-daz-output.xml">
+  <!ENTITY schematron-output SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=schematron-output.sch">
+  <!ENTITY schematron-source-annotation SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=schematron-source-annotation.xml">
+  <!ENTITY split-annotations SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=split-annotations.xml">
+  <!ENTITY split-documentation. SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=split-documentation.html">
+  <!ENTITY split-example-dtd SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=split-example-dtd.xml">
+  <!ENTITY split-example-instance SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=split-example-instance.xml">
+  <!ENTITY test-pre-entities SYSTEM
+    "http://www.chrisbaloney.com/gist-3548832/pre.cgi?f=test-pre-entities.xml">
+
+]>
+
+<document>
+  &annotations-alltypes;
+  &split-example-instance;
+</document>

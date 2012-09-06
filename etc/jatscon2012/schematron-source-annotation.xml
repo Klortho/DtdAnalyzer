@@ -1,0 +1,27 @@
+<!--~~ <split>
+Specifies the main ingredients of a banana split.
+...
+~~ schematron
+  <report test='count(banana) &lt; 4'>
+    You need four bananas to make a bunch.  Many more is okay, too.
+  </report>
+~~-->
+
+<!--~~ <banana>
+Describes a banana in a split.
+
+~~ schematron
+  <assert test="@instrument != 'drums' or . = 'Bingo'">
+    If he plays the drums, he must be Bingo!
+  </assert>
+~~-->
+
+<!--~~ @instrument
+Describes a banana's instrument.
+
+~~schematron
+  <assert test="not(parent::banana) or
+                . = 'guitar' or . = 'drums' or . = 'bass' or . = 'keyboard'">
+    Bananas can only play guitar, drums, bass, or keyboard.
+  </assert>
+~~-->

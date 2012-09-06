@@ -1,0 +1,32 @@
+<element name="split" dtdOrder="61">
+  ...
+  <annotations>
+    <annotation type='note'>
+      <p>Specifies the main ingredients of a banana split.
+        Remember the following:</p>
+      <ul>
+        <li>One banana</li>
+        <li>Two banana</li>
+        <li>Three banana</li>
+        <li>Four</li>
+      </ul>
+    </annotation>
+    <annotation type='model'>
+      <p>Four bananas make a bunch and so do many more.</p>
+    </annotation>
+    <annotation type='tags'>
+      <tag>root</tag>
+      <tag>rock-group</tag>
+      <tag>mess-of-fun</tag>
+    </annotation>
+    <annotation type='example'>
+      <pre><code>&lt;split&gt;
+        &lt;banana instrument='guitar'&gt;Fleegle&lt;/banana&gt;
+        &lt;banana instrument='drums'&gt;Bingo&lt;/banana&gt;
+        &lt;banana instrument='bass'&gt;Drooper&lt;/banana&gt;
+        &lt;banana instrument='keyboard'&gt;Snorky&lt;/banana&gt;
+      &lt;/split&gt;
+      </code></pre>
+    <annotation
+  </annotations>
+</element>
