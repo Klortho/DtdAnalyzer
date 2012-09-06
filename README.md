@@ -81,16 +81,16 @@ To run, from the test directory, for example,
 ##Dependencies
 
 The following jar files are required.  You can use the script getlibs.sh to download and
-unpack these, if you like.
+unpack these, if you like (Unix only).
 
-* Apache Commons CLI, version 1.2
+* [Apache Commons CLI](http://commons.apache.org/cli/), version 1.2
   * commons-cli-1.2.jar
-* Apache XML commons resolver, version 1.2
+* [Apache xml-commons](http://xerces.apache.org/xml-commons/) resolver, version 1.2
   * resolver.jar
-* Apache Xerces2 Java parser, version 2.11.0
+* [Apache Xerces2 Java parser](http://xerces.apache.org/#xerces2-j), version 2.11.0
   * xml-apis.jar
   * xercesImpl.jar
-* Saxon Home Edition, version 6.5.5
+* [Saxon Home Edition](http://saxon.sourceforge.net), version 6.5.5
   * saxon.jar
 
 ##Discussion forum / mailing list
