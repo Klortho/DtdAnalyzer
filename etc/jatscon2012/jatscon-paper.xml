@@ -2,41 +2,24 @@
 <!DOCTYPE article PUBLIC "-//NLM//DTD Article Authoring DTD v3.0 20080202//EN"
 "http://dtd.nlm.nih.gov/articleauthoring/3.0/articleauthoring3.dtd"
 [
-  <!ENTITY annotations-alltypes SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=annotations-alltypes.xml">
-  <!ENTITY dtdanalyzer-output-attribute SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=dtdanalyzer-output-attribute.xml">
-  <!ENTITY dtdanalyzer-output-element SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=dtdanalyzer-output-element.xml">
-  <!ENTITY dtdanalyzer-output-genent SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=dtdanalyzer-output-genent.xml">
-  <!ENTITY dtdanalyzer-output-parament SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=dtdanalyzer-output-parament.xml">
-  <!ENTITY dtdanalyzer-output-top-level SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=dtdanalyzer-output-top-level.xml">
-  <!ENTITY find-inconsistent-attrs SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=find-inconsistent-attrs.xqy">
-  <!ENTITY find-inconsistent-attrs-out SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=find-inconsistent-attrs-out.html">
-  <!ENTITY find-unreachable SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=find-unreachable.xqy">
-  <!ENTITY schematron-daz-output SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=schematron-daz-output.xml">
-  <!ENTITY schematron-output SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=schematron-output.sch">
-  <!ENTITY schematron-source-annotation SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=schematron-source-annotation.xml">
-  <!ENTITY split-annotations SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=split-annotations.xml">
-  <!ENTITY split-documentation SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=split-documentation.html">
-  <!ENTITY split-example-dtd SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=split-example-dtd.xml">
-  <!ENTITY split-example-instance SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=split-example-instance.xml">
-  <!ENTITY test-pre-entities SYSTEM
-    "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=test-pre-entities.xml">
-]>
+<!ENTITY annotations-alltypes SYSTEM "annotations-alltypes.ent">
+<!ENTITY dtdanalyzer-output-attribute SYSTEM "dtdanalyzer-output-attribute.ent">
+
+<!ENTITY dtdanalyzer-output-element SYSTEM "dtdanalyzer-output-element.ent">
+<!ENTITY dtdanalyzer-output-genent SYSTEM "dtdanalyzer-output-genent.ent">
+<!ENTITY dtdanalyzer-output-parament SYSTEM "dtdanalyzer-output-parament.ent">
+<!ENTITY dtdanalyzer-output-top-level SYSTEM "dtdanalyzer-output-top-level.ent">
+
+<!ENTITY find-inconsistent-attrs SYSTEM "find-inconsistent-attrs.ent">
+<!ENTITY scaffold-template-example SYSTEM "scaffold-template-example.ent">
+<!ENTITY schematron-daz-output SYSTEM "schematron-daz-output.ent">
+<!ENTITY schematron-output SYSTEM "schematron-output.ent">
+<!ENTITY schematron-source-annotation SYSTEM "schematron-source-annotation.ent">
+
+<!ENTITY split-annotations SYSTEM "split-annotations.ent">
+<!ENTITY split-example-dtd SYSTEM "split-example-dtd.ent">
+<!ENTITY split-example-instance SYSTEM "split-example-instance.ent">
+<!ENTITY test-pre-entities SYSTEM "test-pre-entities.ent">]>
 
 <article xmlns:xlink="http://www.w3.org/1999/xlink">
   <front>
@@ -80,8 +63,9 @@
         the National Library of Medicine (NLM), developed and has used the
         DtdAnalyzer to maintain the suite of NLM DTDs and to develop new
         conversion applications. NCBI recently decided to release the code as a
-        self-contained application and to move its development to GitHub.
-        (https://github.com/dtdanalyzer/DtdAnalyzer).</p>
+        self-contained application and to move its development to GitHub, as
+        the project <ext-link
+        xlink:href="https://github.com/NCBITools/DtdAnalyzer">NCBITools/DtdAnalyzer</ext-link>.</p>
         <p>The heart of the tool is a Java application that creates an XML
         representation of all the element, attribute, and entity declarations
         contained inside a DTD, as well as textual annotations created for
@@ -192,7 +176,7 @@
       <p>The first version of the tool remained in use at PMC and Chris Maloney
       eventually took a lead role in refactoring the application. In 2012,
       Maloney released a new version of the code as an open source project on
-      GitHub<fn id="f3"><p>DtdAnalyzer is available on Github at: <ext-link xlink:href="https://github.com/dtdanalyzer/DtdAnalyzer">https://github.com/dtdanalyzer/DtdAnalyzer</ext-link></p></fn>.
+      GitHub.
       The two main forks of the code (the PMC version and the SAGE Publications
       version) were then merged together under this GitHub project.</p>
       <p>At the time of this writing, the GitHub project contains the normative
@@ -236,9 +220,7 @@
         <p>Each of the main tools described in this paper can be run from the
         command line (either Unix or Windows).  The following sections give a
         quick overview of the usage of each of these tools.  For additional
-        details, see the documentation on the GitHub project wiki.  For some of
-        these tools, we have written shell scripts to make it easier to run
-        them from the command line.</p>
+        details, see the documentation on the GitHub project wiki. </p>
         <sec>
           <title>dtdanalyzer</title>
           <p>The <italic>dtdanalyzer</italic> script provides command-line
@@ -363,14 +345,16 @@
         </sec>
         <sec>
           <title>General and Parameter Entities</title>
-          <p>Parameter entities and general entity references are the most
+          <p>Parameter and general entity definitions are the most
           straightforward to model. For each, the application outputs an
           element with the name of the entity, where it was declared in the
-          DTD, and the value the entity represents.
+          DTD, and the value the entity represents.  The following is an
+          example of the output for a parameter entity.
             &dtdanalyzer-output-parament;
-            Parameter Entities
+          </p>
+          <p>
+            The next example illustrates the output for a general entity.
             &dtdanalyzer-output-genent;
-            General Entities
           </p>
         </sec>
         <sec>
@@ -660,58 +644,29 @@
           between their source code and the original DTDs.</p>
         <p>When applied to the JATS Authoring DTD v3.0, the scaffolder included
           with the DtdAnalyzer  produces templates that look like this:
-          <preformat>
-            &lt;!-- **************************************************************************** --&gt;
-            &lt;!-- Template for: article --&gt;
-            &lt;!-- ============================================================================ --&gt;
-            &lt;!-- Content model:
-              ( front, body?, back?, floats-group?, ( sub-article* | response* ) )
-
-              Attributes:
-              -article-type (Type: CDATA; Mode: #IMPLIED)
-              -dtd-version (Type: CDATA; Default Value: 3.0; Mode: #FIXED)
-              -xml:lang (Type: NMTOKEN; Default Value: en)
-              -xmlns:mml (Type: CDATA; Default Value: http://www.w3.org/1998/Math/MathML; Mode:
-              #FIXED)
-              -xmlns:xlink (Type: CDATA; Default Value: http://www.w3.org/1999/xlink; Mode:
-              #FIXED)
-              -xmlns:xsi (Type: CDATA; Default Value: http://www.w3.org/2001/XMLSchema-instance;
-              Mode: #FIXED)
-            --&gt;
-            &lt;!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --&gt;
-            &lt;xsl:template match="article"&gt;
-              &lt;xsl:copy&gt;
-                &lt;xsl:copy-of select="@*"/&gt;
-                &lt;xsl:apply-templates/&gt;
-              &lt;/xsl:copy&gt;
-            &lt;/xsl:template&gt;
-          </preformat>
+          &scaffold-template-example;
         </p>
         <p>The basic scaffolding XSLT we have created could also be extended by
           coupling it with the annotations feature supported by the
           DtdAnalyzer. For example, the developer could add an annotation to
           each element specifying the mapping to the new schema. An annotation
           mapping the “p” element to the “para” element could look like this:
-          <preformat>
-            &lt;element name="p"&gt;
-              ...
-              &lt;annotation type="target"&gt;para&lt;/annotation&gt;
-              ...
-            &lt;/element&gt;
-          </preformat>
+          <preformat>&lt;element name="p"&gt;
+  ...
+  &lt;annotation type="target"&gt;para&lt;/annotation&gt;
+  ...
+&lt;/element&gt;</preformat>
         </p>
         <p>The developer could then change the scaffolding template so that it
           uses the target annotation to transform elements to the new schema
           rather than simply copying them out unchanged:
-          <preformat>
-            &lt;xsl:template match="element"&gt;
-              &lt;x:template match="{@name}"&gt;
-                &lt;x:element name="{annotation[@type eq ‘target’]}"&gt;
-                  &lt;x:apply-templates/&gt;
-                &lt;/x:element&gt;
-              &lt;/x:template&gt;
-            &lt;/xsl:template&gt;
-          </preformat>
+          <preformat>&lt;xsl:template match="element"&gt;
+  &lt;x:template match="{@name}"&gt;
+    &lt;x:element name="{annotation[@type eq ‘target’]}"&gt;
+      &lt;x:apply-templates/&gt;
+    &lt;/x:element&gt;
+  &lt;/x:template&gt;
+&lt;/xsl:template&gt;</preformat>
         </p>
         <p>Using automated scaffolding does not replace programming or manual
           effort. But the amount of effort declines and the focus begins to
