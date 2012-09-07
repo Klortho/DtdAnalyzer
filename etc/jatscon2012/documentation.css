@@ -1,0 +1,118 @@
+body{
+  font-family: Helvetica, Arial, sans-serif; 
+  font-size: 10pt; 
+  margin: 0; 
+  padding: 0;
+  background-color: #EBF4F8;
+}
+
+input, form, textarea,
+h1, h2, h3, h4, h5, h6 
+{ 
+  margin: 0; 
+  padding: 0;
+}
+h1 {
+  font-size: 22px;
+  font-family: Georgia;
+}
+h2 {
+  font-size: 14px; 
+  color: #999999;
+}
+h3 {
+  font-size: 13px; 
+  border-bottom: solid 1px #DEDEDE; 
+  padding: 4px 0; 
+  margin-bottom: 10px;
+}
+
+a:link, a:visited{
+  color:#0033CC;
+}
+a:hover{
+  text-decoration:none;
+}
+
+/* Layout */
+
+#container{
+  margin: 0 auto;
+  padding: 0;
+  width: 780px; 
+}
+
+#head {
+  margin: 0;
+  padding: 15px;
+  width: auto; 
+  display: block; 
+  height: 40px;
+  background-color: white;
+  border: 1px solid #98AAB1;
+}
+
+#main{
+  width: auto; 
+  display: block; 
+  padding: 10px 0;
+}
+#toc {
+  width: 180px; 
+  padding: 10px; 
+  margin-right: 0;
+  float: left;
+  background-color: white;
+  border-top: 1px solid #98AAB1;
+  border-left: 1px solid #98AAB1;
+  border-bottom: 1px solid #98AAB1;
+  height: 560px;
+}
+#maincontent{ 
+  width: 555px; 
+  padding: 10px;
+  border: 1px solid #98AAB1;
+  float: left;
+  background-color: white;
+  height: 560px;
+}
+
+div.spacer{
+  clear: both; 
+  height: 10px; 
+  display: block;
+}
+
+#footer{
+  width: auto; 
+  display: block; 
+  padding: 10px 0; 
+  font-size: 11px; 
+  color: #666666;
+}
+
+h2 {
+  font-size: 11pt; 
+  color: black;
+  background-color: #98AAB1;
+  padding: 3px;
+
+background: #ffffff; /* Old browsers */
+background: -moz-linear-gradient(top, #ffffff 0%, #a3d0e2 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#a3d0e2)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #ffffff 0%,#a3d0e2 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #ffffff 0%,#a3d0e2 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #ffffff 0%,#a3d0e2 100%); /* IE10+ */
+background: linear-gradient(to bottom, #ffffff 0%,#a3d0e2 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#a3d0e2',GradientType=0 ); /* IE6-9 */
+}
+
+#toc ul {
+  list-style-type: none;
+  padding-left: 5px;
+}
+#toc a {
+  text-decoration: none;
+  color: black;
+  font-size: 110%;
+}
