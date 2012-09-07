@@ -52,10 +52,12 @@
         </contrib>
       </contrib-group>
       <permissions>
-        <license>
-          <license-p>The copyright holder grants the U.S. National Library of
-          Medicine permission to archive and post a copy of this paper on the
-          Journal Article Tag Suite Conference proceedings website.</license-p>
+        <license license-type="open-access" xlink:href="http://creativecommons.org/publicdomain/zero/1.0/">
+          <license-p>The authors of this work have dedicated it to the public domain by waiving all of
+            their rights to the work worldwide under copyright law, including all related and neighboring
+            rights, to the extent allowed by law. You can copy, modify, distribute and perform the work,
+            even for commercial purposes, all without asking permission.
+          </license-p>
         </license>
       </permissions>
       <abstract>
