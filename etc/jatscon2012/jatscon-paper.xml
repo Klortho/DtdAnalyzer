@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE article SYSTEM "file:/Volumes/pmcprod/load/converter3/dtd/nlm/3.0/archivearticle3.dtd"[
+<!DOCTYPE article SYSTEM "articleauthoring3.dtd"[
 <!ENTITY annotations-alltypes SYSTEM "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=annotations-alltypes.xml">
 <!ENTITY dtdanalyzer-output-attribute SYSTEM "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=dtdanalyzer-output-attribute.xml">
 <!ENTITY dtdanalyzer-output-element SYSTEM "http://www.chrisbaloney.com/DtdAnalyzer/etc/jatscon2012/pre.cgi?f=dtdanalyzer-output-element.xml">
@@ -20,7 +20,6 @@
 ]>
 <article xmlns:xlink="http://www.w3.org/1999/xlink">
 	<front>
-		<journal-meta/>
 		<article-meta>
 			<title-group>
 				<article-title>DtdAnalyzer</article-title>
@@ -57,18 +56,19 @@
 			<abstract>
 				<p>The National Center for Biotechnology Information (NCBI), a part of the National Library of Medicine (NLM), developed and has used the DtdAnalyzer to maintain the suite of NLM DTDs and to develop new conversion applications. NCBI recently decided to release the code as a self-contained application and to move its development to GitHub. (https://github.com/dtdanalyzer/DtdAnalyzer).</p>
 				<p>The heart of the tool is a Java application that creates an XML representation of all the element, attribute, and entity declarations contained inside a DTD, as well as textual annotations created for documentation and other purposes. The resulting XML can be transformed using XSLT to create many useful outputs.</p>
-				<p>NCBI has created XSLT scripts for three important use cases, and these are included in the DtdAnalyzer package on GitHub.</p>
-				<list list-type="bullet">
-					<list-item>
-						<p>Documentation. End users often lack the technical expertise to read DTDs, particularly when the schema has been highly modularized. NCBI uses the DtdAnalyzer to create a simple HTML representation of any DTD so that the structure can be viewed in a web browser. Annotations entered into the DTD appear on the web page alongside the content model, thus providing usage and semantic information.</p>
-					</list-item>
-					<list-item>
-						<p>Comparison and Analysis. The DtdAnalyzer can produce human-readable reports that pinpoint differences between two versions of a common schema. These reports are useful when developing new XML vocabularies, maintaining multiple versions of a complex DTD, or performing content analysis for a large scale data conversion project.</p>
-					</list-item>
-					<list-item>
-						<p>Automated scaffolding and scripting. Scaffolding is the automated creation of code in order to minimize human effort, reduce errors, and enforce coding conventions. Output from the DtdAnalyzer can be used to scaffold XSLT and other scripts, thus allowing programmers to rapidly create XML conversion applications.</p>
-					</list-item>
-				</list>
+				<p>NCBI has created XSLT scripts for three important use cases, and these are included in the DtdAnalyzer package on GitHub.
+					<list list-type="bullet">
+						<list-item>
+							<p>Documentation. End users often lack the technical expertise to read DTDs, particularly when the schema has been highly modularized. NCBI uses the DtdAnalyzer to create a simple HTML representation of any DTD so that the structure can be viewed in a web browser. Annotations entered into the DTD appear on the web page alongside the content model, thus providing usage and semantic information.</p>
+						</list-item>
+						<list-item>
+							<p>Comparison and Analysis. The DtdAnalyzer can produce human-readable reports that pinpoint differences between two versions of a common schema. These reports are useful when developing new XML vocabularies, maintaining multiple versions of a complex DTD, or performing content analysis for a large scale data conversion project.</p>
+						</list-item>
+						<list-item>
+							<p>Automated scaffolding and scripting. Scaffolding is the automated creation of code in order to minimize human effort, reduce errors, and enforce coding conventions. Output from the DtdAnalyzer can be used to scaffold XSLT and other scripts, thus allowing programmers to rapidly create XML conversion applications.</p>
+						</list-item>
+					</list>
+				</p>
 			</abstract>
 		</article-meta>
 	</front>
@@ -76,7 +76,7 @@
 		<sec>
 			<title>Background</title>
 			<p>Despite the rise of alternate schema technologies, XML DTDs have proven to be resilient and remain widely used in the publishing industry. One drawback to DTDs, however, has been the lack of tools that enable DTDs to be read and manipulated programmatically.</p>
-			<p>The majority of the tools that are available focus on converting DTDs into human readable documentation.  Open source projects that are still being maintained include  DTDDoc (Java)<xref rid="f1"/> and LiveDTD (Perl).<xref rid="f2"/></p>
+			<p>The majority of the tools that are available focus on converting DTDs into human readable documentation.  Open source projects that are still being maintained include  DTDDoc (Java)<fn id="f1"><p>DTDDoc is available at: <ext-link xlink:href="http://dtddoc.sourceforge.net/">http://dtddoc.sourceforge.net/</ext-link></p></fn> and LiveDTD (Perl).<fn id="f2"><p>LiveDTD is available at: <ext-link xlink:href="http://www.sagehill.net/livedtd/">http://www.sagehill.net/livedtd/</ext-link></p></fn></p>
 			<p>A much smaller set of tools exists to programmatically manipulate DTDs. Near and Far, now out of business, allowed users to create DTDs by drawing graphs on a graphical user interface.<xref rid="b1"/> Trang, still widely used, will convert XML DTDs into Relax NGs and XML Schema Documents (XSDs).<xref rid="b2"/> DTDInst, a sub-project of Trang, will convert DTDs into an XML representation that can then be analyzed and further manipulated.</p>
 			<p>Of all these tools, DTDInst is the closest in intent to the DtdAnalyzer project described in this paper. Like DTDInst, DtdAnalyzer converts DTDs into an XML representation. A major difference, however, is that DTDInst focuses on preserving all aspects of the DTD, including parameter entities, include and ignore sections, and overridden entity declarations.<xref rid="b3"/></p>
 		<p>	In contrast to DTDInst, the DtdAnalyzer creates a lightweight representation of the post-parse DTD instance. In other words, the output represents the final view of the DTD after the parser has removed IGNORE sections, expanded parameter entities, and resolved multiple entity declarations. While the DtdAnalyzer output lacks the completeness of the DTDInst format, it is much less complicated and thus can be easier to transform and use. Indeed, the simplified output is very useful when working with highly modular, parameterized DTDs like JATS and DocBook, since it allows users to view the final content model, including all customizations.</p>
@@ -86,6 +86,8 @@
 				<list-item><p>Content analysis</p></list-item>
 				<list-item><p>Scaffolds and scripting</p></list-item>
 			</list>
+			<p>The following diagram illustrates the components and the data flow for the typical use cases of this tool:</p>
+			<graphic xlink:href="image1"/>			
 			<p>In this paper we will review the development of the DtdAnalyzer, discuss its technical implementation, and give examples of how it can be used in each of the three application areas.</p>
 		</sec>
 		<sec>
@@ -93,7 +95,7 @@
 			<p>Demian Hess, one of the authors of this paper, developed an early version of the DtdAnalyzer in 2004 to aid in the creation of XSLT scripts at PubMed Central (PMC). Specifically, Hess was writing a script to convert publisher content to the NLM Archiving DTD and wanted to make a list of all the elements and attributes used in both the source and target schemas.</p>
 			<p>Written in Java, the first version of the application converted the publisher's DTD to an XML representation from which lists of elements and attributes could be extracted. Other members of the PMC data transformation group began to develop XSLTs to manipulate the output from the DtdAnalyzer tool, thus adding to the pool of available scripts.</p>
 			<p>Hess later refactored the Java code to make a tool that would help the National Library of Medicine (NLM) document its suite of DTDs. This second version of the DtdAnalyzer eventually migrated to SAGE Publications, an STM publisher based in California, after Hess left PMC in late 2005.</p>
-			<p>The first version of the tool remained in use at PMC and Chris Maloney eventually took a lead role in refactoring the application. In 2012, Maloney released a new version of the code as an open source project on GitHub<xref rid="f3"/>. The two main forks of the code (the PMC version and the SAGE Publications version) were then merged together under this GitHub project.</p>
+			<p>The first version of the tool remained in use at PMC and Chris Maloney eventually took a lead role in refactoring the application. In 2012, Maloney released a new version of the code as an open source project on GitHub<fn id="f3"><p>DtdAnalyzer is available on Github at: <ext-link xlink:href="https://github.com/dtdanalyzer/DtdAnalyzer">https://github.com/dtdanalyzer/DtdAnalyzer</ext-link></p></fn>. The two main forks of the code (the PMC version and the SAGE Publications version) were then merged together under this GitHub project.</p>
 			<p>At the time of this writing, the GitHub project contains the normative version of the application. Work is continuing to migrate XSLTs developed for the PMC and SAGE versions into the new open source project.</p>
 		</sec>
 		<sec>
@@ -140,7 +142,7 @@
 			</sec>
 			<sec>
 				<title>DtdAnalyzer Output Format</title>
-				<p>The output of the core <italic>dtdanalyzer</italic> tool is illustrated in the following code block.  The document root element is <monospace>&lt;declarations&gt;</monospace>, which contains child sections for elements, attributes, parameter entities and general entity declarations.<xref rid="f4"/>
+				<p>The output of the core <italic>dtdanalyzer</italic> tool is illustrated in the following code block.  The document root element is <monospace>&lt;declarations&gt;</monospace>, which contains child sections for elements, attributes, parameter entities and general entity declarations.<fn id="f4"><p>In this and other code examples, whitespace has been added for readability.</p></fn>
 					&dtdanalyzer-output-top-level;
 				</p>  
 				<sec>
@@ -208,9 +210,13 @@
 				<p>The example above, after being processed by the DtdAnalyzer, produces this output:
 						&split-annotations;
 				</p>
-				<p>The dtddocumentor utility described above includes an XSLT stylesheet that transforms this output into XHTML, which has this appearance when rendered in a browser:
-						&split-documentation;
-				</p>
+				<p>The dtddocumentor utility described above includes an XSLT stylesheet that transforms this output into XHTML, which, when rendered in a browser, has the appearance as seen in <xref rid="fig2">Figure 2</xref>.</p>
+				<fig id="fig2">
+					<caption>
+						<title>Banana split XHTML documentation</title>
+					</caption>
+					<graphic xlink:href="image2"/>
+				</fig>
 				<p>Information architects have always inserted comments into DTDs to provide documentation. In this way, DTD files have a dual nature: they are input to parsers and also human-readable documents. However, because the inserted comments were not semantically linked to the objects that they documented in any consistent, machine-readable way, they were not accessible to other processes. Furthermore, the documentation embedded within the DTD was not easily accessible to content managers using that DTD, since they typically use finished, formatted reference documents rather than looking at DTD source files.</p>
 				<p>By inserting machine-readable markers into comments, it is possible for the annotations to be extracted and integrated with data derived from the parsed DTD itself.  Rather than having to separately maintain the schemas as well as a set of official documents, DTD designers have the option of placing all of the reference documentation within the DTD source files themselves. Integrating the documentation with the output of the design process reduces the burden of maintaining two separate sets of sources, and thus makes it easier to keep the documentation and the DTD in sync.</p>
 				<p>In addition to documentation, annotations can also contain other kinds of structured or semi-structured information.  One simple example is the list of tags that can be associated with various definitions in the DTD.  Special tags can be defined for certain purposes, such as the "root" tag, which can be used on an element definition to indicate that it is one of a set of possible tags that can appear as the root of a document instance.  This is not possible to express in a DTD, so this, in effect, acts as an extension to the DTD language itself.</p>
@@ -224,26 +230,25 @@
 				<p>In addition to using XPath, one can also use XQuery to analyze the content model. For example, the following XQuery answers the question, "Do all of the attribute definitions in this DTD that share the same name have the same definition?"  It produces an HTML report for all the attributes that have inconsistent definitions, and prints each of those individual definitions.
 					&find-inconsistent-attrs;
 				</p>
-				<p>The output from this query, when run against the new NISO JATS Article Authoring DTD v1.0, produces the following result (only the first four attributes are shown):
-					&find-inconsistent-attrs-out;
-				</p>
+				<p>The output from this query, when run against the new NISO JATS Article Authoring DTD v1.0, produces the following result (only the first four attributes are shown):</p>
+				<graphic xlink:href="image3"/>
 				<p>These are not necessarily problems, of course, but some of them might be.  The point is that this type of analysis can be a valuable tool for DTD developers and maintainers.  Attempting to run these queries against a DTD directly is difficult, but once transformed to XML, for which there are many sophisticated querying tools, this type of analysis is much easier.</p>
 			</sec>
 			<sec>
 				<title>Comparison of DTDs</title>
 				<p>A more complex task is to compare different versions of a DTD to determine which elements have been added, removed or changed. As part of the DtdAnalyzer project, we have created a shell script, <italic>dtdcompare</italic>, that uses an XSLT stylesheet to perform such a comparison using the following algorithm:
 				<list list-type="bullet">
-					<list-item><p>For each element that appears in both DTD 1 and DTD 2:</p>
+					<list-item><p>For each element that appears in both DTD 1 and DTD 2:
 						<list list-type="bullet">
-							<list-item><p>Report that attributes have differences if</p>
+							<list-item><p>Report that attributes have differences if
 								<list list-type="bullet">
 									<list-item><p>attributes present in DTD 1 are not in DTD 2</p></list-item>
 									<list-item><p>attributes present in DTD 2 are not in DTD 1</p></list-item>
 									<list-item><p>common attributes have different definitions</p></list-item>
-								</list>
+								</list></p>
 							</list-item>
 							<list-item><p>Do a string comparison of the element content models and report if they are different</p></list-item>
-						</list>
+						</list></p>
 					</list-item>
 					<list-item><p>List each element present in DTD 1 that is not present in DTD 2</p></list-item>
 					<list-item><p>List each element present in DTD 2 that is not present in DTD 1</p></list-item>
@@ -252,13 +257,12 @@
 				<p>The comparison is not particularly fine-grained. For example, when comparing content models, it does not attempt to pinpoint exactly what has changed in the model—whether, for example, element ordering or cardinality has changed. Instead, a simple string comparison is done to detect whether any differences exist, and if so, they are reported as being different.</p>
 				<p>Nevertheless, even this simple analysis can be extremely helpful when dealing with multiple versions of large DTDs. At a glance, a user can determine which elements are new and which common elements have changed.</p>
 				<p>For example, if you are moving your content from version 2.3 of the Journal Publishing DTD to version 3.0, you could use the <italic>dtdcompare</italic> script to generate a report. This is particularly useful if you’ve customized your version of the DTD and so cannot rely exclusively on NLM’s release notes.</p>
-				<p>Elements that appear in both DTDs and that have changed appear first, as shown in Figure X. In this case, we immediately see that an xml:lang attribute has appeared on the <monospace>&lt;abbrev-journal-title&gt;</monospace> element. More significantly, the content model for the <monospace>&lt;abstract&gt;</monospace> element has changed, with the introduction of an optional label and the addition of a specific-use attribute.</p>
-				<fig>
-					<label>Figure X</label>
+				<p>Elements that appear in both DTDs and that have changed appear first, as shown in <xref rid="fig3">Figure 3</xref>. In this case, we immediately see that an xml:lang attribute has appeared on the <monospace>&lt;abbrev-journal-title&gt;</monospace> element. More significantly, the content model for the <monospace>&lt;abstract&gt;</monospace> element has changed, with the introduction of an optional label and the addition of a specific-use attribute.</p>
+				<fig id="fig3">
 					<caption>
 						<title>Showing differences in common elements</title>
 					</caption>
-					<graphic xlink:href="fig1"/>
+					<graphic xlink:href="image4"/>
 				</fig>
 				<p>In addition to showing which common elements have changed, the report also shows that ten elements in v. 2.3 have been removed from v. 3.0 (<monospace>&lt;chem-struct-wrapper&gt;, &lt;citation&gt;, &lt;contract-num&gt;, &lt;contract-sponsor&gt;, &lt;custom-meta-wrap&gt;, &lt;floats-wrap&gt;, &lt;font&gt;, &lt;gloss-group&gt;, &lt;grant-num&gt;,</monospace> and <monospace>&lt;grant-sponsor&gt;</monospace>), while v. 3.0 has added 32 elements (too numerous to list here).</p>
 				<p>One could also use the annotation features of the DTDAnalyzer to include or link to usage notes in the output of the comparison. This would allow users to immediately see elements that have changed, as well as a description of how the elements should now be used.</p>
@@ -349,20 +353,6 @@
 		</sec>
 	</body>
 	<back>
-		<fn-group>
-			<fn id="f1">
-				<p>DTDDoc is available at: <ext-link xlink:href="http://dtddoc.sourceforge.net/">http://dtddoc.sourceforge.net/</ext-link></p>
-			</fn>
-			<fn id="f2">
-				<p>LiveDTD is available at: <ext-link xlink:href="http://www.sagehill.net/livedtd/">http://www.sagehill.net/livedtd/</ext-link></p>
-			</fn>
-			<fn id="f3">
-				<p>DtdAnalyzer is available on Github at: <ext-link xlink:href="https://github.com/dtdanalyzer/DtdAnalyzer">https://github.com/dtdanalyzer/DtdAnalyzer</ext-link></p>
-			</fn>
-			<fn id="f4">
-				<p>In this and other code examples, whitespace has been added for readability.</p>
-			</fn>
-		</fn-group>
 		<ref-list>
 			<ref id="b1">
 				<mixed-citation publication-type="webpage" publication-format="web">
@@ -391,7 +381,7 @@
 			</ref>
 			<ref id="b6">
 				<mixed-citation publication-type="webpage" publication-format="web">
-					<source>List of Markdown implementations</source><comment>[Internet]</comment>.	<publisher-name>Wikipedia</publisher-name>; <date-in-citation><year>2012</year>, <month>August</month> <day>30</day></date-in-citation>. <comment>Available from: <ext-link xlink:href="http://en.wikipedia.org/wiki/List_of_Markdown_implementations">http://en.wikipedia.org/wiki/List_of_Markdown_implementations</ext-link></comment>.
+					<source>List of Markdown implementations</source> <comment>[Internet]</comment>. <publisher-name>Wikipedia</publisher-name>; <date-in-citation><year>2012</year>, <month>August</month> <day>30</day></date-in-citation>. <comment>Available from: <ext-link xlink:href="http://en.wikipedia.org/wiki/List_of_Markdown_implementations">http://en.wikipedia.org/wiki/List_of_Markdown_implementations</ext-link></comment>.
 				</mixed-citation>
 			</ref>
 			<ref id="b7">
