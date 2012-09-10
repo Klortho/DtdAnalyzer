@@ -1,44 +1,51 @@
-declare function local:distinct-nodes($arg as node()*) as node()* 
-{ 
-   for $a at $apos in $arg 
-   let $before_a := fn:subsequence($arg, 1, $apos - 1) 
-   where every $ba in $before_a satisfies not($ba is $a) 
-   return $a 
-};
+(:
+  This script finds all of the unreachable elements in a DTD.
+  The set of root nodes is hard-coded below as $roots.  From there,
+  this walks the tree formed by the <child> elements within each 
+  <element> element's content model.  Each call to the reachable()
+  function descends one layer down the tree.  When it stops finding
+  new descendents that it can add to its list, the recursion halts.
+:)
 
 declare function 
 local:reachable($allElems as element(element)*,
-                $startSet as element(element)*,
-                $newKids as element(element)*)
-   as element(element)* 
+                $startSet as xs:string*,
+                $lastFound as xs:string*)
+   as xs:string* 
 {
-    let $set := ($startSet, $allElems[@name='article'])
-    (: Find all the children of $newKids :)
-    let $nextKidNames := $newKids//child/string()
-    (:let $nextKids := $allElems[@name=$nextKidNames]:)
-    let $nextKids :=
-        for $n in $nextKidNames
-            return $allElems[@name=$n]
-    (: Are there any in this set that are not in startSet? :)
-    let $newNextKids :=
-        for $nk in $nextKids
-            return if ($nk = $startSet)
-                   then ()
-                   else $nk
-    let $newStartSet := ($startSet, $newNextKids)
+    (: Find all the children of the new reachable elements that we
+      found last time :)
+    let $newKidNames := distinct-values(
+        $allElems[@name=$lastFound]//child/string()
+    )
     
-    (:let $nextSet := local:distinct-nodes($set):)
-    return $newNextKids
+    (: The new "last found set" is the set of all elements that we
+      just found, that we've never seen before (are not in $startSet :)
+    let $newLastFound := $newKidNames[not(.=$startSet)]
+    
+    (: Finally, the new start set is the old start plus all these
+      elements that we've just found.  :)
+    let $newStartSet := ($startSet, $newLastFound)
+    
+    (: If we didn't find any new elements this time, then we're done.
+      Otherwise, recurse.  :)
+    return 
+        if (count($newLastFound) = 0)
+        then $startSet
+        else local:reachable($allElems, $newStartSet, $newLastFound)
 };
 
-let $elements := //element
-let $roots := $elements[@name='article']
-return local:reachable($elements, $roots, $roots)
+(:----------------------------------------------------------:)
+let $allElems := //element
+let $roots := ('article')
 
-(:
-let $e1 := $elements[@name='article']
-let $e2 := ($elements[@name='aricle'], $elements[@name='chapter-title'])
-return $e1 = $e2
-:)
+let $reachable := local:reachable($allElems, $roots, $roots)
 
+let $allElemNames := $allElems/@name/string()
+let $unreachable := (
+  for $u in $allElemNames[not(.=$reachable)]
+  order by $u
+  return $u
+)
+return count($unreachable)
 
