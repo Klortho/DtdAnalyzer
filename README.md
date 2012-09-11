@@ -101,3 +101,5 @@ for discussions.
 ##Public domain
 
 This work is in the public domain and may be used and reproduced without special permission.
+
+foo
