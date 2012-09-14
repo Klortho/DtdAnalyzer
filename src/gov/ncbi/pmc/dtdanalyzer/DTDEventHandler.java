@@ -282,10 +282,22 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
         throw new EndOfDTDException();
     }
     
-    // ++++ NOT IMPLEMENTED ++++
-    public void comment(char[] values, int param, int param2) throws org.xml.sax.SAXException {
-        //do nothing
+    /**
+     * Handle comments.  This extracts the special annotations and stores them
+     * for later.
+     */
+    public void comment(char[] text, int start, int length) 
+        throws org.xml.sax.SAXException 
+    {
+        String fullComment = new String(text, start, length).trim();
+        
+        // Make sure this is a special comment
+        if ( !fullComment.startsWith("~~") ) return;
+
+        //System.out.println("Got a special comment");
     }
+
+
     public void endCDATA() throws org.xml.sax.SAXException {
         //do nothing
     }
