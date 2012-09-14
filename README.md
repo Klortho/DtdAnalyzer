@@ -45,7 +45,7 @@ and uses make.  To use the scripts that come with the package, first set the
 environment variable $DTDANALYZER_HOME to the root of the git repository.
 For example (Unix):
 
-    git clone git://github.com/Klortho/DtdAnalyzer.git
+    git clone git://github.com/NCBITools/DtdAnalyzer.git
     cd DtdAnalyzer
     export DTDANALZER_HOME=`pwd`
 
@@ -58,14 +58,13 @@ On Windows,
 
     script\setenv
 
-Next, you'll want to download all the dependencies into the lib directory.  This
-script is only available for Unix.  On Windows, you'll have to do it manually.
+To build the project, use make.  For example, the following should build both
+the Javadoc documentation and compile the Java classes.  (At the time of this
+writing, though, the "t" target, which is the self-test, is not working.)
 
-    getlibs.sh
+    make
 
-See below for a list of the dependencies.
-
-To build the project, use make.  The Makefile targets are:
+The Makefile targets are:
 
 * all - default target, everything below.
 * clean - deletes intermediate files
@@ -73,7 +72,7 @@ To build the project, use make.  The Makefile targets are:
 * doc - builds javadocs; puts results into 'doc'
 * t - runs the script over the test file in the 'test' directory
 
-To run, from the test directory, for example,
+To run, for example, from the test directory:
 
     dtdanalyzer --doc archiving-3.0.xml out.xml
 
@@ -85,11 +84,14 @@ unpack these, if you like (Unix only).
 
 * [Apache Commons CLI](http://commons.apache.org/cli/), version 1.2
   * commons-cli-1.2.jar
+
 * [Apache xml-commons](http://xerces.apache.org/xml-commons/) resolver, version 1.2
   * resolver.jar
+
 * [Apache Xerces2 Java parser](http://xerces.apache.org/#xerces2-j), version 2.11.0
   * xml-apis.jar
   * xercesImpl.jar
+
 * [Saxon Home Edition](http://saxon.sourceforge.net), version 6.5.5
   * saxon.jar
 
