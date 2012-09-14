@@ -18,6 +18,6 @@ set CLASSPATH=%CLASSPATH%;%DTDANALYZER_HOME%\lib\xercesImpl.jar
 set CLASSPATH=%CLASSPATH%;%DTDANALYZER_HOME%\lib\xml-apis.jar
 set CLASSPATH=%CLASSPATH%;%DTDANALYZER_HOME%\lib\commons-cli-1.2.jar
 
-set PATH=%DTDANALYZER_HOME%\script;%path%
+set PATH=%DTDANALYZER_HOME%;%path%
 
 :end

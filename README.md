@@ -92,7 +92,7 @@ unpack these, if you like (Unix only).
   * xml-apis.jar
   * xercesImpl.jar
 
-* [Saxon Home Edition](http://saxon.sourceforge.net), version 6.5.5
+* Saxon Home Edition (http://saxon.sourceforge.net), version 6.5.5
   * saxon.jar
 
 ##Discussion forum / mailing list
