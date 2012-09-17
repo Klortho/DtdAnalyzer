@@ -5,7 +5,7 @@
 	
 	<xsl:strip-space elements="*"/>
 	
-	<xsl:param name="complete" select="'yes'"/>
+	<xsl:param name="complete" select="'no'"/>
 
     <xsl:template match="/">
     	<schema xmlns="http://purl.oclc.org/dsdl/schematron">
