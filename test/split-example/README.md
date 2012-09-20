@@ -9,3 +9,12 @@ Note the two new additions, that aren't described in the paper:
   It uses the name in the structured comment line and cross-references that to a
   system and public id, so that we can cross-reference each element, attribute, and
   entity to the module in which it is defined.
+
+Check that the instance file and the whole DTD is valid with
+    xmllint --valid --noout split-instance.xml
+
+Run the dtdanalyzer on it with
+    dtdanalyzer --doc split-instance.xml split-example.daz.xml
+
+Then compare split-example.daz.xml to split-mockup.daz.xml.
+
