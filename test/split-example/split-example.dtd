@@ -1,0 +1,47 @@
+<!--~~ !dtd
+This is a sample DTD to illustrate and to test various features of the
+DtdAnalyzer.
+
+This is the main ".dtd" module of this DTD.  These notes will be inserted into
+the main index.html page of the documenation.  Note that since this is the main
+module, we should use the "!dtd" annotations, and not any "!module" annotations
+here.
+~~-->
+
+<!--~~ <split>
+Specifies the main ingredients of a banana split.
+Remember the following:
+* One banana,
+* Two banana,
+* Three banana,
+* Four.
+
+~~ model
+Four bananas make a bunch and so do many more.
+
+~~ tags
+root rock-group mess-of-fun
+
+~~ examples
+    <split>
+      <banana instrument='guitar'>Fleegle</banana>
+      <banana instrument='drums'>Bingo</banana>
+      <banana instrument='bass'>Drooper</banana>
+      <banana instrument='keyboard'>Snorky</banana>
+    </split>
+
+~~ schematron
+  <report test='count(banana) &lt; 4'>
+    You need four bananas to make a bunch.  Many more is okay, too.
+  </report>
+~~-->
+
+<!ELEMENT split (banana)*>
+
+
+<!ENTITY % inline.ent PUBLIC "-//NLM//external ent dummy public id 1//EN" "inline.ent">
+%inline.ent;
+
+<!ENTITY % banana.ent PUBLIC "-//NLM//external ent dummy public id 2//EN" "banana.ent">
+%banana.ent;
+

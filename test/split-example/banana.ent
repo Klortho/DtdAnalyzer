@@ -1,0 +1,35 @@
+<!--~~ !module banana.ent
+This module defines the <banana> element, and all the slippery things associated
+with it.
+~~-->
+
+<!--~~ <banana>
+This specifies one banana.  One banana doesn't make a bunch.
+
+~~ schematron
+  <assert test="@instrument != 'drums' or . = 'Bingo'">
+    If he plays the drums, he must be Bingo!
+  </assert>
+~~-->
+
+<!ELEMENT banana (#PCDATA|%inline;)* >
+<!ATTLIST banana 
+          name CDATA #REQUIRED>
+
+<!--~~ @instrument
+Describes a banana's instrument.
+
+~~schematron
+  <assert test="not(parent::banana) or
+                . = 'guitar' or . = 'drums' or . = 'bass' or . = 'keyboards'">
+    Bananas can only play guitar, drums, bass, or keyboards.
+  </assert>
+~~-->
+
+<!ATTLIST banana
+          instrument CDATA #IMPLIED>
+
+<!--~~ &fleegle-pic;
+This is a picture of Fleegle.
+~~-->
+<!ENTITY fleegle-pic SYSTEM "fleegle-pic.ent">

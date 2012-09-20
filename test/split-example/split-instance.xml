@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE split PUBLIC "-//NLM//external dtd dummy public id//EN" "split-example.dtd">
+
+<split>
+  <banana name='Fleegle'
+          instrument="guitar">
+    Fleegle is a <em>beagle</em>:
+    &fleegle-pic;
+  </banana>
+  <banana name='Bingo'
+          instrument='drums'>
+    Bingo is my favorite.
+  </banana>
+  <banana name='Drooper'
+          instrument='bass'>
+    Drooper is a <em>lion</em>.
+  </banana>
+  <banana name='Snorky'
+          instrument="keyboards">
+    Is his name "Snork" or "Snorky" -- we may never know.
+  </banana>
+</split>
