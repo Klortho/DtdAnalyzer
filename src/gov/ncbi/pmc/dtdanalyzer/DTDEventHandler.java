@@ -9,7 +9,6 @@ package gov.ncbi.pmc.dtdanalyzer;
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
 import java.util.*;
-import java.util.regex.*;
 
 /**
  * Collects and stores information about elements, attributes, and entities
@@ -28,7 +27,6 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
     private Elements allElements = new Elements();        // Contains all declared elements
     private int numOfElements = 0;                        // Element counter
     private Entities allEntities = new Entities();        // Contains all declared entities
-    private SComments allSComments = new SComments();     // Contains all structured comments.
         
     /**
      * Returns all declared Attributes 
@@ -294,60 +292,9 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
         String fullComment = new String(text, start, length).trim();
         
         // Make sure this is a special comment
-        if (!fullComment.startsWith("~~")) return;
+        if ( !fullComment.startsWith("~~") ) return;
 
-        // Match the beginning and ending "~~", and the identifier line.       
-        Pattern p = Pattern.compile("\\A~~[ \\t]*(\\S+)[ \\t]*\\n(.*)~~", Pattern.DOTALL);
-        Matcher m = p.matcher(fullComment);
-        if (!m.find()) {
-            // FIXME:  throw an exception here, if in "strict" mode.
-            System.err.println("Identifier not found");
-            return;
-        }
-        String identifier = m.group(1);
-        SComment sc = new SComment(identifier);
-        String comment = m.group(2);
-        
-        // Parse the rest of the comment
-        int sp = 0;  // Points to the next character in the input string that we want to match
-        
-        // Find each annotation section until done
-        boolean done = false;
-        
-        // This pattern matches the current text section, plus the intro line of the next
-        // section, if there is one.
-        p = Pattern.compile("(.*?)((\\n~~[ \\t]*(\\S+)[ \\t]*\\n)|\\z)", Pattern.DOTALL);
-        
-        // This stores the name of the next section.  The first section name is implicitly
-        // defined to be "notes".
-        String sectionName = "notes";
-        
-        while (!done) {
-            //System.err.println("Searching from " + sp);
-            m = p.matcher(comment.substring(sp));
-            if (m.find()) {
-                String sectionText = m.group(1);
-                System.err.println(sectionName + ": from " + m.start() + " to " + m.end() + ":\n'" +
-                    sectionText + "'");
-                sp += m.end();
-                //System.err.println("\ngroup(2) = '" + m.group(2) + "'");
-                if (m.group(2).equals("")) {
-                    done = true;
-                }
-                else {
-                    sectionName = m.group(4);
-                }
-            }
-            else {
-                // FIXME:  throw an exception here, if in "strict" mode.
-                System.err.println("Malformed annotated comment section.");
-                done = true;
-            }
-        }
-        
-        // Create a new SComment object and add it to the collection
-        allSComments.addSComment(sc);
-
+        //System.out.println("Got a special comment");
     }
 
 
