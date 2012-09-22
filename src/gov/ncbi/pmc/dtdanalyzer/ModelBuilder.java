@@ -23,6 +23,7 @@ public class ModelBuilder {
     private Attributes attributes;             // All attribute declarations
     private Entities entities;                 // All entity declarations
     private Map contexts = new HashMap(1024);  // Collection used to hold context info
+    private SComments scomments;               // All structured comments
     
     /**
      * Creates a new instance of ModelBuilder 
@@ -33,6 +34,7 @@ public class ModelBuilder {
         elements = dtdInfo.getAllElements();
         attributes = dtdInfo.getAllAttributes();
         entities = dtdInfo.getAllEntities();
+        scomments = dtdInfo.getAllSComments();
         processContext();
     }
             
@@ -79,6 +81,13 @@ public class ModelBuilder {
      */    
     public Entities getEntities(){
         return entities;        
+    }
+    
+    /**
+     * Returns all the structured comments.
+     */
+    public SComments getSComments() {
+        return scomments;
     }
 
     /**

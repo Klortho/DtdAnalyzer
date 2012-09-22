@@ -28,6 +28,7 @@ public class XMLWriter {
     private Elements elements;           // All element declarations
     private Attributes attributes;       // All attribute declarations
     private Entities entities;           // All entity declarations
+    private SComments scomments;         // All structured comments
     private StringWriter buffer;         // Buffer to hold XML instance as its written
     private String internalDTD = null;   // Holds the internal DTD
     
@@ -74,6 +75,7 @@ public class XMLWriter {
             elements = model.getElements();
             attributes = model.getAttributes();
             entities = model.getEntities();
+            scomments = model.getSComments();
             
             // Make elements
             processAllElements();
@@ -88,18 +90,15 @@ public class XMLWriter {
         buffer.flush();    
     }
     
-    /**
-     * Helper method closes the start tag
-     */
-    private void closeStartTag(){
-        buffer.write(">");        
-    }
-    
    /**
     * Escapes protected XML characters in content
     */
     private String escape(String str) {
-       return str.replaceAll("&", "&amp;").replaceAll(">", "&gt;").replaceAll("<", "&lt;").replaceAll("\"", "&quot;").replaceAll("'","&apos;");
+       return str.replaceAll("&", "&amp;")
+                 .replaceAll(">", "&gt;")
+                 .replaceAll("<", "&lt;")
+                 .replaceAll("\"", "&quot;")
+                 .replaceAll("'","&apos;");
     } // escape
     
     /**
@@ -126,6 +125,32 @@ public class XMLWriter {
     }
     
     /**
+     * Helper method to write a complete start tag, for an element that
+     * won't get any attributes
+     */
+    private void makeStartTag(String name) {
+        buffer.write("<" + name + ">");
+    } 
+    
+    /**
+     * Helper method starts writing an start tag to the buffer. Note
+     * that the start tag does not have a closing angle bracket because 
+     * the user may want to write attributes.
+     *
+     * @param name Tag name
+     */
+    private void openStartTag(String name){
+        buffer.write("<" + name);        
+    }
+
+    /**
+     * Helper method closes the start tag
+     */
+    private void closeStartTag(){
+        buffer.write(">");        
+    }
+    
+    /**
      * Helper methods writes an attribute to the buffer
      *
      * @param name Attribute name
@@ -144,16 +169,6 @@ public class XMLWriter {
         buffer.write( "</" + name + ">");       
     }
     
-    /**
-     * Helper method starts writing an start tag to the buffer. Note
-     * that the start tag does not have a closing angle bracket because 
-     * the user may want to write attributes.
-     *
-     * @param name Tag name
-     */
-    private void openStartTag(String name){
-        buffer.write("<" + name);        
-    }
 
     /**
      * Iterates over all attribute declarations to create the "attributes"
@@ -171,7 +186,22 @@ public class XMLWriter {
                 AttributeIterator atts = attributes.getAttributesByName(attNames[i]);
                 while (atts.hasNext()){               
                     writeDeclarationInfo(atts.next());
-                }//while
+                }
+                
+                // Write the annotations for this attribute
+                SComment sc = scomments.getSComment(SComment.ATTRIBUTE, attNames[i]);
+                if (sc != null) {
+                    System.err.println("*******Getting scomment for attr " + attNames[i] + ": " + sc);
+                    makeStartTag("annotations");
+                    Iterator secNames = sc.getSectionNameIterator();
+                    while ( secNames.hasNext() ) {
+                        String secName = (String) secNames.next();
+                        System.err.println("found section name " + secName);
+                    }
+                    makeEndTag("annotations");
+                }
+                
+                
                 makeEndTag("attribute");
            }//for
            buffer.write("</attributes>");

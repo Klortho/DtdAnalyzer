@@ -56,7 +56,14 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
     public Entities getAllEntities(){
         return allEntities;
     }
-      
+    
+    /**
+     * Returns the collection of structured comments
+     */
+    public SComments getAllSComments() {
+        return allSComments;
+    }
+    
     /**
      * Returns location of the last declaration. This is a convenience method for
      * internal use.
@@ -304,24 +311,29 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
             System.err.println("Identifier not found");
             return;
         }
+        
+        // Pull out the identifier, and create a new SComment object
         String identifier = m.group(1);
         SComment sc = new SComment(identifier);
+        
+        // comment will hold everything after the first line, and up to but not including
+        // the final ~~.
         String comment = m.group(2);
         
-        // Parse the rest of the comment
-        int sp = 0;  // Points to the next character in the input string that we want to match
-        
-        // Find each annotation section until done
-        boolean done = false;
+        // Next we'll parse the rest of the comment
         
         // This pattern matches the current text section, plus the intro line of the next
-        // section, if there is one.
+        // section, if there is one; or the end-of-input, if not.
         p = Pattern.compile("(.*?)((\\n~~[ \\t]*(\\S+)[ \\t]*\\n)|\\z)", Pattern.DOTALL);
         
-        // This stores the name of the next section.  The first section name is implicitly
-        // defined to be "notes".
+        // sectionName stores the name of the next annotation section.  The first section is 
+        // implicitly defined to be "notes".
         String sectionName = "notes";
         
+        // sp points to the next character in the input string that we want to match
+        int sp = 0;  
+        // We'll find each annotation section until done
+        boolean done = false;
         while (!done) {
             //System.err.println("Searching from " + sp);
             m = p.matcher(comment.substring(sp));
@@ -330,7 +342,12 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
                 System.err.println(sectionName + ": from " + m.start() + " to " + m.end() + ":\n'" +
                     sectionText + "'");
                 sp += m.end();
+                
+                // Add this section to the SComment
+                sc.addSection(sectionName, sectionText);
+                
                 //System.err.println("\ngroup(2) = '" + m.group(2) + "'");
+                // If there's no next intro line, then we're done.
                 if (m.group(2).equals("")) {
                     done = true;
                 }
@@ -345,9 +362,8 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
             }
         }
         
-        // Create a new SComment object and add it to the collection
+        // Add this SComment object to the collection
         allSComments.addSComment(sc);
-
     }
 
 
