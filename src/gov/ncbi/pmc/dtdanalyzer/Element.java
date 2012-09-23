@@ -84,8 +84,7 @@ public class Element {
     }    
         
     /**
-     * Returns a Location object that indicates the location of the element
-     * declaration inside the DTD.
+     * Sets the location for this element declaration inside the DTD.
      *
      * @param loc  Location information 
      */    

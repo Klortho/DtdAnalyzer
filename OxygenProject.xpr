@@ -1231,6 +1231,17 @@
         </options>
     </meta>
     <projectTree name="OxygenProject.xpr">
+        <folder name="Work">
+            <file name="test/split-example/banana.ent"/>
+            <file name="test/split-example/fleegle-pic.ent"/>
+            <file name="test/split-example/inline.ent"/>
+            <file name="src/gov/ncbi/pmc/dtdanalyzer/SComment.java"/>
+            <file name="src/gov/ncbi/pmc/dtdanalyzer/SComments.java"/>
+            <file name="test/split-example/split-example.dtd"/>
+            <file name="test/split-example/split-instance.daz.xml"/>
+            <file name="test/split-example/split-mockup.daz.xml"/>
+            <file name="src/gov/ncbi/pmc/dtdanalyzer/XMLWriter.java"/>
+        </folder>
         <folder path="."/>
         <file name="../../../Projects/jatspan/archive_dtd/publishing/3.0/journal-publishing-dtd-3.0/journalpublishing3.dtd"/>
     </projectTree>

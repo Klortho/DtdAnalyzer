@@ -77,6 +77,14 @@ public class XMLWriter {
             entities = model.getEntities();
             scomments = model.getSComments();
             
+            // Process any dtd-level annotations, if there are any
+            SComment dtdAnnotations = scomments.getSComment(SComment.DTD, "");
+            if (dtdAnnotations != null) {
+                makeStartTag("annotations");
+                  processSComment(dtdAnnotations);
+                makeEndTag("annotations");
+            }
+            
             // Make elements
             processAllElements();
             
@@ -189,23 +197,34 @@ public class XMLWriter {
                 }
                 
                 // Write the annotations for this attribute
-                SComment sc = scomments.getSComment(SComment.ATTRIBUTE, attNames[i]);
-                if (sc != null) {
-                    System.err.println("*******Getting scomment for attr " + attNames[i] + ": " + sc);
-                    makeStartTag("annotations");
-                    Iterator secNames = sc.getSectionNameIterator();
-                    while ( secNames.hasNext() ) {
-                        String secName = (String) secNames.next();
-                        System.err.println("found section name " + secName);
-                    }
-                    makeEndTag("annotations");
-                }
-                
+                processSComment(scomments.getSComment(SComment.ATTRIBUTE, attNames[i]));
                 
                 makeEndTag("attribute");
            }//for
            buffer.write("</attributes>");
         }//if
+    }
+    
+    /**
+     * This outputs the <annotations> element corresponding to a SComment object.
+     * If the sc argument is null, then this outputs nothing.
+     */
+    private void processSComment(SComment sc) {
+        if (sc == null) return;
+
+        //System.err.println("*******Getting scomment for attr " + attNames[i] + ": " + sc);
+        makeStartTag("annotations");
+        Iterator secNames = sc.getSectionNameIterator();
+        while ( secNames.hasNext() ) {
+            String secName = (String) secNames.next();
+            //System.err.println("found section name " + secName);
+            openStartTag("annotation");
+            makeAttribute("type", secName);
+            closeStartTag();
+            buffer.write(sc.getSection(secName));
+            makeEndTag("annotation");
+        }
+        makeEndTag("annotations");
     }
      
     /**
@@ -339,7 +358,8 @@ public class XMLWriter {
         closeStartTag();
           writeDeclaredInInfo( e.getLocation() );  
           writeContentModel( e.getContentModel() );
-          writeContextInfo(model.getContext(e.getName()));        
+          writeContextInfo(model.getContext(e.getName()));
+          processSComment(scomments.getSComment(SComment.ELEMENT, e.getName()));
         makeEndTag("element");                
     }
     
@@ -472,22 +492,22 @@ public class XMLWriter {
         
         makeAttribute("name", ent.getName());
         
-        if (ent.getSystemId() != null){
+        if (ent.getSystemId() != null) {
             makeAttribute("systemId", ent.getSystemId());
         }
         
-        if (ent.getPublicId() != null){
+        if (ent.getPublicId() != null) {
             makeAttribute("publicId", ent.getPublicId());
         }
         
         closeStartTag();        
  
-        if (ent.getLocation() != null){
+        if (ent.getLocation() != null) {
             writeDeclaredInInfo(ent.getLocation());
         }
-        
         writeValueInfo(ent);
-        
+        processSComment(scomments.getSComment(ent.getType(), ent.getName()));
+
         makeEndTag("entity");
     }        
     
