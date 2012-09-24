@@ -21,14 +21,22 @@ import java.util.regex.*;
  * @author Demian Hess
  * @version 1.0 2005-11-09
  */
-public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.ErrorHandler, org.xml.sax.ext.DeclHandler, org.xml.sax.ext.LexicalHandler {
-        
+public class DTDEventHandler 
+    implements org.xml.sax.ContentHandler, 
+               org.xml.sax.ErrorHandler, 
+               org.xml.sax.ext.DeclHandler, 
+               org.xml.sax.ext.LexicalHandler 
+{
     private Locator locator = null;                       // Receives location information from XML reader
     private Attributes allAttributes = new Attributes();  // Contains all declared attributes
     private Elements allElements = new Elements();        // Contains all declared elements
     private int numOfElements = 0;                        // Element counter
     private Entities allEntities = new Entities();        // Contains all declared entities
     private SComments allSComments = new SComments();     // Contains all structured comments.
+    
+    // modules stores info about every unique set of pubid/sysid we've seen.
+    // This is instantiated below in setDocumentLocator;
+    private Modules modules;  
         
     /**
      * Returns all declared Attributes 
@@ -65,6 +73,13 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
     }
     
     /**
+     * Returns the collection of modules
+     */
+    public Modules getModules() {
+        return modules;
+    }
+    
+    /**
      * Returns location of the last declaration. This is a convenience method for
      * internal use.
      *
@@ -72,8 +87,10 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
      */  
     private Location getLocation() throws SAXException{
         if ( locator == null ){
-            throw new SAXException("No locator provided by the parser. The DTD cannot be processed without location information.");
-        } // if
+            throw new SAXException("No locator provided by the parser. " +
+                "The DTD cannot be processed without location information.");
+        }
+        //modules.checkModule();
         
         return new Location(locator.getSystemId(), locator.getPublicId(), locator.getLineNumber());
     }
@@ -88,19 +105,21 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
      * @param locator Reports location information from the DTD during parsing
      */    
     public void setDocumentLocator(org.xml.sax.Locator locator) {
-            this.locator = locator;
+        this.locator = locator;
+        modules = new Modules(locator);
     }
 
     /**
      * Reinitializes all values so that declaration information can be collected
      *
-     * @throws SAXException Indicates problem occurred during processing */    
+     * @throws SAXException Indicates problem occurred during processing 
+     */    
     public void startDocument() throws org.xml.sax.SAXException {
         //System.out.println("startDocument\n");
         allAttributes = new Attributes();
         allElements = new Elements();  
         allEntities = new Entities();
-        numOfElements = 0;       
+        numOfElements = 0;
     }
 
     /**
@@ -308,7 +327,8 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
         Matcher m = p.matcher(fullComment);
         if (!m.find()) {
             // FIXME:  throw an exception here, if in "strict" mode.
-            System.err.println("Identifier not found");
+            System.err.println("Identifier not found in comment starting in " + 
+                locator.getSystemId() + ", line " + locator.getLineNumber());
             return;
         }
         
@@ -316,6 +336,12 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
         String identifier = m.group(1);
         SComment sc = new SComment(identifier);
         
+        // If this comment type is MODULE, then the name has to come from the name of the 
+        // last Module object that we created.
+        if (sc.getType() == SComment.MODULE) {
+            sc.setName(modules.getCurrent().getName());
+        }
+
         // comment will hold everything after the first line, and up to but not including
         // the final ~~.
         String comment = m.group(2);
@@ -335,18 +361,18 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
         // We'll find each annotation section until done
         boolean done = false;
         while (!done) {
-            //System.err.println("Searching from " + sp);
             m = p.matcher(comment.substring(sp));
             if (m.find()) {
                 String sectionText = m.group(1);
-                System.err.println(sectionName + ": from " + m.start() + " to " + m.end() + ":\n'" +
-                    sectionText + "'");
+                //System.err.println(sectionName + ": from " + m.start() + " to " + m.end() + ":\n'" +
+                //    sectionText + "'");
                 sp += m.end();
                 
                 // Add this section to the SComment
                 sc.addSection(sectionName, sectionText);
                 
                 //System.err.println("\ngroup(2) = '" + m.group(2) + "'");
+                
                 // If there's no next intro line, then we're done.
                 if (m.group(2).equals("")) {
                     done = true;
@@ -380,7 +406,13 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
         //do nothing
     }
     public void startEntity(String str) throws org.xml.sax.SAXException {
-        //do nothing
+        //System.err.println("Calling checkModule from startEntity(" + str + ")");
+        if (str.equals("[dtd]")) {
+            modules.setDtd();
+        }
+        else {
+            modules.checkModule();
+        }
     }
     
 } //DTDEventHandler

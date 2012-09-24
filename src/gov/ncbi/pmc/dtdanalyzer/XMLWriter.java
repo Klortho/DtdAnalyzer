@@ -29,6 +29,7 @@ public class XMLWriter {
     private Attributes attributes;       // All attribute declarations
     private Entities entities;           // All entity declarations
     private SComments scomments;         // All structured comments
+    private Modules modules;             // All modules
     private StringWriter buffer;         // Buffer to hold XML instance as its written
     private String internalDTD = null;   // Holds the internal DTD
     
@@ -76,6 +77,7 @@ public class XMLWriter {
             attributes = model.getAttributes();
             entities = model.getEntities();
             scomments = model.getSComments();
+            modules = model.getModules();
             
             // Process any dtd-level annotations, if there are any
             SComment dtdAnnotations = scomments.getSComment(SComment.DTD, "");
@@ -84,6 +86,9 @@ public class XMLWriter {
                   processSComment(dtdAnnotations);
                 makeEndTag("annotations");
             }
+            
+            // Process modules
+            processModules();
             
             // Make elements
             processAllElements();
@@ -189,7 +194,7 @@ public class XMLWriter {
            buffer.write("<attributes>");
            for (int i = 0; i < attNames.length; i++){
                 openStartTag("attribute");
-                makeAttribute("name", attNames[i]);
+                  makeAttribute("name", attNames[i]);
                 closeStartTag();
                 AttributeIterator atts = attributes.getAttributesByName(attNames[i]);
                 while (atts.hasNext()){               
@@ -255,7 +260,7 @@ public class XMLWriter {
     /**
      * Iterates over all element declarations to create the "elements" element
      */
-    private void processAllElements(){
+    private void processAllElements() {
         ElementIterator iter = elements.getElementIterator();
         
         if ( iter.hasNext() ){
@@ -525,4 +530,30 @@ public class XMLWriter {
             makeEndTag("value");
         }//if   
     }
+    
+    /**
+     * Outputs the <modules> section at the top-level.
+     */
+    private void processModules() {
+        Iterator iter = modules.getIterator();
+        
+        if ( iter.hasNext() ){
+            makeStartTag("modules");
+            
+            while(iter.hasNext()) {
+                Module m = (Module) iter.next();
+                openStartTag("module");
+                  makeAttribute("name", m.getName());
+                  makeAttribute("systemId", m.getSystemId());
+                  makeAttribute("publicId", m.getPublicId());
+                closeStartTag();
+                // Write any annotations for this module, if there are any
+                processSComment(scomments.getSComment(SComment.MODULE, m.getName()));
+                makeEndTag("module");
+            }
+            
+            makeEndTag("modules");
+        }//if 
+    }
+     
 }

@@ -90,6 +90,10 @@ public class SComment {
     public int getType() {
         return type;
     }
+    public void setName(String n) {
+        name = n;
+    }
+    
     public String getName() {
         return name;
     }
