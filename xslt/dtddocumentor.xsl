@@ -10,28 +10,25 @@
 
 	<xsl:param name="exclude-elems" select="' '"/>
 	<xsl:param name="include-files"/>
-
-	<xsl:variable name="dtd-name">
+	
+	<xsl:variable name="title">
 		<xsl:choose>
 			<xsl:when test="/declarations/title">
-				<xsl:value-of select="/declarations/title"/>
+				<xsl:value-of select="/declarations/title"/><xsl:text> Documentation</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="tokenize($files, '/')[last()]"/>
+				<xsl:text>Documentation for </xsl:text><xsl:value-of select="/declarations/dtd/@relSysId"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
 
-	<xsl:template match="/">
-		<xsl:apply-templates select="declarations" mode="build-page"/>
-		
+	<xsl:template match="/">		
 		<xsl:apply-templates select="declarations/*[not(title)]"/>
 		
 		<xsl:for-each-group select="//annotation[@type='tags']/tag" group-by=".">
 			<xsl:apply-templates select="current-group()[1]" mode="build-page"/>			
 		</xsl:for-each-group>
-	</xsl:template>
-	
+	</xsl:template>	
 	
 	<!-- ========================= -->
 	<!-- Exclude unwanted elements -->
@@ -62,15 +59,16 @@
 		<xsl:apply-templates select="entity" mode="build-page"/>
 	</xsl:template>
 	
-	<!-- Not sure what to do with modules yet -->
-	<xsl:template match="modules"/>
+	<xsl:template match="dtd">
+		<xsl:apply-templates select="self::node()" mode="build-page"/>
+	</xsl:template>
 
 
 	<!-- ========================= -->
 	<!-- Build Page -->
 	<!-- ========================= -->
 	
-	<xsl:template match="element | attribute | entity | tag | declarations" mode="build-page">
+	<xsl:template match="element | attribute | entity | tag | dtd" mode="build-page">
 		<xsl:variable name="file">
 			<xsl:if test="self::node()[name()='element']">
 				<xsl:value-of select="concat($dir, '/', translate(@name, ':', '-'), '.html')"/>
@@ -84,14 +82,14 @@
 			<xsl:if test="self::node()[name()='tag']">
 				<xsl:value-of select="concat($dir, '/tag-', translate(., ':', '-'), '.html')"/>
 			</xsl:if>
-			<xsl:if test="self::node()[name()='declarations']">
+			<xsl:if test="self::node()[name()='dtd']">
 				<xsl:value-of select="concat($dir, '/index.html')"/>
 			</xsl:if>
 		</xsl:variable> 
 		<xsl:result-document href="{$file}">
 			<html>
 				<head>
-					<title><xsl:value-of select="$dtd-name"/><xsl:text> Documentation: </xsl:text><xsl:value-of select="@name"/><xsl:text> </xsl:text><xsl:value-of select="self::node()/name()"></xsl:value-of></title>
+					<title><xsl:copy-of select="$title"></xsl:copy-of><xsl:text>: </xsl:text><xsl:value-of select="@name"/><xsl:text> </xsl:text><xsl:value-of select="self::node()/name()"></xsl:value-of></title>
 					<!-- Default Stylesheet -->
 					<link rel="stylesheet" type="text/css">
 						<xsl:attribute name="href">
@@ -120,7 +118,7 @@
 					</script>
 				</head>
 				<body>
-					<div id="head"><a href="index.html"><h1><xsl:value-of select="$dtd-name"/><xsl:text> Documentation</xsl:text></h1></a></div>
+					<div id="head"><a href="index.html"><h1><xsl:copy-of select="$title"/></h1></a></div>
 					<div id="nav">
 						<div class="inner">
 							<xsl:apply-templates select="/declarations"/>
@@ -373,8 +371,8 @@
 	<!-- Index Page -->
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->	
 	
-	<xsl:template match="declarations" mode="content">
-		<h2><span class="pagetitle"><xsl:value-of select="title"/><xsl:text> Documentation:</xsl:text></span><xsl:text> Welcome</xsl:text></h2>
+	<xsl:template match="dtd" mode="content">
+		<h2><span class="pagetitle"><xsl:text> Documentation: </xsl:text></span><xsl:value-of select="@relSysId"/></h2>
 		<xsl:apply-templates select="annotations/*"/>
 	</xsl:template>
 	
