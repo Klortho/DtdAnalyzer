@@ -1235,7 +1235,7 @@
             <file name="test/split-example/banana.ent"/>
             <file name="src/gov/ncbi/pmc/dtdanalyzer/DTDEventHandler.java"/>
             <file name="test/split-example/fleegle-pic.ent"/>
-            <file name="test/split-example/inline.ent"/>
+            <file name="test/split-example/core/inline.ent"/>
             <file name="src/gov/ncbi/pmc/dtdanalyzer/ModelBuilder.java"/>
             <file name="src/gov/ncbi/pmc/dtdanalyzer/Module.java"/>
             <file name="src/gov/ncbi/pmc/dtdanalyzer/Modules.java"/>
