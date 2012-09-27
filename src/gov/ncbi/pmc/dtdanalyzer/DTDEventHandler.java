@@ -28,16 +28,21 @@ public class DTDEventHandler
                org.xml.sax.ext.LexicalHandler 
 {
     private Locator locator = null;                       // Receives location information from XML reader
+    private DtdModule dtdModule = null;                   // Information about the top-level
+                                                          // external subset
     private Attributes allAttributes = new Attributes();  // Contains all declared attributes
     private Elements allElements = new Elements();        // Contains all declared elements
     private int numOfElements = 0;                        // Element counter
     private Entities allEntities = new Entities();        // Contains all declared entities
     private SComments allSComments = new SComments();     // Contains all structured comments.
-    
-    // modules stores info about every unique set of pubid/sysid we've seen.
-    // This is instantiated below in setDocumentLocator;
-    private Modules modules;  
-        
+       
+    /**
+     * Gets the DtdModule associated with this DTD.
+     */
+    public DtdModule getDtdModule() {
+        return dtdModule;
+    }
+      
     /**
      * Returns all declared Attributes 
      *
@@ -73,13 +78,6 @@ public class DTDEventHandler
     }
     
     /**
-     * Returns the collection of modules
-     */
-    public Modules getModules() {
-        return modules;
-    }
-    
-    /**
      * Returns location of the last declaration. This is a convenience method for
      * internal use.
      *
@@ -90,7 +88,6 @@ public class DTDEventHandler
             throw new SAXException("No locator provided by the parser. " +
                 "The DTD cannot be processed without location information.");
         }
-        //modules.checkModule();
         
         return new Location(locator.getSystemId(), locator.getPublicId(), locator.getLineNumber());
     }
@@ -106,7 +103,6 @@ public class DTDEventHandler
      */    
     public void setDocumentLocator(org.xml.sax.Locator locator) {
         this.locator = locator;
-        modules = new Modules(locator);
     }
 
     /**
@@ -278,7 +274,7 @@ public class DTDEventHandler
         entity.setValue(value);       
         entity.setLocation(getLocation());
                
-        allEntities.addEntity(entity);        
+        allEntities.addEntity(entity);
     }
 
     // *********************** ErrorHandler methods ***********************
@@ -323,11 +319,11 @@ public class DTDEventHandler
         if (!fullComment.startsWith("~~")) return;
 
         // Match the beginning and ending "~~", and the identifier line.       
-        Pattern p = Pattern.compile("\\A~~[ \\t]*(\\S+)[ \\t]*\\n(.*)~~", Pattern.DOTALL);
+        Pattern p = Pattern.compile("\\A~~[ \\t]*(.*?)[ \\t]*\\n(.*)~~", Pattern.DOTALL);
         Matcher m = p.matcher(fullComment);
         if (!m.find()) {
             // FIXME:  throw an exception here, if in "strict" mode.
-            System.err.println("Identifier not found in comment starting in " + 
+            System.err.println("Malformed structured comment staring at " + 
                 locator.getSystemId() + ", line " + locator.getLineNumber());
             return;
         }
@@ -336,10 +332,13 @@ public class DTDEventHandler
         String identifier = m.group(1);
         SComment sc = new SComment(identifier);
         
-        // If this comment type is MODULE, then the name has to come from the name of the 
-        // last Module object that we created.
+        // If this comment type is MODULE, then the name has to come from the system id
+        // of the beast that we are currently parsing.  We'll convert this into a 
+        // relative URI, and use that for the name.
         if (sc.getType() == SComment.MODULE) {
-            sc.setName(modules.getCurrent().getName());
+            String curSysId = locator.getSystemId();
+            String relSysId = dtdModule.relativize(curSysId);
+            sc.setName(relSysId);
         }
 
         // comment will hold everything after the first line, and up to but not including
@@ -364,14 +363,10 @@ public class DTDEventHandler
             m = p.matcher(comment.substring(sp));
             if (m.find()) {
                 String sectionText = m.group(1);
-                //System.err.println(sectionName + ": from " + m.start() + " to " + m.end() + ":\n'" +
-                //    sectionText + "'");
                 sp += m.end();
                 
                 // Add this section to the SComment
                 sc.addSection(sectionName, sectionText);
-                
-                //System.err.println("\ngroup(2) = '" + m.group(2) + "'");
                 
                 // If there's no next intro line, then we're done.
                 if (m.group(2).equals("")) {
@@ -405,14 +400,29 @@ public class DTDEventHandler
     public void startDTD(String str, String str1, String str2) throws org.xml.sax.SAXException {
         //do nothing
     }
+    
+    /**
+     * Handler for the start of entities.  We use this to find information about "modules", which
+     * are files that make up the DTD.
+     */
     public void startEntity(String str) throws org.xml.sax.SAXException {
-        //System.err.println("Calling checkModule from startEntity(" + str + ")");
+      try {
         if (str.equals("[dtd]")) {
-            modules.setDtd();
+            dtdModule = new DtdModule(locator);
+            Entity.setBaseUri(dtdModule.getBaseUri());
         }
-        else {
-            modules.checkModule();
+
+        else if (str.charAt(0) == '%') {
+            Entity e = allEntities.getEntity(str.substring(1), Entity.PARAMETER_ENTITY);
+            if (e.isExternal()) {
+                e.setIncluded(true);
+            }
         }
+
+      }
+      catch (Exception e) {
+          // FIXME:  fix this exception handling
+      }
     }
     
 } //DTDEventHandler

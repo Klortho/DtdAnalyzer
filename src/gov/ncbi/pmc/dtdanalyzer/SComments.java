@@ -30,8 +30,6 @@ public class SComments {
      * @param scomment SComment to be added
      */
     public void addSComment( SComment sc ) {
-        //System.err.println("type is " + sc.getType() +
-        //    "scomments[0] is " + scomments[0]);
         scomments[sc.getType()].put(sc.getName(), sc);
     }
 

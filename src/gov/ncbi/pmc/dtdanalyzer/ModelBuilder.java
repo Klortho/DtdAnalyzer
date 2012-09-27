@@ -19,24 +19,25 @@ import java.io.*;
  * @author  Demian Hess
  */
 public class ModelBuilder {
+    private DTDEventHandler dtdInfo;
     private Elements elements;                 // All element declarations
     private Attributes attributes;             // All attribute declarations
     private Entities entities;                 // All entity declarations
     private Map contexts = new HashMap(1024);  // Collection used to hold context info
     private SComments scomments;               // All structured comments
-    private Modules modules;
-    
+
     /**
      * Creates a new instance of ModelBuilder 
      *
      * @param dtdInfo Provides all declaration information for processing
      */
-    public ModelBuilder(DTDEventHandler dtdInfo) {
-        elements = dtdInfo.getAllElements();
-        attributes = dtdInfo.getAllAttributes();
-        entities = dtdInfo.getAllEntities();
-        scomments = dtdInfo.getAllSComments();
-        modules = dtdInfo.getModules();
+    public ModelBuilder(DTDEventHandler _dtdInfo) {
+        dtdInfo = _dtdInfo;
+        elements = _dtdInfo.getAllElements();
+        attributes = _dtdInfo.getAllAttributes();
+        entities = _dtdInfo.getAllEntities();
+        scomments = _dtdInfo.getAllSComments();
+
         processContext();
     }
             
@@ -68,6 +69,13 @@ public class ModelBuilder {
     }
     
     /**
+     * Returns the DtdModule associated with this DTD.
+     */
+    public DtdModule getDtdModule() {
+        return dtdInfo.getDtdModule();
+    }
+     
+    /**
      * Returns all element declarations
      *
      * @return  All element declarations
@@ -92,13 +100,6 @@ public class ModelBuilder {
         return scomments;
     }
     
-    /**
-     * Returns the Modules.
-     */
-    public Modules getModules() {
-        return modules;
-    }
-
     /**
      * Tokenizes the content model for an element and builds the context list. All
      * the element names inside the model represent children of the current element.

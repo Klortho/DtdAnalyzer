@@ -9,7 +9,7 @@ package gov.ncbi.pmc.dtdanalyzer;
 import java.util.*;
 
 /**
- * Holds a collection of Entity objects and provides accessor methods
+ * Holds a collection of Entity objects and provides accessor methods.
  *
  * @author  Demian Hess
  */
@@ -80,17 +80,8 @@ public class Entities {
      *
      * @param entity Entity for which a key is needed
      */
-    private String makeKey(Entity entity){
-        String key;
-        
-        switch ( entity.getType() ){
-            case Entity.PARAMETER_ENTITY:
-                key = "%" + entity.getName();
-                break;
-            default:
-                key = entity.getName();
-        }        
-        return key;              
+    private String makeKey(Entity entity) {
+        return makeKey(entity.getName(), entity.getType());
     }
 
     /**
@@ -99,16 +90,7 @@ public class Entities {
      * @param name Entity name
      * @param int Indicates whether a parameter or general entity
      */    
-    private String makeKey(String name, int type ){
-        String key;
-        
-        switch ( type ){
-            case Entity.PARAMETER_ENTITY:
-                key = "%" + name;
-                break;
-            default:
-                key = name;
-        }        
-        return key;              
+    private String makeKey(String name, int type ) {
+        return type == Entity.PARAMETER_ENTITY ? "%" + name : name;
     }
 }

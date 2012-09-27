@@ -11,27 +11,27 @@ import java.util.*;
  */
 public class SComment {
     /**
-     * Marks a comment as belonging to the dtd as a whole.
-     */
-    public static final int DTD = 0;
-    /**
      * Marks a comment that applies to a parameter entity definition.
      * For consistency, make sure this matches the definition in Entity.java.
      */
     public static final int PARAMETER_ENTITY = 1;
+    
     /**
      * Marks a comment that applies to a general entity definition.
      * For consistency, make sure this matches the definition in Entity.java.
      */
     public static final int GENERAL_ENTITY = 2;
+    
     /**
      * Marks a comment as belonging to an individual module.
      */
     public static final int MODULE = 3;
+    
     /**
      * Marks a comment as belonging to an element
      */
     public static final int ELEMENT = 4;
+    
     /**
      * Marks a comment as belonging to an attribute.
      */
@@ -58,21 +58,19 @@ public class SComment {
      * such as "<split>" or "!dtd".  It is parsed first to determine the target type.
      */
     public SComment(String identifier) {
-        if (identifier.startsWith("%") && identifier.endsWith(";")) {
+        if (identifier.startsWith("%")) {
             type = PARAMETER_ENTITY;
-            name = identifier.substring(1, identifier.length() - 1);
-            //System.err.println("Adding parameter entity " + name);
+            // semicolon at the end is optional
+            name = identifier.endsWith(";") ?
+                  identifier.substring(1, identifier.length() - 1) 
+                : identifier.substring(1);
         }
-        else if (identifier.startsWith("&") && identifier.endsWith(";")) {
+        else if (identifier.startsWith("&")) {
             type = GENERAL_ENTITY;
-            name = identifier.substring(1, identifier.length() - 1);
-        }
-        else if (identifier.equals("!dtd")) {
-            type = DTD;
-            name = "";   // There can be only one.
-        }
-        else if (identifier.equals("!module")) {
-            type = MODULE;
+            // semicolon at the end is optional
+            name = identifier.endsWith(";") ?
+                  identifier.substring(1, identifier.length() - 1) 
+                : identifier.substring(1);
         }
         else if (identifier.startsWith("<") && identifier.endsWith(">")) {
             type = ELEMENT;
@@ -83,7 +81,9 @@ public class SComment {
             name = identifier.substring(1);
         }
         else {
-            // FIXME:  Throw an exception here.
+            type = MODULE;
+            // Name gets set later, from the relSysId of the current parsing location,
+            // and not from the identifier.
         }
     }
     

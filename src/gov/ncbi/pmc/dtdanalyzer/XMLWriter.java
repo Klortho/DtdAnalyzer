@@ -29,7 +29,6 @@ public class XMLWriter {
     private Attributes attributes;       // All attribute declarations
     private Entities entities;           // All entity declarations
     private SComments scomments;         // All structured comments
-    private Modules modules;             // All modules
     private StringWriter buffer;         // Buffer to hold XML instance as its written
     private String internalDTD = null;   // Holds the internal DTD
     
@@ -67,28 +66,23 @@ public class XMLWriter {
     private void buildXML(){ 
         buffer = new StringWriter();
         buffer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        
         // Write out a DOCTYPE and internal DTD if one is available
-        if ( internalDTD != null ){
+        if ( internalDTD != null ) {
             writeDOCTYPE();
-        }//if
+        }
+        
         buffer.write("<declarations>");       
         if ( model != null ){
             elements = model.getElements();
             attributes = model.getAttributes();
             entities = model.getEntities();
             scomments = model.getSComments();
-            modules = model.getModules();
             
-            // Process any dtd-level annotations, if there are any
-            SComment dtdAnnotations = scomments.getSComment(SComment.DTD, "");
-            if (dtdAnnotations != null) {
-                makeStartTag("annotations");
-                  processSComment(dtdAnnotations);
-                makeEndTag("annotations");
-            }
+            processDtdModule();
             
             // Process modules
-            processModules();
+            //processModules();
             
             // Make elements
             processAllElements();
@@ -101,6 +95,25 @@ public class XMLWriter {
         }//if        
         buffer.write("</declarations>");
         buffer.flush();    
+    }
+    
+    /**
+     * Output the top-level <dtd> element, with information and annoations about the 
+     * main DTD module
+     */
+    private void processDtdModule() {
+        DtdModule dtd = model.getDtdModule();
+        openStartTag("dtd");
+          makeAttribute("relSysId", dtd.getRelSysId());
+          makeAttribute("systemId", dtd.getSystemId());
+          makeAttribute("publicId", dtd.getPublicId());
+        closeStartTag();
+          // Process any dtd-level annotations, if there are any
+          SComment dtdAnnotations = scomments.getSComment(SComment.MODULE, dtd.getRelSysId());
+          if (dtdAnnotations != null) {
+              processSComment(dtdAnnotations);
+          }
+        makeEndTag("dtd");
     }
     
    /**
@@ -215,14 +228,25 @@ public class XMLWriter {
      * If the sc argument is null, then this outputs nothing.
      */
     private void processSComment(SComment sc) {
+        processSComment(sc, "");
+    }
+    
+    /**
+     * This version of processSComment puts a @level attribute on the <annotations> element,
+     * if it is not an empty string.
+     */
+    private void processSComment(SComment sc, String level) {
         if (sc == null) return;
 
-        //System.err.println("*******Getting scomment for attr " + attNames[i] + ": " + sc);
-        makeStartTag("annotations");
+        openStartTag("annotations");
+        if (!level.equals("")) {
+            makeAttribute("level", level);
+        }
+        closeStartTag();
+        
         Iterator secNames = sc.getSectionNameIterator();
         while ( secNames.hasNext() ) {
             String secName = (String) secNames.next();
-            //System.err.println("found section name " + secName);
             openStartTag("annotation");
             makeAttribute("type", secName);
             closeStartTag();
@@ -499,8 +523,11 @@ public class XMLWriter {
         
         if (ent.getSystemId() != null) {
             makeAttribute("systemId", ent.getSystemId());
+            makeAttribute("relSysId", ent.getRelSysId());
+            if (ent.getType() == Entity.PARAMETER_ENTITY) {
+                makeAttribute("included", Boolean.toString(ent.getIncluded()));
+            }
         }
-        
         if (ent.getPublicId() != null) {
             makeAttribute("publicId", ent.getPublicId());
         }
@@ -511,7 +538,17 @@ public class XMLWriter {
             writeDeclaredInInfo(ent.getLocation());
         }
         writeValueInfo(ent);
-        processSComment(scomments.getSComment(ent.getType(), ent.getName()));
+        
+        // Only for parameter entities will we output the level="reference" attribute
+        int type = ent.getType();
+        String level = type == Entity.PARAMETER_ENTITY ? "reference" : "";
+        processSComment(scomments.getSComment(ent.getType(), ent.getName()), level);
+        
+        // Again, only for parameter entities, if it's external, then also put out the
+        // module-level annotations
+        if (type == Entity.PARAMETER_ENTITY && ent.isExternal()) {
+            processSComment(scomments.getSComment(SComment.MODULE, ent.getRelSysId()), "module");
+        }
 
         makeEndTag("entity");
     }        
@@ -535,6 +572,7 @@ public class XMLWriter {
      * Outputs the <modules> section at the top-level.
      */
     private void processModules() {
+      /*
         Iterator iter = modules.getIterator();
         
         if ( iter.hasNext() ){
@@ -554,6 +592,7 @@ public class XMLWriter {
             
             makeEndTag("modules");
         }//if 
+      */
     }
      
 }
