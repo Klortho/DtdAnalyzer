@@ -20,6 +20,7 @@ import java.io.*;
  */
 public class ModelBuilder {
     private DTDEventHandler dtdInfo;
+    private String dtdTitle;                   // Either null or a title value.
     private Elements elements;                 // All element declarations
     private Attributes attributes;             // All attribute declarations
     private Entities entities;                 // All entity declarations
@@ -27,20 +28,44 @@ public class ModelBuilder {
     private SComments scomments;               // All structured comments
 
     /**
-     * Creates a new instance of ModelBuilder 
+     * Creates a new instance of ModelBuilder.  
      *
-     * @param dtdInfo Provides all declaration information for processing
+     * @param _dtdInfo Provides all the information about the DTD, that was gathered during
+     * parsing.
+     * @param _dtdTitle If not null, this will override any title that was given in the
+     * top-level DTD structured comment.
      */
-    public ModelBuilder(DTDEventHandler _dtdInfo) {
+    public ModelBuilder(DTDEventHandler _dtdInfo, String _dtdTitle) {
         dtdInfo = _dtdInfo;
         elements = _dtdInfo.getAllElements();
         attributes = _dtdInfo.getAllAttributes();
         entities = _dtdInfo.getAllEntities();
         scomments = _dtdInfo.getAllSComments();
 
+        // The DTD title will either come from the parsed content (from _dtdInfo) or else 
+        // from the command-line param (from _dtdTitle).
+        if (_dtdTitle != null) {
+            dtdTitle = _dtdTitle;
+        }
+        else {
+            SComment dtdSComment = scomments.getSComment(SComment.MODULE, getDtdModule().getRelSysId());
+            if (dtdSComment != null) {
+                dtdTitle = dtdSComment.getTitle();
+            }
+        }
+        
         processContext();
     }
-            
+
+    /**
+     * Returns the DTD title which will either come from the structured annotation within
+     * the top-level DTD module, or else the command line.  It will be null if it's not
+     * specified in either place.
+     */
+    public String getDtdTitle() {
+        return dtdTitle;
+    }
+     
     /**
      * Returns all attribute declarations
      *

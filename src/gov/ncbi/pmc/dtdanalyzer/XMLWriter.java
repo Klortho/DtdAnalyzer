@@ -72,7 +72,14 @@ public class XMLWriter {
             writeDOCTYPE();
         }
         
-        buffer.write("<declarations>");       
+        makeStartTag("declarations");
+        String dtdTitle = model.getDtdTitle();
+        if (dtdTitle != null) {
+            makeStartTag("title");
+            buffer.write(dtdTitle);
+            makeEndTag("title");
+        }
+
         if ( model != null ){
             elements = model.getElements();
             attributes = model.getAttributes();

@@ -49,6 +49,12 @@ public class SComment {
     private String name;
     
     /**
+     * Only for MODULE structured comments, the text immediately after the opening
+     * comment tag is used for the title.  For other SComment types, this will be null;
+     */
+    private String title = null;
+    
+    /**
      * List of sections, indexed by section name.
      */
     private HashMap sections = new HashMap();
@@ -84,6 +90,10 @@ public class SComment {
             type = MODULE;
             // Name gets set later, from the relSysId of the current parsing location,
             // and not from the identifier.
+            // Instead, use the identifier to set the title.
+            if (identifier != null && !identifier.equals("")) {
+                title = identifier;
+            }
         }
     }
     
@@ -92,6 +102,10 @@ public class SComment {
     }
     public void setName(String n) {
         name = n;
+    }
+    
+    public String getTitle() {
+        return title;
     }
     
     public String getName() {

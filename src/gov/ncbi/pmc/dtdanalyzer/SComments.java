@@ -39,5 +39,4 @@ public class SComments {
     public SComment getSComment(int type, String name) {
         return (SComment) scomments[type].get(name);
     }
-
 }

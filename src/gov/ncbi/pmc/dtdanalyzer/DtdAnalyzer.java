@@ -166,6 +166,10 @@ public class DtdAnalyzer {
                     System.exit(1);
                 }
             }
+            
+            String dtdTitle = null;
+            if (line.hasOption("t")) dtdTitle = line.getOptionValue("t");
+            //System.err.println("title is " + dtdTitle);
     
             Result out = null;
             String[] rest = line.getArgs();
@@ -237,7 +241,7 @@ public class DtdAnalyzer {
                 System.exit(1);
             }
         
-            ModelBuilder model = new ModelBuilder(dtdEvents);
+            ModelBuilder model = new ModelBuilder(dtdEvents, dtdTitle);
             XMLWriter writer = new XMLWriter(model);
             
             // Now run the transformation
