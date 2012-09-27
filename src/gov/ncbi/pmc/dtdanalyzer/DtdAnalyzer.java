@@ -99,7 +99,6 @@ public class DtdAnalyzer {
                 .withArgName("xslt")
                 .create('x') 
         );
-
         options.addOption( 
             OptionBuilder
                 .withLongOpt( "title" )
@@ -108,6 +107,19 @@ public class DtdAnalyzer {
                 .hasArg()
                 .withArgName("dtd-title")
                 .create('t') 
+        );
+        options.addOption(
+            OptionBuilder
+                .withLongOpt("roots")
+                .withDescription("Specify the set of possible root elements for documents conforming " + 
+                    "to this DTD.  These elements will be tagged with a 'root=true' attribute in " +
+                    "the output.  This will also cause the DtdAnalyzer to find those elements that " +
+                    "are not reachable from this set of possible root elements, and to tag those " +
+                    "with a 'reachable=false' attribute.  The argument to this " +
+                    "should be a space-delimited list of element names. ")
+                .hasArg()
+                .withArgName("roots")
+                .create('r')
         );
 
         // create the command line parser
@@ -166,6 +178,16 @@ public class DtdAnalyzer {
                     System.exit(1);
                 }
             }
+            
+            String dtdTitle = null;
+            if (line.hasOption("t")) dtdTitle = line.getOptionValue("t");
+            //System.err.println("title is " + dtdTitle);
+            
+            String[] roots = null;
+            if (line.hasOption("r")) {
+                roots = line.getOptionValue("r").split("\\s");
+            }
+
     
             Result out = null;
             String[] rest = line.getArgs();
@@ -237,7 +259,15 @@ public class DtdAnalyzer {
                 System.exit(1);
             }
         
-            ModelBuilder model = new ModelBuilder(dtdEvents);
+            ModelBuilder model = new ModelBuilder(dtdEvents, dtdTitle);
+            try {
+                if (roots != null) model.findReachable(roots);
+            }
+            catch (Exception e) {
+                // This is not fatal.
+                System.err.println("Error trying to find reachable nodes from set of roots: " +
+                    e.getMessage());
+            }
             XMLWriter writer = new XMLWriter(model);
             
             // Now run the transformation
@@ -260,7 +290,7 @@ public class DtdAnalyzer {
                 stylesheet.transform(xmlSource, out);
             }
             catch(Exception e){ 
-                System.out.println("Could not run the transformation: " + e.getMessage());
+                System.err.println("Could not run the transformation: " + e.getMessage());
                 e.printStackTrace(System.out);
             }     
         }
@@ -280,7 +310,7 @@ public class DtdAnalyzer {
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
         formatter.setSyntaxPrefix("Usage:  ");
-        OptionComparator c = new OptionComparator("hsdpcxt");
+        OptionComparator c = new OptionComparator("hsdpcxtr");
         formatter.setOptionComparator(c);
 
         formatter.printHelp(

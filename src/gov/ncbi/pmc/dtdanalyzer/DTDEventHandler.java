@@ -20,14 +20,28 @@ import java.util.*;
  * @author Demian Hess
  * @version 1.0 2005-11-09
  */
-public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.ErrorHandler, org.xml.sax.ext.DeclHandler, org.xml.sax.ext.LexicalHandler {
-        
+public class DTDEventHandler 
+    implements org.xml.sax.ContentHandler, 
+               org.xml.sax.ErrorHandler, 
+               org.xml.sax.ext.DeclHandler, 
+               org.xml.sax.ext.LexicalHandler 
+{
     private Locator locator = null;                       // Receives location information from XML reader
+    private DtdModule dtdModule = null;                   // Information about the top-level
+                                                          // external subset
     private Attributes allAttributes = new Attributes();  // Contains all declared attributes
     private Elements allElements = new Elements();        // Contains all declared elements
     private int numOfElements = 0;                        // Element counter
     private Entities allEntities = new Entities();        // Contains all declared entities
-        
+    private SComments allSComments = new SComments();     // Contains all structured comments.
+       
+    /**
+     * Gets the DtdModule associated with this DTD.
+     */
+    public DtdModule getDtdModule() {
+        return dtdModule;
+    }
+      
     /**
      * Returns all declared Attributes 
      *
@@ -54,7 +68,14 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
     public Entities getAllEntities(){
         return allEntities;
     }
-      
+    
+    /**
+     * Returns the collection of structured comments
+     */
+    public SComments getAllSComments() {
+        return allSComments;
+    }
+    
     /**
      * Returns location of the last declaration. This is a convenience method for
      * internal use.
@@ -63,8 +84,9 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
      */  
     private Location getLocation() throws SAXException{
         if ( locator == null ){
-            throw new SAXException("No locator provided by the parser. The DTD cannot be processed without location information.");
-        } // if
+            throw new SAXException("No locator provided by the parser. " +
+                "The DTD cannot be processed without location information.");
+        }
         
         return new Location(locator.getSystemId(), locator.getPublicId(), locator.getLineNumber());
     }
@@ -79,19 +101,20 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
      * @param locator Reports location information from the DTD during parsing
      */    
     public void setDocumentLocator(org.xml.sax.Locator locator) {
-            this.locator = locator;
+        this.locator = locator;
     }
 
     /**
      * Reinitializes all values so that declaration information can be collected
      *
-     * @throws SAXException Indicates problem occurred during processing */    
+     * @throws SAXException Indicates problem occurred during processing 
+     */    
     public void startDocument() throws org.xml.sax.SAXException {
         //System.out.println("startDocument\n");
         allAttributes = new Attributes();
         allElements = new Elements();  
         allEntities = new Entities();
-        numOfElements = 0;       
+        numOfElements = 0;
     }
 
     /**
@@ -250,7 +273,7 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
         entity.setValue(value);       
         entity.setLocation(getLocation());
                
-        allEntities.addEntity(entity);        
+        allEntities.addEntity(entity);
     }
 
     // *********************** ErrorHandler methods ***********************
@@ -292,9 +315,75 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
         String fullComment = new String(text, start, length).trim();
         
         // Make sure this is a special comment
-        if ( !fullComment.startsWith("~~") ) return;
+        if (!fullComment.startsWith("~~")) return;
 
-        //System.out.println("Got a special comment");
+        // Match the beginning and ending "~~", and the identifier line.       
+        Pattern p = Pattern.compile("\\A~~[ \\t]*(.*?)[ \\t]*\\n(.*)~~", Pattern.DOTALL);
+        Matcher m = p.matcher(fullComment);
+        if (!m.find()) {
+            // FIXME:  throw an exception here, if in "strict" mode.
+            System.err.println("Malformed structured comment staring at " + 
+                locator.getSystemId() + ", line " + locator.getLineNumber());
+            return;
+        }
+        
+        // Pull out the identifier, and create a new SComment object
+        String identifier = m.group(1);
+        SComment sc = new SComment(identifier);
+        
+        // If this comment type is MODULE, then the name has to come from the system id
+        // of the beast that we are currently parsing.  We'll convert this into a 
+        // relative URI, and use that for the name.
+        if (sc.getType() == SComment.MODULE) {
+            String curSysId = locator.getSystemId();
+            String relSysId = dtdModule.relativize(curSysId);
+            sc.setName(relSysId);
+        }
+
+        // comment will hold everything after the first line, and up to but not including
+        // the final ~~.
+        String comment = m.group(2);
+        
+        // Next we'll parse the rest of the comment
+        
+        // This pattern matches the current text section, plus the intro line of the next
+        // section, if there is one; or the end-of-input, if not.
+        p = Pattern.compile("(.*?)((\\n~~[ \\t]*(\\S+)[ \\t]*\\n)|\\z)", Pattern.DOTALL);
+        
+        // sectionName stores the name of the next annotation section.  The first section is 
+        // implicitly defined to be "notes".
+        String sectionName = "notes";
+        
+        // sp points to the next character in the input string that we want to match
+        int sp = 0;  
+        // We'll find each annotation section until done
+        boolean done = false;
+        while (!done) {
+            m = p.matcher(comment.substring(sp));
+            if (m.find()) {
+                String sectionText = m.group(1);
+                sp += m.end();
+                
+                // Add this section to the SComment
+                sc.addSection(sectionName, sectionText);
+                
+                // If there's no next intro line, then we're done.
+                if (m.group(2).equals("")) {
+                    done = true;
+                }
+                else {
+                    sectionName = m.group(4);
+                }
+            }
+            else {
+                // FIXME:  throw an exception here, if in "strict" mode.
+                System.err.println("Malformed annotated comment section.");
+                done = true;
+            }
+        }
+        
+        // Add this SComment object to the collection
+        allSComments.addSComment(sc);
     }
 
 
@@ -310,8 +399,29 @@ public class DTDEventHandler implements org.xml.sax.ContentHandler, org.xml.sax.
     public void startDTD(String str, String str1, String str2) throws org.xml.sax.SAXException {
         //do nothing
     }
+    
+    /**
+     * Handler for the start of entities.  We use this to find information about "modules", which
+     * are files that make up the DTD.
+     */
     public void startEntity(String str) throws org.xml.sax.SAXException {
-        //do nothing
+      try {
+        if (str.equals("[dtd]")) {
+            dtdModule = new DtdModule(locator);
+            Entity.setBaseUri(dtdModule.getBaseUri());
+        }
+
+        else if (str.charAt(0) == '%') {
+            Entity e = allEntities.getEntity(str.substring(1), Entity.PARAMETER_ENTITY);
+            if (e.isExternal()) {
+                e.setIncluded(true);
+            }
+        }
+
+      }
+      catch (Exception e) {
+          // FIXME:  fix this exception handling
+      }
     }
     
 } //DTDEventHandler

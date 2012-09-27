@@ -25,6 +25,9 @@ public class Element {
     private int dtdOrder = 0;       // Order declared in the DTD
     private Location location;      // Location inside the DTD
     
+    private boolean isRoot = false;  // True if this is one of a set of possible roots
+    private boolean reachable = true;
+    
     /**
      * Creates a new instance of the class
      *
@@ -84,8 +87,7 @@ public class Element {
     }    
         
     /**
-     * Returns a Location object that indicates the location of the element
-     * declaration inside the DTD.
+     * Sets the location for this element declaration inside the DTD.
      *
      * @param loc  Location information 
      */    
@@ -93,4 +95,32 @@ public class Element {
         location = loc;
     }
     
+    /**
+     * Sets the value of the isRoot flag to true.
+     */
+    public void setIsRoot() {
+        isRoot = true;
+    }
+    
+    /**
+     * Returns the value of the isRoot flag.
+     */
+    public boolean isRoot() {
+        return isRoot;
+    }
+    
+    /**
+     * Sets the reachable flag to false.
+     */
+    public void setUnreachable() {
+        reachable = false;
+    }
+    
+    /**
+     * Returns the value of the reachable flag.
+     */
+    public boolean isReachable() {
+        return reachable;
+    }
 }
+

@@ -28,6 +28,7 @@ public class XMLWriter {
     private Elements elements;           // All element declarations
     private Attributes attributes;       // All attribute declarations
     private Entities entities;           // All entity declarations
+    private SComments scomments;         // All structured comments
     private StringWriter buffer;         // Buffer to hold XML instance as its written
     private String internalDTD = null;   // Holds the internal DTD
     
@@ -65,15 +66,30 @@ public class XMLWriter {
     private void buildXML(){ 
         buffer = new StringWriter();
         buffer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        
         // Write out a DOCTYPE and internal DTD if one is available
-        if ( internalDTD != null ){
+        if ( internalDTD != null ) {
             writeDOCTYPE();
-        }//if
-        buffer.write("<declarations>");       
+        }
+        
+        makeStartTag("declarations");
+        String dtdTitle = model.getDtdTitle();
+        if (dtdTitle != null) {
+            makeStartTag("title");
+            buffer.write(dtdTitle);
+            makeEndTag("title");
+        }
+
         if ( model != null ){
             elements = model.getElements();
             attributes = model.getAttributes();
             entities = model.getEntities();
+            scomments = model.getSComments();
+            
+            processDtdModule();
+            
+            // Process modules
+            //processModules();
             
             // Make elements
             processAllElements();
@@ -89,17 +105,33 @@ public class XMLWriter {
     }
     
     /**
-     * Helper method closes the start tag
+     * Output the top-level <dtd> element, with information and annoations about the 
+     * main DTD module
      */
-    private void closeStartTag(){
-        buffer.write(">");        
+    private void processDtdModule() {
+        DtdModule dtd = model.getDtdModule();
+        openStartTag("dtd");
+          makeAttribute("relSysId", dtd.getRelSysId());
+          makeAttribute("systemId", dtd.getSystemId());
+          makeAttribute("publicId", dtd.getPublicId());
+        closeStartTag();
+          // Process any dtd-level annotations, if there are any
+          SComment dtdAnnotations = scomments.getSComment(SComment.MODULE, dtd.getRelSysId());
+          if (dtdAnnotations != null) {
+              processSComment(dtdAnnotations);
+          }
+        makeEndTag("dtd");
     }
     
    /**
     * Escapes protected XML characters in content
     */
     private String escape(String str) {
-       return str.replaceAll("&", "&amp;").replaceAll(">", "&gt;").replaceAll("<", "&lt;").replaceAll("\"", "&quot;").replaceAll("'","&apos;");
+       return str.replaceAll("&", "&amp;")
+                 .replaceAll(">", "&gt;")
+                 .replaceAll("<", "&lt;")
+                 .replaceAll("\"", "&quot;")
+                 .replaceAll("'","&apos;");
     } // escape
     
     /**
@@ -126,23 +158,12 @@ public class XMLWriter {
     }
     
     /**
-     * Helper methods writes an attribute to the buffer
-     *
-     * @param name Attribute name
-     * @param value Attribute value
+     * Helper method to write a complete start tag, for an element that
+     * won't get any attributes
      */
-    private void makeAttribute(String name, String value){
-        buffer.write( " " + name + "=\"" + escape(value) + "\"");
-    }
-    
-    /**
-     * Helper methods writes an end tag to the buffer
-     *
-     * @param name Tag name
-     */
-    private void makeEndTag(String name){
-        buffer.write( "</" + name + ">");       
-    }
+    private void makeStartTag(String name) {
+        buffer.write("<" + name + ">");
+    } 
     
     /**
      * Helper method starts writing an start tag to the buffer. Note
@@ -156,6 +177,34 @@ public class XMLWriter {
     }
 
     /**
+     * Helper method closes the start tag
+     */
+    private void closeStartTag(){
+        buffer.write(">");        
+    }
+    
+    /**
+     * Helper methods writes an attribute to the buffer
+     *
+     * @param name Attribute name
+     * @param value Attribute value.  If this is null, then no attribute is created.
+     */
+    private void makeAttribute(String name, String value){
+        if (value != null) 
+            buffer.write( " " + name + "=\"" + escape(value) + "\"");
+    }
+    
+    /**
+     * Helper methods writes an end tag to the buffer
+     *
+     * @param name Tag name
+     */
+    private void makeEndTag(String name){
+        buffer.write( "</" + name + ">");       
+    }
+    
+
+    /**
      * Iterates over all attribute declarations to create the "attributes"
      * element.
      */
@@ -166,16 +215,53 @@ public class XMLWriter {
            buffer.write("<attributes>");
            for (int i = 0; i < attNames.length; i++){
                 openStartTag("attribute");
-                makeAttribute("name", attNames[i]);
+                  makeAttribute("name", attNames[i]);
                 closeStartTag();
                 AttributeIterator atts = attributes.getAttributesByName(attNames[i]);
                 while (atts.hasNext()){               
                     writeDeclarationInfo(atts.next());
-                }//while
+                }
+                
+                // Write the annotations for this attribute
+                processSComment(scomments.getSComment(SComment.ATTRIBUTE, attNames[i]));
+                
                 makeEndTag("attribute");
            }//for
            buffer.write("</attributes>");
         }//if
+    }
+    
+    /**
+     * This outputs the <annotations> element corresponding to a SComment object.
+     * If the sc argument is null, then this outputs nothing.
+     */
+    private void processSComment(SComment sc) {
+        processSComment(sc, "");
+    }
+    
+    /**
+     * This version of processSComment puts a @level attribute on the <annotations> element,
+     * if it is not an empty string.
+     */
+    private void processSComment(SComment sc, String level) {
+        if (sc == null) return;
+
+        openStartTag("annotations");
+        if (!level.equals("")) {
+            makeAttribute("level", level);
+        }
+        closeStartTag();
+        
+        Iterator secNames = sc.getSectionNameIterator();
+        while ( secNames.hasNext() ) {
+            String secName = (String) secNames.next();
+            openStartTag("annotation");
+            makeAttribute("type", secName);
+            closeStartTag();
+            buffer.write(sc.getSection(secName));
+            makeEndTag("annotation");
+        }
+        makeEndTag("annotations");
     }
      
     /**
@@ -206,7 +292,7 @@ public class XMLWriter {
     /**
      * Iterates over all element declarations to create the "elements" element
      */
-    private void processAllElements(){
+    private void processAllElements() {
         ElementIterator iter = elements.getElementIterator();
         
         if ( iter.hasNext() ){
@@ -306,10 +392,13 @@ public class XMLWriter {
         openStartTag("element");
           makeAttribute("name", e.getName());
           makeAttribute("dtdOrder", Integer.toString(e.getDTDOrder()));
+          if (e.isRoot()) makeAttribute("root", "true");
+          if (!e.isReachable()) makeAttribute("reachable", "false");
         closeStartTag();
           writeDeclaredInInfo( e.getLocation() );  
           writeContentModel( e.getContentModel() );
-          writeContextInfo(model.getContext(e.getName()));        
+          writeContextInfo(model.getContext(e.getName()));
+          processSComment(scomments.getSComment(SComment.ELEMENT, e.getName()));
         makeEndTag("element");                
     }
     
@@ -442,22 +531,35 @@ public class XMLWriter {
         
         makeAttribute("name", ent.getName());
         
-        if (ent.getSystemId() != null){
+        if (ent.getSystemId() != null) {
             makeAttribute("systemId", ent.getSystemId());
+            makeAttribute("relSysId", ent.getRelSysId());
+            if (ent.getType() == Entity.PARAMETER_ENTITY) {
+                makeAttribute("included", Boolean.toString(ent.getIncluded()));
+            }
         }
-        
-        if (ent.getPublicId() != null){
+        if (ent.getPublicId() != null) {
             makeAttribute("publicId", ent.getPublicId());
         }
         
         closeStartTag();        
  
-        if (ent.getLocation() != null){
+        if (ent.getLocation() != null) {
             writeDeclaredInInfo(ent.getLocation());
         }
-        
         writeValueInfo(ent);
         
+        // Only for parameter entities will we output the level="reference" attribute
+        int type = ent.getType();
+        String level = type == Entity.PARAMETER_ENTITY ? "reference" : "";
+        processSComment(scomments.getSComment(ent.getType(), ent.getName()), level);
+        
+        // Again, only for parameter entities, if it's external, then also put out the
+        // module-level annotations
+        if (type == Entity.PARAMETER_ENTITY && ent.isExternal()) {
+            processSComment(scomments.getSComment(SComment.MODULE, ent.getRelSysId()), "module");
+        }
+
         makeEndTag("entity");
     }        
     
@@ -475,4 +577,32 @@ public class XMLWriter {
             makeEndTag("value");
         }//if   
     }
+    
+    /**
+     * Outputs the <modules> section at the top-level.
+     */
+    private void processModules() {
+      /*
+        Iterator iter = modules.getIterator();
+        
+        if ( iter.hasNext() ){
+            makeStartTag("modules");
+            
+            while(iter.hasNext()) {
+                Module m = (Module) iter.next();
+                openStartTag("module");
+                  makeAttribute("name", m.getName());
+                  makeAttribute("systemId", m.getSystemId());
+                  makeAttribute("publicId", m.getPublicId());
+                closeStartTag();
+                // Write any annotations for this module, if there are any
+                processSComment(scomments.getSComment(SComment.MODULE, m.getName()));
+                makeEndTag("module");
+            }
+            
+            makeEndTag("modules");
+        }//if 
+      */
+    }
+     
 }

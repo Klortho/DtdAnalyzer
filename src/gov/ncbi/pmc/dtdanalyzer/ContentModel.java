@@ -12,9 +12,14 @@ import java.util.*;
 public class ContentModel {
     
     private String minModel = null;   // Minified string version of the content model
-    private String spec;            // Either "any", "empty", "text", "mixed", or "element".
-    private Vector kids;            // If the spec is "mixed", this holds the list of child elements
-    private NameChoiceSeq choiceOrSeq;   // If the spec is "element", this holds the parsed model. 
+    private String spec;              // Either "any", "empty", "text", "mixed", or "element".
+    private Vector kids;              // If the spec is "mixed", this holds the list of child elements
+    private NameChoiceSeq choiceOrSeq;  // If the spec is "element", this holds the parsed model. 
+
+    // If spec is "mixed" or "element", this contains pointers to all this child Element names.
+    // In the case of "mixed", this is the same as kids, except unordered.  In the case of
+    // "element", this is like choiceOrSeq, but flattened, so that each kid appears only once.
+    private HashSet allKids;
     
     // Used in parsing the model string
     private int _tp;                      // token pointer, index of the *next* character in minModel
@@ -45,19 +50,24 @@ public class ContentModel {
             }
             else if (m.startsWith("(#PCDATA")) {
                 spec = "mixed";
-                // Need to parse mixed content
                 kids = new Vector();
+                allKids = new HashSet();
+
+                // Need to parse mixed content
                 _tp = 9;
                 _getToken();
                 while (_token != 'e') {
                     if (_token == 'n') {
                         kids.addElement(_tokenName);
+                        allKids.add(_tokenName);
                     }
                     _getToken();
                 }
             }
             else {
                 spec = "element";
+                allKids = new HashSet();
+
                 // Initialize the parser
                 _tp = 0;
                 // The first token must be an '('
@@ -107,6 +117,14 @@ public class ContentModel {
     public NameChoiceSeq getChoiceOrSeq() {
         return choiceOrSeq;
     }
+    
+    /**
+     * If spec is "mixed" or "element", this returns an iterator over all of the child
+     * element names (not Element objects).
+     */
+    public Iterator getKidsIter() {
+        return (spec.equals("mixed") || spec.equals("element")) ? allKids.iterator() : null;
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////
     // All of the rest of the methods are private, and used for parsing the content model.
@@ -126,6 +144,7 @@ public class ContentModel {
                 self.addKid(_makeChoiceOrSeq());
             }
             else if (_token == 'n') {
+                allKids.add(_tokenName);
                 // We just found a name, create a new kid from it.
                 _printDebug("Creating a new name child");
                 NameChoiceSeq kName = new NameChoiceSeq(_tokenName);
@@ -231,5 +250,7 @@ public class ContentModel {
         }
         System.out.println(indentStr + s); 
     }
+    
+    
     
 }

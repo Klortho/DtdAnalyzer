@@ -1,42 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <declarations>
-  <title>BananaSplit.DTD</title>
-  <annotations>
-    <annotation type='note'>
-      <p>
-        This is a sample DTD to illustrate and to test various features of the
-        DtdAnalyzer.
-      </p>
-      <p>
-        This is the main ".dtd" module of this DTD.  These notes will be inserted into
-        the main index.html page of the documenation.  Note that since this is the main
-        module, we should use the "!dtd" annotations, and not any "!module" annotations
-        here.
-      </p>
-    </annotation>
-  </annotations>
-  
-  <modules>
-    <module name='inline.ent'
-      systemId='file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent'
-      publicId="-//NLM//external ent dummy public id 1//EN">
-      <annotations>
-        <annotation type='note'>
-          <p>This module defines the elements that can be used inline in a description.</p>
-        </annotation>
-      </annotations>
-    </module>
-    <module name='banana.ent'
-      systemId=''
-      publicId=''>
-      <annotations>
-        <annotation type='note'>
-          <p>This module defines the &lt;banana> element, and all the slippery things associated
-          with it.</p>
-        </annotation>
-      </annotations>
-    </module>
-  </modules>
+  <dtd relSysId="split-example.dtd" 
+    systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/split-example/split-example.dtd"
+    publicId="-//NLM//external dtd dummy public id//EN">
+    <annotations>
+      <annotation type='note'>
+        <p>
+          This is a sample DTD to illustrate and to test various features of the
+          DtdAnalyzer.
+        </p>
+        <p>
+          This is the main ".dtd" module of this DTD.  These notes will be inserted into
+          the main index.html page of the documenation.  Note that since this is the main
+          module, we should use the "!dtd" annotations, and not any "!module" annotations
+          here.
+        </p>
+      </annotation>
+    </annotations>
+  </dtd>
   
   <elements>
     <element name="split" dtdOrder="1">
@@ -168,6 +149,7 @@
       </context>
     </element>
   </elements>
+  
   <attributes>
     <attribute name="src">
       <attributeDeclaration element="img" type="CDATA" mode="#REQUIRED">
@@ -199,31 +181,60 @@
       </annotations>
     </attribute>
   </attributes>
+  
   <parameterEntities>
     <entity name="banana.ent"
+      relSysId='banana.ent'
       systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/banana.ent"
       publicId="-//NLM//external ent dummy public id 2//EN">
       <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/split-example.dtd"
         publicId="-//NLM//external dtd dummy public id//EN" lineNumber="45"/>
+      <annotations level='reference'>
+        <annotation type='note'>
+          <p>In the split DTD, we bring in the banana.ent module in order to get all the 
+            slippery things assocatied with bananas.</p>
+        </annotation>
+      </annotations>
+      <annotations level='module'>
+        <annotation type='note'>
+          <p>This module defines the &lt;banana> element, and all the slippery things associated
+            with it.</p>
+        </annotation>
+      </annotations>
     </entity>
+    
     <entity name="inline.ent"
+      relSysId='inline.ent'
       systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
       publicId="-//NLM//external ent dummy public id 1//EN">
       <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/split-example.dtd"
         publicId="-//NLM//external dtd dummy public id//EN" lineNumber="42"/>
-      <annotations>
+      <annotations level='reference'>
         <annotation type='note'>
-          <p>Example parameter entity.  This is a list of elements that can be included inline
-            within a &lt;banana> element.</p>            
+          <p>This entity declares some "core" things, that really just happen to be a few
+            elements that look suspiciously like HTML.</p>
+        </annotation>
+      </annotations>
+      <annotations level='module'>
+        <annotation type='note'>
+          <p>This module defines the elements that can be used inline in a description.</p>
         </annotation>
       </annotations>
     </entity>
+    
     <entity name="inline">
       <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
         publicId="-//NLM//external ent dummy public id 1//EN" lineNumber="10"/>
       <value>em | strong | i | img</value>
+      <annotations>
+        <annotation type='note'>
+          <p>Example parameter entity.  This is a list of elements that can be included inline
+            within a &lt;banana> element.</p>
+        </annotation>
+      </annotations>
     </entity>
   </parameterEntities>
+
   <generalEntities>
     <entity name="fleegle-pic"
       systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/fleegle-pic.ent">
@@ -237,3 +248,4 @@
     </entity>
   </generalEntities>
 </declarations>
+

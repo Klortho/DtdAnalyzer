@@ -1,4 +1,5 @@
-<!--~~ !dtd
+<!--~~ Banana Split Example DTD
+
 This is a sample DTD to illustrate and to test various features of the
 DtdAnalyzer.
 
@@ -38,9 +39,18 @@ root rock-group mess-of-fun
 
 <!ELEMENT split (banana)*>
 
+<!--~~ %inline.ent;
+This entity declares some "core" things, that really just happen to be a few
+elements that look suspiciously like HTML.
+~~-->
 
-<!ENTITY % inline.ent PUBLIC "-//NLM//external ent dummy public id 1//EN" "inline.ent">
+<!ENTITY % inline.ent PUBLIC "-//NLM//external ent dummy public id 1//EN" "core/inline.ent">
 %inline.ent;
+
+<!--~~ %banana.ent;
+In the split DTD, we bring in the banana.ent module in order to get all the 
+slippery things assocatied with bananas.
+~~-->
 
 <!ENTITY % banana.ent PUBLIC "-//NLM//external ent dummy public id 2//EN" "banana.ent">
 %banana.ent;
