@@ -9,6 +9,7 @@ package gov.ncbi.pmc.dtdanalyzer;
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
 import java.util.*;
+import java.util.regex.*;
 
 /**
  * Collects and stores information about elements, attributes, and entities
