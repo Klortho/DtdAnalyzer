@@ -187,10 +187,11 @@ public class XMLWriter {
      * Helper methods writes an attribute to the buffer
      *
      * @param name Attribute name
-     * @param value Attribute value
+     * @param value Attribute value.  If this is null, then no attribute is created.
      */
     private void makeAttribute(String name, String value){
-        buffer.write( " " + name + "=\"" + escape(value) + "\"");
+        if (value != null) 
+            buffer.write( " " + name + "=\"" + escape(value) + "\"");
     }
     
     /**
@@ -391,6 +392,8 @@ public class XMLWriter {
         openStartTag("element");
           makeAttribute("name", e.getName());
           makeAttribute("dtdOrder", Integer.toString(e.getDTDOrder()));
+          if (e.isRoot()) makeAttribute("root", "true");
+          if (!e.isReachable()) makeAttribute("reachable", "false");
         closeStartTag();
           writeDeclaredInInfo( e.getLocation() );  
           writeContentModel( e.getContentModel() );

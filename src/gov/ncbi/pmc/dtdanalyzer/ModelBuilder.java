@@ -182,4 +182,76 @@ public class ModelBuilder {
             parseModel(el.getName(), el.getMinifiedModel());
         } // while        
     }
+    
+    
+    /**
+     * Finds all the reachable elements, given a list of roots.  This then will flag the
+     * roots with a 'root=true' attribute, and the unreachable elements with a 
+     * 'reachable=false' attribute.
+     */
+
+    public void findReachable(String[] roots) throws Exception {
+        _reachable = new HashSet();
+        _toCheck = new LinkedList();
+        String name;
+        Element r;
+
+        for (int i = 0; i < roots.length; ++i) {
+            name = roots[i];
+            //System.err.println("root: " + roots[i]);
+            r = elements.getElement(name);
+            if (r == null) throw new Exception("Specified root \"" + name + "\" not found");
+            r.setIsRoot();
+
+            // Add each of these to the list of reachable elements
+            _putReachable(r);
+        }
+        
+        // Pop a new reachable element off the queue, and check each of its kids, until done.
+        while ((r = (Element) _toCheck.poll()) != null) {
+            ContentModel cm = r.getContentModel();
+            String spec = cm.getSpec();
+            // If the spec is "any", then we're done -- all elements are reachable
+            if (spec.equals("any")) return;
+            if (spec.equals("mixed") || spec.equals("element")) {
+                Iterator kids = cm.getKidsIter();
+                while (kids.hasNext()) {
+                    String kn = (String) kids.next();
+                    Element k = elements.getElement(kn);
+                    if (k == null) throw new Exception("Can't find element \"" + kn + "\"");
+                    _putReachable(k);
+                }
+            }
+        }
+        
+        // Now mark all those that are not in our set of reachable elements
+        ElementIterator ei = elements.getElementIterator();
+        while (ei.hasNext()) {
+            Element e = ei.next();
+            if (!_reachable.contains(e)) {
+                e.setUnreachable();
+                //System.err.println("Element " + e.getName() + ": unreachable");
+            }
+            else {
+                //System.err.println("Element " + e.getName() + ": reachable");
+            }
+        }
+    }
+    
+    // Keeps a list of all the elements we've found so far that are reachable
+    private HashSet _reachable;
+
+    // Here are the reachable elements whose kids we still need to check.
+    private Queue _toCheck;
+    
+    // This helper function checks a given element that has just been determined to be
+    // reachable.  If it has not been seen before, then it adds it to the queue of those
+    // that still need to be checked.
+    private void _putReachable(Element r) {
+        if (!_reachable.contains(r)) {
+            _reachable.add(r);
+            _toCheck.add(r);
+        }
+    }
+    
 }
