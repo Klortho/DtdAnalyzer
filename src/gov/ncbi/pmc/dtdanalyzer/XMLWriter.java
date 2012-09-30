@@ -448,7 +448,7 @@ public class XMLWriter {
                 sm += kid + " ";
                 if (kids.hasNext()) sm += "| ";
             }
-            sm += ")";
+            sm += ")*";
         }
         else {  // element content
             sm = makeSpacedModel(cm.getChoiceOrSeq());
