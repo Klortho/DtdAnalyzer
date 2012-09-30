@@ -90,6 +90,8 @@ version 1.2:  resolver.jar
 version 2.11.0:  xml-apis.jar and xercesImpl.jar  
 * [Saxon Home Edition](http://saxon.sourceforge.net), version 6.5.5:
 saxon.jar
+* [Apache Commons IO](http://commons.apache.org/io/), version 2.4:
+commons-io-2.4.jar
 
 ##Discussion forum / mailing list
 
