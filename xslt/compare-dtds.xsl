@@ -97,11 +97,11 @@
    </xsl:template>
    
    <!-- ============================================================================== -->
-   <!-- @model
+   <!-- @minified
         
         Clean up the text so add whitespace after ',' and '|': so can flow the text-->
    <!-- ============================================================================== -->
-   <xsl:template match="@model">
+   <xsl:template match="@minified">
       <xsl:call-template name="insert-whitespace">
          <xsl:with-param name="text" select="."/>
       </xsl:call-template>
@@ -122,8 +122,8 @@
       
       <xsl:variable name="are-models-same">
          <xsl:call-template name="same-model">
-            <xsl:with-param name="dtd1-model" select="@model"/>
-            <xsl:with-param name="dtd2-model" select="$dtd2-element/@model"/>
+            <xsl:with-param name="dtd1-model" select="content-model/@minified"/>
+            <xsl:with-param name="dtd2-model" select="$dtd2-element/content-model/@minified"/>
          </xsl:call-template>
       </xsl:variable>
 
@@ -146,15 +146,15 @@
             <xsl:if test="$are-models-same = 'false'">
                <tr>
                   <td colspan="2">
-                     <b>Model differences:</b>
+                     <b>Model:</b>
                   </td>
                </tr>
                <tr>
                   <td>
-                     <xsl:apply-templates select="@model"/>
+                     <xsl:apply-templates select="content-model/@minified"/>
                   </td>
                   <td>
-                     <xsl:apply-templates select="$dtd2-element/@model"/>
+                     <xsl:apply-templates select="$dtd2-element/content-model/@minified"/>
                   </td>
                </tr>
             </xsl:if>
@@ -162,7 +162,7 @@
             <xsl:if test="$are-atts-same = 'false'">
                <tr>
                   <td colspan="2">
-                     <b>Attribute differences:</b>
+                     <b>Attributes:</b>
                   </td>
                </tr>
                
@@ -215,7 +215,7 @@
                   <xsl:apply-templates select="@name"/>
                </b>
                <br/>
-               <xsl:apply-templates select="@model"/>
+               <xsl:apply-templates select="content-model/@minified"/>
                <br/>
 
                <xsl:if test="/declarations/attributes/attribute/attributeDeclaration[@element = $current-name]">
@@ -252,7 +252,7 @@
                   <xsl:apply-templates select="@name"/>
                </b>
                <br/>
-               <xsl:apply-templates select="@model"/>
+               <xsl:apply-templates select="content-model/@minified"/>
                <br/>
 
                <xsl:if test="$dtd2/declarations/attributes/attribute/attributeDeclaration[@element = $current-name]">
