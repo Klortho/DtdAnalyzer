@@ -108,6 +108,11 @@ saxon.jar
 * [Apache Commons IO](http://commons.apache.org/io/), version 2.4:
 commons-io-2.4.jar
 
+For structured comments in Markdown format:
+
+* [Pandoc](http://johnmacfarlane.net/pandoc/) is highly recommended.  The "-m" command-line switch uses this.  You'll need to download and install it on your system following the [installation instructions](http://johnmacfarlane.net/pandoc/installing.html).  You could also substitute any other comment-processor that you want (even other formats), and use the "--docproc" option to pass the command into dtdanalyzer.
+
+* 
 ##Discussion forum / mailing list
 
 Please join the <a href='https://groups.google.com/d/forum/dtdanalyzer'>DtdAnalyzer Google group</a>
