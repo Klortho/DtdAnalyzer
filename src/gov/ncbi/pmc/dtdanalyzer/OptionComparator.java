@@ -21,8 +21,12 @@ public class OptionComparator implements Comparator {
     }
 
     public int compare(Object o1, Object o2) {
-        Option opt1 = (Option) o1;
-        Option opt2 = (Option) o2;
-        return order.indexOf(opt1.getOpt()) - order.indexOf(opt2.getOpt());
+        String opt1 = ((Option) o1).getOpt();
+        int opt1i = opt1 == null ? 1000 : order.indexOf(opt1);
+        
+        String opt2 = ((Option) o2).getOpt();
+        int opt2i = opt2 == null ? 1000 : order.indexOf(opt2);
+        
+        return opt1i - opt2i;
     }
 }

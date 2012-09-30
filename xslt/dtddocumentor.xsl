@@ -70,22 +70,39 @@
 	
 	<xsl:template match="element | attribute | entity | tag | dtd" mode="build-page">
 		<xsl:variable name="file">
-			<xsl:if test="self::node()[name()='element']">
-				<xsl:value-of select="concat($dir, '/', translate(@name, ':', '-'), '.html')"/>
+		  <xsl:value-of select='concat($dir, "/")'/>
+			<xsl:if test="self::element">
+			  <xsl:call-template name='docFilename'>
+			    <xsl:with-param name='name' select='@name'/>
+			    <xsl:with-param name='type' select='"element"'/>
+			  </xsl:call-template>
 			</xsl:if>
-			<xsl:if test="self::node()[name()='attribute']">
-				<xsl:value-of select="concat($dir, '/att-', translate(@name, ':', '-'), '.html')"/>
+			<xsl:if test="self::attribute">
+			  <xsl:call-template name='docFilename'>
+			    <xsl:with-param name='name' select='@name'/>
+			    <xsl:with-param name='type' select='"attribute"'/>
+			  </xsl:call-template>
 			</xsl:if>
-			<xsl:if test="self::node()[name()='entity']">
-				<xsl:value-of select="concat($dir, '/ent-', translate(@name, ':', '-'), '-', declaredIn/@lineNumber, '.html')"/>
+		  <xsl:if test="self::entity and parent::parameterEntities">
+		    <xsl:call-template name='docFilename'>
+		      <xsl:with-param name='name' select='@name'/>
+		      <xsl:with-param name='type' select='"parament"'/>
+		    </xsl:call-template>
 			</xsl:if>
-			<xsl:if test="self::node()[name()='tag']">
-				<xsl:value-of select="concat($dir, '/tag-', translate(., ':', '-'), '.html')"/>
+		  <xsl:if test="self::entity and parent::generalEntities">
+		    <xsl:call-template name='docFilename'>
+		      <xsl:with-param name='name' select='@name'/>
+		      <xsl:with-param name='type' select='"genent"'/>
+		    </xsl:call-template>
+		  </xsl:if>
+		  <xsl:if test="self::tag">
+				<xsl:value-of select="concat('tag-', translate(., ':', '-'), '.html')"/>
 			</xsl:if>
-			<xsl:if test="self::node()[name()='dtd']">
-				<xsl:value-of select="concat($dir, '/index.html')"/>
+			<xsl:if test="self::dtd">
+				<xsl:value-of select="'index.html'"/>
 			</xsl:if>
-		</xsl:variable> 
+		</xsl:variable>
+
 		<xsl:result-document href="{$file}">
 			<html>
 				<head>
@@ -205,17 +222,27 @@
 		</xsl:for-each>
 	</xsl:template>
 	
-	<xsl:template match="parameterEntities | generalEntities" mode="sidebar">
-		<xsl:for-each select="entity">
-			<xsl:sort select="@name"/>
-			<xsl:call-template name="list-link">
-				<xsl:with-param name="name" select="@name"/>
-				<xsl:with-param name="type" select="'entity'"/>
-			</xsl:call-template>
-		</xsl:for-each>
-	</xsl:template>	
-
-
+  <xsl:template match="parameterEntities" mode="sidebar">
+    <xsl:for-each select="entity">
+      <xsl:sort select="@name"/>
+      <xsl:call-template name="list-link">
+        <xsl:with-param name="name" select="@name"/>
+        <xsl:with-param name="type" select="'parament'"/>
+      </xsl:call-template>
+    </xsl:for-each>
+  </xsl:template>	
+  
+  <xsl:template match="generalEntities" mode="sidebar">
+    <xsl:for-each select="entity">
+      <xsl:sort select="@name"/>
+      <xsl:call-template name="list-link">
+        <xsl:with-param name="name" select="@name"/>
+        <xsl:with-param name="type" select="'genent'"/>
+      </xsl:call-template>
+    </xsl:for-each>
+  </xsl:template>	
+  
+  
 	
 	<!-- ========================= -->
 	<!-- Page Content -->
@@ -397,47 +424,70 @@
 		<a href="tag-{.}.html" class="tag"><xsl:value-of select="."/></a>
 		<xsl:if test="following-sibling::tag"><xsl:text>, </xsl:text></xsl:if>
 	</xsl:template>
-	
+  
+  <!--
+    Make the link to an object's documentation page.
+    'type' should be one of "element", "attribute", "genent", or "parament".
+  -->
 	<xsl:template name="list-link">
 		<xsl:param name="name"/>
 		<xsl:param name="type"/>
-		<li>		
-			<xsl:if test="$type='element'">
-				<xsl:text>&lt;</xsl:text>
-				<a>
-					<xsl:attribute name="href">
-						<xsl:value-of select="translate($name, ':', '-')"/>
-						<xsl:text>.html</xsl:text>
-					</xsl:attribute>
-					<xsl:value-of select="$name"/>
-				</a>
-				<xsl:text>&gt;</xsl:text>
-			</xsl:if>
-			<xsl:if test="$type='attribute'">
-				<xsl:text>@</xsl:text>
-				<a>
-					<xsl:attribute name="href">
-						<xsl:text>att-</xsl:text>
-						<xsl:value-of select="translate($name, ':', '-')"/>
-						<xsl:text>.html</xsl:text>
-					</xsl:attribute>
-					<xsl:value-of select="$name"/>
-				</a>				
-			</xsl:if>
-			<xsl:if test="$type='entity'">
-				<xsl:text>%</xsl:text>
-				<a>
-					<xsl:attribute name="href">
-						<xsl:text>ent-</xsl:text>
-						<xsl:value-of select="@name"/>
-						<xsl:text>-</xsl:text>
-						<xsl:value-of select="declaredIn/@lineNumber"/>							
-						<xsl:text>.html</xsl:text>
-					</xsl:attribute>
-					<xsl:value-of select="translate($name, ':', '-')"/>
-				</a>
-			</xsl:if>
-		</li>
+	  
+	  <xsl:variable name='href'>
+	    <xsl:call-template name='docFilename'>
+	      <xsl:with-param name='name' select='$name'/>
+	      <xsl:with-param name='type' select='$type'/>
+	    </xsl:call-template>
+	  </xsl:variable>
+
+	  <li>
+	    <a href='{$href}'>
+	      <xsl:choose>
+    			<xsl:when test="$type='element'">
+  					<xsl:value-of select="concat('&lt;', $name, '&gt;')"/>
+    			</xsl:when>
+    			<xsl:when test="$type='attribute'">
+  					<xsl:value-of select="concat('@', $name)"/>
+    			</xsl:when>
+    			<xsl:when test="$type='parament'">
+  					<xsl:value-of select="concat('%', translate($name, ':', '-'), ';')"/>
+    			</xsl:when>
+  	      <xsl:when test="$type='genent'">
+	          <xsl:value-of select="concat('&amp;', translate($name, ':', '-'), ';')"/>
+  	      </xsl:when>
+	      </xsl:choose>
+	    </a>
+	  </li>
 	</xsl:template>
-	
+  
+  <!--
+    This template constructs the filename for the documentation page for a thing,
+    given its name and its type.  'type' should be one of "element", "attribute",
+    "genent", or "parament".
+    This same template is used both to contruct the output filename when the file is
+    written, and to make the hyperlink to it in the navigation panel.
+  -->
+  <xsl:template name='docFilename'>
+    <xsl:param name="name"/>
+    <xsl:param name="type"/>
+
+    <xsl:choose>
+      <xsl:when test="$type='element'">
+        <xsl:value-of select="translate($name, ':', '-')"/>
+      </xsl:when>
+      <xsl:when test="$type='attribute'">
+        <xsl:text>att-</xsl:text>
+        <xsl:value-of select="translate($name, ':', '-')"/>
+      </xsl:when>
+      <xsl:when test="$type='parament'">
+        <xsl:text>pe-</xsl:text>
+        <xsl:value-of select="@name"/>
+      </xsl:when>
+      <xsl:when test="$type='genent'">
+        <xsl:text>ge-</xsl:text>
+        <xsl:value-of select="@name"/>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:text>.html</xsl:text>
+  </xsl:template>
 </xsl:stylesheet>

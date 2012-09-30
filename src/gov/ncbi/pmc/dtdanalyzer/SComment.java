@@ -5,6 +5,9 @@
 package gov.ncbi.pmc.dtdanalyzer;
 
 import java.util.*;
+import java.io.*;
+import org.apache.commons.io.*;
+import java.util.regex.*;
 
 /**
  * Holds a single instance of a structured comment ("scomment") from the DTD.
@@ -37,6 +40,12 @@ public class SComment {
      */
     public static final int ATTRIBUTE = 5;
 
+    /**
+     * Structured comment processor.
+     */
+    private static String commentProcessor = "";
+     
+     
     /**
      * My type, one of the above integer constants.
      */
@@ -112,8 +121,91 @@ public class SComment {
         return name;
     }
     
+    /**
+     * Add a new section to this structured comment.  Here is where (for now) we encapsulate
+     * knowledge about the special handling of each section type, but see also GitHub
+     * issue #13.
+     * Special handling:
+     *   tags - convert into a list of <tag> elements
+     *   schematron - pass-thru
+     *   anything else - process as Markdown
+     */
     public void addSection(String name, String text) {
-        sections.put(name, text);
+        if (name.equals("tags")) {
+            String[] tags = text.split("\\s+");
+            String tagElems = "";
+            for (int i = 0; i < tags.length; ++i) {
+                if (tags[i].equals("")) continue;
+                // FIXME:  Need to handle well-formedness errors.
+                tagElems += "<tag>" + tags[i] + "</tag>";
+                //System.err.println("tag: '" + tags[i] + "'");
+            }
+            sections.put(name, tagElems);
+        }
+        else if (name.equals("schematron")) {
+            sections.put(name, text);
+        }
+        else {
+            sections.put(name, convertMarkdown(text));
+        }
+    }
+
+    // Here's the regular expression for a hyperlink to another element in the documentation
+    // It will match `<banana>, but not \`<banana>
+    private static Pattern elemLink = Pattern.compile("(?<!\\\\)\\`\\<(\\S+?)>");
+    
+    // The pattern for an attribute
+    // FIXME:  Need to fix this regex so that it recognizes the full set of allowed chars.
+    private static Pattern attrLink = Pattern.compile("(?<!\\\\)@([-_a-zA-Z]+)");
+    
+    // Patterns for entities are simpler, since they are closed by a ";"
+    private static Pattern paramEntLink = Pattern.compile("(?<!\\\\)%(\\S+?);");
+    private static Pattern genEntLink = Pattern.compile("(?<!\\\\)&(\\S+?);");
+    
+
+
+    /**
+     * This method takes care of converting a structure comment section into Markdown.
+     * It first pre-processes it, to insert links.  If there's an exception, it will
+     * print an error message and then return the original, or preprocessed string.
+     */
+     
+    public String convertMarkdown(String s) {
+        String html = s;
+        Matcher m;
+        
+        // Preprocess links
+        m = attrLink.matcher(s);
+        s = m.replaceAll("<a href='att-$1.html'>@$1</a>");
+        m = paramEntLink.matcher(s);
+        s = m.replaceAll("<a href='pe-$1.html'>%$1;</a>");
+        m = genEntLink.matcher(s);
+        s = m.replaceAll("<a href='ge-$1.html'>&$1;</a>");
+        m = elemLink.matcher(s);
+        s = m.replaceAll("<a href='$1.html'>&lt;$1&gt;</a>");
+        
+        if (!commentProcessor.equals("")) {
+            try {
+                Process cproc = Runtime.getRuntime().exec(commentProcessor);
+                
+                // The output stream of the process is piped into the stdin of the comment
+                // processor. 
+                PrintWriter pos = new PrintWriter(cproc.getOutputStream());
+                pos.print(s);
+                pos.close();
+    
+                // The input stream of the process is where we get the output of the comment
+                // processor (XHTML format)
+                InputStream is = cproc.getInputStream();
+                html = IOUtils.toString(is, "UTF-8");
+                is.close();    
+                //System.err.println("html output is " + html);
+            }
+            catch (IOException e) {
+                System.err.println("Error interpreting comment as markdown: " + e.getMessage());
+            }
+        }
+        return html;
     }
     
     public String getSection(String name) {
@@ -126,5 +218,12 @@ public class SComment {
      */    
     public Iterator getSectionNameIterator() {
         return sections.keySet().iterator();
+    }
+    
+    /**
+     * Sets the structured comment processor for this class.
+     */
+    public static void setCommentProcessor(String p) {
+        commentProcessor = p;
     }
 }

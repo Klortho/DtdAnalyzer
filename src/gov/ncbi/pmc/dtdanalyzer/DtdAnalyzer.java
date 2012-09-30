@@ -121,6 +121,24 @@ public class DtdAnalyzer {
                 .withArgName("roots")
                 .create('r')
         );
+        options.addOption(
+            OptionBuilder
+                .withLongOpt("docproc")
+                .withDescription("Command to use to process structured comments.  This command should " +
+                    "take its input on stdin, and produce valid XHTML on stdout.")
+                .hasArg()
+                .withArgName("cmd")
+                .create()
+        );
+        options.addOption(
+            OptionBuilder
+                .withLongOpt("markdown")
+                .withDescription("Causes structured comments to be processed as Markdown. " +
+                    "Requires pandoc to be installed on the system, and accessible to this process. " +
+                    "Same as \"--docproc 'pandoc'\".")
+                .create('m')
+        );
+
 
         // create the command line parser
         CommandLineParser clp = new PosixParser();
@@ -187,6 +205,14 @@ public class DtdAnalyzer {
             if (line.hasOption("r")) {
                 roots = line.getOptionValue("r").split("\\s");
             }
+            
+            if (line.hasOption("m")) {
+                SComment.setCommentProcessor("pandoc");            
+            }
+            else if (line.hasOption("docproc")) {
+                SComment.setCommentProcessor(line.getOptionValue("docproc"));
+            }
+
 
     
             Result out = null;
@@ -310,7 +336,7 @@ public class DtdAnalyzer {
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
         formatter.setSyntaxPrefix("Usage:  ");
-        OptionComparator c = new OptionComparator("hsdpcxtr");
+        OptionComparator c = new OptionComparator("hsdpcxtrm");
         formatter.setOptionComparator(c);
 
         formatter.printHelp(

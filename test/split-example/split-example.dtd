@@ -7,11 +7,20 @@ This is the main ".dtd" module of this DTD.  These notes will be inserted into
 the main index.html page of the documenation.  Note that since this is the main
 module, we should use the "!dtd" annotations, and not any "!module" annotations
 here.
+
+Here is how you make links to other documentation pages:
+
+* Element tags must be preceded with a backtick:  \`\<split> -> `<split>.
+* Attribute:  \@instrument -> @instrument
+* Parameter entity:  \%banana.ent; -> %banana.ent;
+* General entity:  \&fleegle-pic; -> &fleegle-pic;
+
 ~~-->
 
 <!--~~ <split>
 Specifies the main ingredients of a banana split.
 Remember the following:
+
 * One banana,
 * Two banana,
 * Three banana,
