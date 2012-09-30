@@ -21,11 +21,26 @@ the DTD that is to be processed:
 
 Other possible options and arguments are:
 * -h,--help - Print usage information and exit.
-* -c, --catalog *catalog-file* - Specify a file to use as the OASIS catalog, to resolve public
-  identifiers
-* -x, --xslt *xslt-file* - An XSLT script to run to post-process the output.  This is optional.
-* -t, --title *dtd-title* - Specify the title of this DTD.  This will be output within a &lt;title>
+* -c, --catalog *catalog-file* - Specify a file to use as the OASIS catalog, 
+  to resolve public identifiers
+* -x, --xslt *xslt-file* - An XSLT script to run to post-process the output.  
+  This is optional.
+* -t, --title *dtd-title* - Specify the title of this DTD.  This will be output 
+  within a &lt;title>
   element under the root &lt;declarations> element of the output XML.
+* -r, --roots *roots* -  Specify the set of possible root elements for 
+  documents conforming to this DTD. These elements will be tagged with a 
+  'root=true' attribute in the output.  This will also cause the 
+  DtdAnalyzer to find those elements that are not reachable from this set 
+  of possible root elements, and to tag those with a 'reachable=false' 
+  attribute.  The argument to this should be a space-delimited list of 
+  element names.
+* -m,--markdown - Causes structured comments to be processed as 
+  Markdown. Requires pandoc to be installed on the system, and accessible 
+  to this process. Same as "--docproc 'pandoc'". 
+* --docproc *cmd* - Command to use to process structured comments.  
+  This command should take its input on stdin, and produce valid XHTML on 
+  stdout.
 * &lt;output file> - Name of the file to write the output to.  If this argument is not given,
   the output is written to standard out.
 
