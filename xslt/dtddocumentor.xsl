@@ -24,10 +24,9 @@
 
 	<xsl:template match="/">		
 		<xsl:apply-templates select="declarations/*[not(title)]"/>
-		
 		<xsl:for-each-group select="//annotation[@type='tags']/tag" group-by=".">
 			<xsl:apply-templates select="current-group()[1]" mode="build-page"/>			
-		</xsl:for-each-group>
+		</xsl:for-each-group>		
 	</xsl:template>	
 	
 	<!-- ========================= -->
@@ -35,7 +34,7 @@
 	<!-- ========================= -->
 	
 	<xsl:template match="elements">
-		<xsl:apply-templates select="element[not(matches(@name, $exclude-elems))]" mode="build-page"/>
+		<xsl:apply-templates select="element[not(matches(@name, $exclude-elems)) and not(@reachable='false')]" mode="build-page"/>
 	</xsl:template>
 	
 	<xsl:template match="attributes">
@@ -44,7 +43,7 @@
 			<xsl:variable name="notexcluded">	
 				<xsl:for-each select="attributeDeclaration">
 					<xsl:choose>
-						<xsl:when test="matches(@element, $exclude-elems)">0</xsl:when>
+						<xsl:when test="matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name">0</xsl:when>
 						<xsl:otherwise>1</xsl:otherwise>
 					</xsl:choose>
 				</xsl:for-each>
@@ -71,30 +70,18 @@
 	<xsl:template match="element | attribute | entity | tag | dtd" mode="build-page">
 		<xsl:variable name="file">
 		  <xsl:value-of select='concat($dir, "/")'/>
-			<xsl:if test="self::element">
-			  <xsl:call-template name='docFilename'>
-			    <xsl:with-param name='name' select='@name'/>
-			    <xsl:with-param name='type' select='"element"'/>
+			<xsl:if test="self::element or self::attribute">
+			  <xsl:call-template name="docFilename">
+			    <xsl:with-param name="name" select="@name"/>
+			    <xsl:with-param name="type" select="self::node()/name()"/>
 			  </xsl:call-template>
 			</xsl:if>
-			<xsl:if test="self::attribute">
-			  <xsl:call-template name='docFilename'>
-			    <xsl:with-param name='name' select='@name'/>
-			    <xsl:with-param name='type' select='"attribute"'/>
-			  </xsl:call-template>
-			</xsl:if>
-		  <xsl:if test="self::entity and parent::parameterEntities">
-		    <xsl:call-template name='docFilename'>
-		      <xsl:with-param name='name' select='@name'/>
-		      <xsl:with-param name='type' select='"parament"'/>
+		  <xsl:if test="self::entity">
+		    <xsl:call-template name="docFilename">
+		      <xsl:with-param name="name" select="@name"/>
+		      <xsl:with-param name="type" select="parent::node()/name()"/>
 		    </xsl:call-template>
 			</xsl:if>
-		  <xsl:if test="self::entity and parent::generalEntities">
-		    <xsl:call-template name='docFilename'>
-		      <xsl:with-param name='name' select='@name'/>
-		      <xsl:with-param name='type' select='"genent"'/>
-		    </xsl:call-template>
-		  </xsl:if>
 		  <xsl:if test="self::tag">
 				<xsl:value-of select="concat('tag-', translate(., ':', '-'), '.html')"/>
 			</xsl:if>
@@ -192,8 +179,8 @@
 	</xsl:template>
 	
 	<xsl:template match="elements" mode="sidebar">
-		<xsl:for-each select="element[not(matches(@name, $exclude-elems))]">
-			<xsl:sort select="@name"/>
+		<xsl:for-each select="element[not(matches(@name, $exclude-elems)) and not(@reachable='false')]">
+			<xsl:sort select="@name" order="ascending"/>
 			<xsl:call-template name="list-link">
 				<xsl:with-param name="name" select="@name"/>
 				<xsl:with-param name="type" select="'element'"/>
@@ -203,12 +190,12 @@
 	
 	<xsl:template match="attributes" mode="sidebar">
 		<xsl:for-each select="attribute">
-			<xsl:sort select="@name"/>
+			<xsl:sort select="@name" order="ascending"/>
 			<!-- Checks to see if only excluded elements are in attributeDeclarations. Excludes attributes if so. -->
 			<xsl:variable name="notexcluded">
 				<xsl:for-each select="attributeDeclaration">
 					<xsl:choose>
-						<xsl:when test="matches(@element, $exclude-elems)">0</xsl:when>
+						<xsl:when test="matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name">0</xsl:when>
 						<xsl:otherwise>1</xsl:otherwise>
 					</xsl:choose>
 				</xsl:for-each>
@@ -224,21 +211,21 @@
 	
   <xsl:template match="parameterEntities" mode="sidebar">
     <xsl:for-each select="entity">
-      <xsl:sort select="@name"/>
-      <xsl:call-template name="list-link">
-        <xsl:with-param name="name" select="@name"/>
-        <xsl:with-param name="type" select="'parament'"/>
-      </xsl:call-template>
+    	<xsl:sort select="translate(@name, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" order="ascending"/>
+    	<xsl:call-template name="list-link">
+    		<xsl:with-param name="name" select="@name"/>
+    		<xsl:with-param name="type" select="'parameterEntities'"/>
+    	</xsl:call-template>
     </xsl:for-each>
   </xsl:template>	
   
   <xsl:template match="generalEntities" mode="sidebar">
     <xsl:for-each select="entity">
-      <xsl:sort select="@name"/>
-      <xsl:call-template name="list-link">
-        <xsl:with-param name="name" select="@name"/>
-        <xsl:with-param name="type" select="'genent'"/>
-      </xsl:call-template>
+    	<xsl:sort select="translate(@name, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" order="ascending"/>
+    	<xsl:call-template name="list-link">
+    		<xsl:with-param name="name" select="@name"/>
+    		<xsl:with-param name="type" select="'generalEntities'"/>
+    	</xsl:call-template>
     </xsl:for-each>
   </xsl:template>	
   
@@ -253,7 +240,15 @@
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 	<xsl:template match="element" mode="content">
-		<h2><span class="pagetitle">Element: </span><xsl:value-of select="@name"/></h2>
+		<h2>
+			<span class="pagetitle">
+				<xsl:if test="@root='true'">
+					<xsl:text>Root </xsl:text>
+				</xsl:if>
+				<xsl:text>Element: </xsl:text>
+			</span>
+			<xsl:value-of select="@name"/>
+		</h2>
 		<xsl:apply-templates select="annotations/annotation[@type='note']"/>
 		<xsl:variable name="e-name">
 			<xsl:value-of select="@name"/>
@@ -290,10 +285,10 @@
 		</xsl:if>
 		<xsl:apply-templates select="annotations/annotation[@type='tags']"/>
 		<xsl:apply-templates select="annotations/annotation[@type='example']"/>
-		<xsl:if test="context/parent">
+		<xsl:if test="context/parent[not(matches(@name, $exclude-elems))][@name=//element[not(@reachable='false')]/@name]">
 			<h3>May be contained in:</h3>
 			<ul class="parents">
-				<xsl:for-each select="context/parent[not(matches(@name, $exclude-elems))][@name=//element/@name]">
+				<xsl:for-each select="context/parent[not(matches(@name, $exclude-elems))][@name=//element[not(@reachable='false')]/@name]">
 					<xsl:sort select="@name"/>
 					<xsl:call-template name="list-link">
 						<xsl:with-param name="name" select="@name"/>
@@ -313,10 +308,10 @@
 		<h2><span class="pagetitle">Attribute: </span><xsl:value-of select="@name"/></h2>
 		<xsl:apply-templates select="annotations/annotation[@type='note']"/>
 		<xsl:choose>
-			<xsl:when test="count(distinct-values(attributeDeclaration[not(matches(@element, $exclude-elems))][@element=//element/@name]/@type)) > 1">
+			<xsl:when test="count(distinct-values(attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)]/@type)) > 1">
 				<table>
 					<tr><th>Value</th><th>In Elements</th></tr>
-					<xsl:for-each-group select="attributeDeclaration[not(matches(@element, $exclude-elems))][@element=//element/@name]" group-by="@type">
+					<xsl:for-each-group select="attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)]" group-by="@type">
 						<tr class="attvalue">
 							<td><xsl:value-of select="current-grouping-key()"/></td>
 							<td>
@@ -329,7 +324,7 @@
 				</table>
 			</xsl:when>
 			<xsl:otherwise>
-				<p class="bold">Value: <span class="attvalue"><xsl:value-of select="attributeDeclaration[not(matches(@element, $exclude-elems))][@element=//element/@name][1]/@type"/></span></p>
+				<p class="bold">Value: <span class="attvalue"><xsl:value-of select="attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)][1]/@type"/></span></p>
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:apply-templates select="annotations/annotation[@type='model']"/>
@@ -337,7 +332,7 @@
 		<xsl:apply-templates select="annotations/annotation[@type='example']"/>		
 		<h3>May be in elements:</h3>
 		<ul class="parents">
-			<xsl:for-each select="attributeDeclaration[not(matches(@element, $exclude-elems))][@element=//element/@name]">
+			<xsl:for-each select="attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)]">
 				<xsl:sort select="@element"/>
 				<xsl:call-template name="list-link">
 					<xsl:with-param name="name" select="@element"/>
@@ -376,16 +371,18 @@
 		<h2><span class="pagetitle">Tag: </span><xsl:value-of select="$tag"/></h2>
 		<h3><xsl:text>Tagged with "</xsl:text><xsl:value-of select="$tag"/><xsl:text>"</xsl:text></h3>
 		<ul class="tags">
-			<xsl:for-each-group select="//*[annotations[annotation[tag=$tag]]]" group-by="self::node()/name()">	
-				<h4 class="notetitle"><xsl:value-of select="if (current-grouping-key()='entity') then 'entities' else concat(current-grouping-key(), 's')"/></h4>
+			<xsl:for-each-group select="//*[annotations[annotation[tag=$tag]]][not(self::element and (@reachable='false' or matches(@name, $exclude-elems))) and 
+				not(self::attribute and (matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name))]
+				" group-by="parent::node()/name()">	
+				<h4 class="notetitle"><xsl:value-of select="if (current-grouping-key()='parameterEntities') then 'parameter entities' else if(current-grouping-key()='generalEntities') then 'general entities' else current-grouping-key()"/></h4>
 				<ul class="tags">
 					<xsl:for-each select="current-group()">
-						<xsl:sort select="@name"/>
+						<xsl:sort select="translate(@name, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" order="ascending"/>
 						<xsl:call-template name="list-link">
 							<xsl:with-param name="name">
 								<xsl:value-of select="@name"/>
 							</xsl:with-param>
-							<xsl:with-param name="type" select="self::node()/name()"/>
+							<xsl:with-param name="type" select="if(self::entity) then parent::node()/name() else self::node()/name()"/>
 						</xsl:call-template>
 					</xsl:for-each>
 				</ul>
@@ -425,69 +422,80 @@
 		<xsl:if test="following-sibling::tag"><xsl:text>, </xsl:text></xsl:if>
 	</xsl:template>
   
-  <!--
-    Make the link to an object's documentation page.
-    'type' should be one of "element", "attribute", "genent", or "parament".
-  -->
+  
 	<xsl:template name="list-link">
 		<xsl:param name="name"/>
 		<xsl:param name="type"/>
-	  
-	  <xsl:variable name='href'>
-	    <xsl:call-template name='docFilename'>
-	      <xsl:with-param name='name' select='$name'/>
-	      <xsl:with-param name='type' select='$type'/>
-	    </xsl:call-template>
-	  </xsl:variable>
-
-	  <li>
-	    <a href='{$href}'>
-	      <xsl:choose>
-    			<xsl:when test="$type='element'">
-  					<xsl:value-of select="concat('&lt;', $name, '&gt;')"/>
-    			</xsl:when>
-    			<xsl:when test="$type='attribute'">
-  					<xsl:value-of select="concat('@', $name)"/>
-    			</xsl:when>
-    			<xsl:when test="$type='parament'">
-  					<xsl:value-of select="concat('%', translate($name, ':', '-'), ';')"/>
-    			</xsl:when>
-  	      <xsl:when test="$type='genent'">
-	          <xsl:value-of select="concat('&amp;', translate($name, ':', '-'), ';')"/>
-  	      </xsl:when>
-	      </xsl:choose>
-	    </a>
-	  </li>
+		
+	  	<xsl:variable name="href">
+	  		<xsl:call-template name="docFilename">
+	  			<xsl:with-param name="name" select="$name"/>
+	  			<xsl:with-param name="type" select="$type"/>
+	  		</xsl:call-template>
+	  	</xsl:variable>
+		
+		<li>
+			<a href='{$href}'>
+				<xsl:choose>
+					<xsl:when test="$type='element'">
+						<xsl:value-of select="concat('&lt;', $name, '&gt;')"/>
+					</xsl:when>
+					<xsl:when test="$type='attribute'">
+						<xsl:value-of select="concat('@', $name)"/>
+					</xsl:when>
+					<xsl:when test="$type='parameterEntities'">
+						<xsl:value-of select="concat('%', $name)"/>
+					</xsl:when>
+					<xsl:when test="$type='generalEntities'">
+						<xsl:value-of select="concat('&amp;', $name)"/>
+					</xsl:when>
+				</xsl:choose>
+			</a>
+		</li>
 	</xsl:template>
   
-  <!--
-    This template constructs the filename for the documentation page for a thing,
-    given its name and its type.  'type' should be one of "element", "attribute",
-    "genent", or "parament".
-    This same template is used both to contruct the output filename when the file is
-    written, and to make the hyperlink to it in the navigation panel.
-  -->
-  <xsl:template name='docFilename'>
-    <xsl:param name="name"/>
-    <xsl:param name="type"/>
-
-    <xsl:choose>
-      <xsl:when test="$type='element'">
-        <xsl:value-of select="translate($name, ':', '-')"/>
-      </xsl:when>
-      <xsl:when test="$type='attribute'">
-        <xsl:text>att-</xsl:text>
-        <xsl:value-of select="translate($name, ':', '-')"/>
-      </xsl:when>
-      <xsl:when test="$type='parament'">
-        <xsl:text>pe-</xsl:text>
-        <xsl:value-of select="@name"/>
-      </xsl:when>
-      <xsl:when test="$type='genent'">
-        <xsl:text>ge-</xsl:text>
-        <xsl:value-of select="@name"/>
-      </xsl:when>
-    </xsl:choose>
-    <xsl:text>.html</xsl:text>
-  </xsl:template>
+	<!-- Constructs the filename for the documentation page for a thing, given its name and its type.
+		This same template is used both to contruct the output filename when the file is written, 
+		and to make the hyperlink to it in the navigation panel. -->
+	
+	<xsl:template name="docFilename">
+		<xsl:param name="name"/>
+		<xsl:param name="type"/>
+		
+		<xsl:choose>
+			<xsl:when test="$type='element'">
+				<xsl:value-of select="translate($name, ':', '-')"/>
+			</xsl:when>
+			<xsl:when test="$type='attribute'">
+				<xsl:text>att-</xsl:text>
+				<xsl:value-of select="translate($name, ':', '-')"/>
+			</xsl:when>
+			<xsl:when test="$type='parameterEntities'">
+				<xsl:text>pe-</xsl:text>
+				<xsl:choose>
+					<xsl:when test="preceding-sibling::entity[lower-case(@name) = lower-case($name)]">
+						<xsl:value-of select="concat($name, '-')"/>
+						<xsl:value-of select="count(preceding::entity[lower-case(@name) = lower-case($name)])"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$name"/>
+					</xsl:otherwise>
+				</xsl:choose>				
+			</xsl:when>
+			<xsl:when test="$type='generalEntities'">
+				<xsl:text>ge-</xsl:text>
+				<xsl:choose>
+					<xsl:when test="preceding-sibling::entity[lower-case(@name) = lower-case($name)]">
+						<xsl:value-of select="concat($name, '-')"/>
+						<xsl:value-of select="count(preceding::entity[lower-case(@name) = lower-case($name)])"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$name"/>
+					</xsl:otherwise>
+				</xsl:choose>	
+			</xsl:when>
+		</xsl:choose>
+		<xsl:text>.html</xsl:text>
+	</xsl:template>
+	
 </xsl:stylesheet>
