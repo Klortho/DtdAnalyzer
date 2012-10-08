@@ -17,51 +17,62 @@
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">test/split-example/split-example.daz.xml</String>
+                                    <String xml:space="preserve">test/journal-publishing-dtd-3.0/journalpublishing3.daz.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="name">
-                                    <String xml:space="preserve">FindUnreachable</String>
-                                </field>
-                                <field name="type">
-                                    <String xml:space="preserve">XQUERY</String>
-                                </field>
-                                <field name="url">
-                                    <String xml:space="preserve">test/FindUnreachable.xqy</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String xml:space="preserve">toolkit</String>
+                                    <String xml:space="preserve">dtddocumentor</String>
                                 </field>
                                 <field name="type">
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/projects/toolkit-book/toolkit.xml</String>
+                                    <String xml:space="preserve">test/split-example/split.daz.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="name">
-                                    <String xml:space="preserve">xml-stylesheet processing instruction duplicate</String>
+                                    <String xml:space="preserve">expand-models</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">XML</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">datadictionary/xslt/expand-models.xsl</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">dita/ditamap.framework/DITA Map/DITA Map XHTML</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">DITAMAP</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Program%20Files/Oxygen%20XML%20Editor%2012/samples/dita/garage/hierarchy.ditamap</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">tei/teip5.framework/TEI P5/TEI P5 XHTML</String>
                                 </field>
                                 <field name="type">
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">../../Gaia/WorkComputers/cube/JATS/Balisage-2011/JATSPack-paper/FinalPaper/Bal2011malo0713.xml</String>
+                                    <String xml:space="preserve">../../Gaia/Computer/XML/TEI/Examples/FromOxygen12/TEI-P5.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="name">
-                                    <String xml:space="preserve">xml-stylesheet processing instruction</String>
+                                    <String xml:space="preserve">tei/teip5.framework/TEI P5/TEI P5 XHTML</String>
                                 </field>
                                 <field name="type">
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">../../Gaia/WorkComputers/cube/JATS/Balisage-2011/JATSPack-paper/balisage-1-2-xsl/TagZoo.xml</String>
+                                    <String xml:space="preserve">../../Program%20Files/Oxygen%20XML%20Editor%2012/samples/tei/TEI-P5.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -72,29 +83,7 @@
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">../../Gaia/Computer/XML/TEI/Examples/FromOxygen12/TEI-P5.html</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String xml:space="preserve">presentation</String>
-                                </field>
-                                <field name="type">
-                                    <String xml:space="preserve">XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String xml:space="preserve">../../Users/Klortho/Desktop/MarkLogic/presentation/presentation.xml</String>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="name">
-                                    <String xml:space="preserve">presentation</String>
-                                </field>
-                                <field name="type">
-                                    <String xml:space="preserve">XSL</String>
-                                </field>
-                                <field name="url">
-                                    <String xml:space="preserve">file:/F:/MarkLogic/presentation/presentation.xml</String>
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/cube/Presentations/CharSets/presentation.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -116,51 +105,73 @@
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">../../Gaia/WorkComputers/cube/Presentations/CharSets/presentation.xml</String>
+                                    <String xml:space="preserve">file:/F:/MarkLogic/presentation/presentation.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="name">
-                                    <String xml:space="preserve">tei/teip5.framework/TEI P5/TEI P5 XHTML</String>
+                                    <String xml:space="preserve">presentation</String>
                                 </field>
                                 <field name="type">
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">../../Program%20Files/Oxygen%20XML%20Editor%2012/samples/tei/TEI-P5.xml</String>
+                                    <String xml:space="preserve">../../Users/Klortho/Desktop/MarkLogic/presentation/presentation.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="name">
-                                    <String xml:space="preserve">tei/teip5.framework/TEI P5/TEI P5 XHTML</String>
+                                    <String xml:space="preserve">presentation</String>
                                 </field>
                                 <field name="type">
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">../../Gaia/Computer/XML/TEI/Examples/FromOxygen12/TEI-P5.xml</String>
+                                    <String xml:space="preserve">../../Gaia/Computer/XML/TEI/Examples/FromOxygen12/TEI-P5.html</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="name">
-                                    <String xml:space="preserve">dita/ditamap.framework/DITA Map/DITA Map XHTML</String>
+                                    <String xml:space="preserve">xml-stylesheet processing instruction</String>
                                 </field>
                                 <field name="type">
-                                    <String xml:space="preserve">DITAMAP</String>
+                                    <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">../../Program%20Files/Oxygen%20XML%20Editor%2012/samples/dita/garage/hierarchy.ditamap</String>
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/cube/JATS/Balisage-2011/JATSPack-paper/balisage-1-2-xsl/TagZoo.xml</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="name">
-                                    <String xml:space="preserve">expand-models</String>
+                                    <String xml:space="preserve">xml-stylesheet processing instruction duplicate</String>
                                 </field>
                                 <field name="type">
-                                    <String xml:space="preserve">XML</String>
+                                    <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">datadictionary/xslt/expand-models.xsl</String>
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/cube/JATS/Balisage-2011/JATSPack-paper/FinalPaper/Bal2011malo0713.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">toolkit</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">XSL</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">../../Gaia/WorkComputers/snowman/projects/toolkit-book/toolkit.xml</String>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="name">
+                                    <String xml:space="preserve">FindUnreachable</String>
+                                </field>
+                                <field name="type">
+                                    <String xml:space="preserve">XQUERY</String>
+                                </field>
+                                <field name="url">
+                                    <String xml:space="preserve">test/FindUnreachable.xqy</String>
                                 </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
@@ -171,7 +182,7 @@
                                     <String xml:space="preserve">XSL</String>
                                 </field>
                                 <field name="url">
-                                    <String xml:space="preserve">test/split-example/split.daz.xml</String>
+                                    <String xml:space="preserve">test/split-example/split-example.daz.xml</String>
                                 </field>
                             </scenarioAssociation>
                         </scenarioAssociation-array>
