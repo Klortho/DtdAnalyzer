@@ -11,4 +11,4 @@ do
 done
 LOGCONFIG=${LOGCONFIG:-file:$DTDANALYZER_ROOT/etc/log4j.properties}
 exec java -cp "$CP" -Xmx1G "-Dlog4j.configuration=${LOGCONFIG}" gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer \
-    -x "%DTDANALYZER_ROOT%/xslt/dtddocumentor.xsl" "$@" > /dev/null
+    -x "$DTDANALYZER_ROOT/xslt/dtddocumentor.xsl" "$@" > /dev/null
