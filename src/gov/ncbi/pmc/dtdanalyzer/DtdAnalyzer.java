@@ -236,6 +236,9 @@ public class DtdAnalyzer {
             
             if ( System.getProperty(TRANSFORMER_FACTORY_PROPERTY) == null )
                 System.setProperty(TRANSFORMER_FACTORY_PROPERTY, TRANSFORMER_FACTORY_DEFAULT);
+            System.setProperty(TRANSFORMER_FACTORY_PROPERTY, "net.sf.saxon.TransformerFactoryImpl");
+            System.err.println("TRANSFORMER_FACTORY_PROPERTY is " + System.getProperty(TRANSFORMER_FACTORY_PROPERTY));
+            
     
             // Perform set-up and parsing here
             try {

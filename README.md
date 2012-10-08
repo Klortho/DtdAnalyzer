@@ -37,10 +37,10 @@ Other possible options and arguments are:
   element names.
 * -m,--markdown - Causes structured comments to be processed as 
   Markdown. Requires pandoc to be installed on the system, and accessible 
-  to this process. Same as "--docproc 'pandoc'". 
+  to this process. Same as "--docproc pandoc". 
 * --docproc *cmd* - Command to use to process structured comments.  
-  This command should take its input on stdin, and produce valid XHTML on 
-  stdout.
+  This command should take its input on stdin, and produce valid XHTML 
+  fragments on stdout (i.e. not a complete XHTML document).
 * &lt;output file> - Name of the file to write the output to.  If this argument is not given,
   the output is written to standard out.
 
@@ -103,8 +103,8 @@ commons-cli-1.2.jar
 version 1.2:  resolver.jar  
 * [Apache Xerces2 Java parser](http://xerces.apache.org/#xerces2-j), 
 version 2.11.0:  xml-apis.jar and xercesImpl.jar  
-* [Saxon Home Edition](http://saxon.sourceforge.net), version 6.5.5:
-saxon.jar
+* [Saxon Home Edition](http://www.saxonica.com), version 9.4.0.6:
+saxon9he.jar
 * [Apache Commons IO](http://commons.apache.org/io/), version 2.4:
 commons-io-2.4.jar
 

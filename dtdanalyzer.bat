@@ -1,5 +1,5 @@
 @echo off
-set DTDANALYZER_ROOT=%~p0
+set DTDANALYZER_ROOT=%~dp0
 set CP="%DTDANALYZER_ROOT%build"
 call :findjars "%DTDANALYZER_ROOT%lib"
 set LOGCONFIG=file:%DTDANALYZER_ROOT%etc/log4j.properties

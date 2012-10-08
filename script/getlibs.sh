@@ -14,9 +14,9 @@ wget http://www.apache.org/dist/xerces/xml-commons/xml-commons-resolver-1.2.zip
 unzip xml-commons-resolver-1.2.zip xml-commons-resolver-1.2/resolver.jar
 cp xml-commons-resolver-1.2/resolver.jar .
 
-# Saxon 6.5.5 Home Edition
-wget http://sourceforge.net/projects/saxon/files/saxon6/6.5.5/saxon6-5-5.zip/download
-unzip saxon6-5-5.zip saxon.jar
+# Saxon 9.4.0.6 Home Edition
+wget http://sourceforge.net/projects/saxon/files/Saxon-HE/9.4/SaxonHE9-4-0-6J.zip/download
+unzip SaxonHE9-4-0-6J.zip saxon9he.jar
 
 # Apache Xerces2 Java 2.11.0
 wget http://www.apache.org/dist/xerces/j/Xerces-J-bin.2.11.0.zip
