@@ -35,8 +35,9 @@ public class DtdAnalyzer {
     public static final String SAX_DRIVER_DEFAULT = "org.apache.xerces.parsers.SAXParser";               
     // ID for transformer
     public static final String TRANSFORMER_FACTORY_PROPERTY = "javax.xml.transform.TransformerFactory";  
-    // Transformer implementation
-    public static final String TRANSFORMER_FACTORY_DEFAULT = "com.icl.saxon.TransformerFactoryImpl";     
+    // Transformer implementation - default to Saxon 9, per this documentation page:
+    // http://www.saxonica.com/documentation/using-xsl/embedding/jaxp-transformation.xml
+    public static final String TRANSFORMER_FACTORY_DEFAULT = "net.sf.saxon.TransformerFactoryImpl";     
     // Path to reach OASIS dtd
     public static final String OASIS_DTD = "/org/apache/xml/resolver/etc/catalog.dtd";                   
     // Public id of Oasis DTD
@@ -236,8 +237,6 @@ public class DtdAnalyzer {
             
             if ( System.getProperty(TRANSFORMER_FACTORY_PROPERTY) == null )
                 System.setProperty(TRANSFORMER_FACTORY_PROPERTY, TRANSFORMER_FACTORY_DEFAULT);
-            System.setProperty(TRANSFORMER_FACTORY_PROPERTY, "net.sf.saxon.TransformerFactoryImpl");
-            System.err.println("TRANSFORMER_FACTORY_PROPERTY is " + System.getProperty(TRANSFORMER_FACTORY_PROPERTY));
             
     
             // Perform set-up and parsing here
