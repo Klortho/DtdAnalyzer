@@ -237,8 +237,7 @@ public class DtdAnalyzer {
                         System.exit(1);
                     }
                 }
-           }
-
+            }
     
             Result out = null;
             String[] rest = line.getArgs();
@@ -335,7 +334,7 @@ public class DtdAnalyzer {
                 }
                 if (numXsltParams > 0) {
                     for (int i = 0; i < numXsltParams; ++i) {
-                        stylesheet.setParameter(xsltParams[i], xsltParams[i+1]);
+                        stylesheet.setParameter(xsltParams[2*i], xsltParams[2*i+1]);
                     }
                 }
                 

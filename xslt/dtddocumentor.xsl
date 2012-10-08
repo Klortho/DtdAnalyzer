@@ -7,6 +7,7 @@
 	<xsl:param name="date" select="format-date(current-date(),'[MNn] [D], [Y]')"/>
 	<xsl:param name="time" select="format-time(current-time(),'[h]:[m] P')"/>
 	<xsl:param name="dir" select='"doc"'/>
+  <xsl:param name='css' select='"dtddoc.css"'/>
 
 	<xsl:param name="exclude-elems" select="' '"/>
 	<xsl:param name="include-files"/>
@@ -93,13 +94,19 @@
 		<xsl:result-document href="{$file}">
 			<html>
 				<head>
-					<title><xsl:copy-of select="$title"></xsl:copy-of><xsl:text>: </xsl:text><xsl:value-of select="@name"/><xsl:text> </xsl:text><xsl:value-of select="self::node()/name()"></xsl:value-of></title>
+					<title>
+					  <xsl:copy-of select="$title"/>
+					  <xsl:text>: </xsl:text>
+					  <xsl:value-of select="@name"/>
+					  <xsl:text> </xsl:text>
+					  <xsl:value-of select="self::node()/name()"/>
+					</title>
+				  
 					<!-- Default Stylesheet -->
-					<link rel="stylesheet" type="text/css">
-						<xsl:attribute name="href">
-							<xsl:value-of select="'dtddoc.css'"/>
-						</xsl:attribute>
-					</link>
+				  <xsl:if test='$css != ""'>
+  					<link rel="stylesheet" type="text/css" href='{$css}'/>
+				  </xsl:if>
+				  
 					<!-- Links to other stylesheets, google fonts, javascript, etc. added here -->
 					<xsl:if test="$include-files">
 						<xsl:for-each select="tokenize($include-files, ' ')">
