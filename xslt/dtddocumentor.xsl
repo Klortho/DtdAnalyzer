@@ -6,7 +6,7 @@
 	<xsl:param name="files"/>
 	<xsl:param name="date" select="format-date(current-date(),'[MNn] [D], [Y]')"/>
 	<xsl:param name="time" select="format-time(current-time(),'[h]:[m] P')"/>
-	<xsl:param name="dir" select='doc'/>
+	<xsl:param name="dir" select='"doc"'/>
 
 	<xsl:param name="exclude-elems" select="' '"/>
 	<xsl:param name="include-files"/>
