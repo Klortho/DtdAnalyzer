@@ -25,6 +25,8 @@ Other possible options and arguments are:
   to resolve public identifiers
 * -x, --xslt *xslt-file* - An XSLT script to run to post-process the output.  
   This is optional.
+* -P,--param *param=value* - Parameter name & value to pass to the XSLT.
+  You can use multiple instances of this option.
 * -t, --title *dtd-title* - Specify the title of this DTD.  This will be output 
   within a &lt;title>
   element under the root &lt;declarations> element of the output XML.

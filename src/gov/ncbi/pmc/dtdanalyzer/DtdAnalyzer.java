@@ -139,6 +139,16 @@ public class DtdAnalyzer {
                     "Same as \"--docproc 'pandoc'\".")
                 .create('m')
         );
+        options.addOption(
+            OptionBuilder
+                .withLongOpt("param")
+                .hasArgs(2)
+                .withValueSeparator()
+                .withDescription("Parameter name & value to pass to the XSLT.  You can use multiple " +
+                    "instances of this option.")
+                .withArgName( "param=value" )
+                .create("P")
+        );
 
 
         // create the command line parser
@@ -214,6 +224,20 @@ public class DtdAnalyzer {
                 SComment.setCommentProcessor(line.getOptionValue("docproc"));
             }
 
+            String[] xsltParams = null;
+            int numXsltParams = 0;
+            if (line.hasOption("P")) {
+                xsltParams = line.getOptionValues("P");
+                numXsltParams = xsltParams.length / 2;
+                //System.err.println("num of params: " + num);
+                for (int i = 0; i < numXsltParams; ++i) {
+                    // parameter name can't be empty
+                    if (xsltParams[i*2].length() == 0) {
+                        System.err.println("XSLT parameter name can't be empty");
+                        System.exit(1);
+                    }
+                }
+           }
 
     
             Result out = null;
@@ -227,8 +251,7 @@ public class DtdAnalyzer {
             else {
                 throw new ParseException("Too many arguments!");
             }
-    
-    
+
             DTDEventHandler dtdEvents = new DTDEventHandler();
             
             // Set System properties for parsing and transforming
@@ -310,6 +333,11 @@ public class DtdAnalyzer {
                 else {
                     stylesheet = f.newTransformer(new StreamSource(xsl));
                 }
+                if (numXsltParams > 0) {
+                    for (int i = 0; i < numXsltParams; ++i) {
+                        stylesheet.setParameter(xsltParams[i], xsltParams[i+1]);
+                    }
+                }
                 
                 // Use this constructor because Saxon always 
                 // looks for a system id even when a reader is used as the source  
@@ -338,7 +366,7 @@ public class DtdAnalyzer {
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
         formatter.setSyntaxPrefix("Usage:  ");
-        OptionComparator c = new OptionComparator("hsdpcxtrm");
+        OptionComparator c = new OptionComparator("hsdpcxPtrm");
         formatter.setOptionComparator(c);
 
         formatter.printHelp(
