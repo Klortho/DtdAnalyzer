@@ -518,6 +518,7 @@
 
 		<xsl:choose>
 			<xsl:when test="$type='element'">
+				<xsl:text>el-</xsl:text>
 				<xsl:value-of select="translate($name, ':', '-')"/>
 			</xsl:when>
 			<xsl:when test="$type='attribute'">
