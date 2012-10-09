@@ -26,7 +26,8 @@
 		</xsl:choose>
 	</xsl:variable>
 
-	<xsl:template match="/">		
+	<xsl:template match="/">
+		<xsl:apply-templates select="declarations" mode="build-page"/>		
 		<xsl:apply-templates select="declarations/*[not(title)]"/>
 		<xsl:for-each-group select="//annotation[@type='tags']/tag" group-by=".">
 			<xsl:apply-templates select="current-group()[1]" mode="build-page"/>			
@@ -103,9 +104,9 @@
 	<!-- Build Page -->
 	<!-- ========================= -->
 	
-	<xsl:template match="element | attribute | entity | tag | dtd" mode="build-page">
+	<xsl:template match="element | attribute | entity | tag | dtd | declarations" mode="build-page">
 		<xsl:variable name="file">
-		  <xsl:value-of select='concat($dir, "/")'/>
+		  <xsl:value-of select="concat($dir, '/')"/>
 			<xsl:if test="self::element or self::attribute">
 			  <xsl:call-template name="docFilename">
 			    <xsl:with-param name="name" select="@name"/>
@@ -116,8 +117,8 @@
 		    <xsl:call-template name="docFilename">
 		      <xsl:with-param name="name" select="@name"/>
 		      <xsl:with-param name="type" select="parent::node()/name()"/>
-		      <xsl:with-param name='index'>
-		        <xsl:call-template name='makeIndex'/>
+		      <xsl:with-param name="index">
+		        <xsl:call-template name="makeIndex"/>
 		      </xsl:with-param>
 		    </xsl:call-template>
 			</xsl:if>
@@ -127,18 +128,23 @@
 			<xsl:if test="self::dtd">
 				<xsl:value-of select="'index.html'"/>
 			</xsl:if>
+			<xsl:if test="self::declarations">
+				<xsl:value-of select="'sidebar.html'"/>
+			</xsl:if>
 		</xsl:variable>
 
 		<xsl:result-document href="{$file}">
 			<html>
 				<head>
-					<title>
-					  <xsl:copy-of select="$title"/>
-					  <xsl:text>: </xsl:text>
-					  <xsl:value-of select="@name"/>
-					  <xsl:text> </xsl:text>
-					  <xsl:value-of select="self::node()/name()"/>
-					</title>
+					<xsl:if test="not(self::declarations)">
+						<title>
+						  <xsl:copy-of select="$title"/>
+						  <xsl:text>: </xsl:text>
+						  <xsl:value-of select="@name"/>
+						  <xsl:text> </xsl:text>
+						  <xsl:value-of select="self::node()/name()"/>
+						</title>
+					</xsl:if>
 				  
 					<!-- Default Stylesheet -->
 				  <xsl:if test='$css != ""'>
@@ -166,25 +172,28 @@
 						// <![CDATA[ // ]]>
 					</script>
 				</head>
-				<body>
-					<div id="wrapper">
-						<div id="head"><a href="index.html"><h1><xsl:copy-of select="$title"/></h1></a></div>
-						<div id="nav">
-							<div class="inner">
-								<xsl:apply-templates select="/declarations"/>
-							</div>
-						</div>
-						<div id="content">
-							<div class="inner">
-								<xsl:apply-templates select="self::node()" mode="content"/>
-							</div>
-						</div>
-						<div id="foot">
-							<p class="right"><xsl:text>Made with </xsl:text><em>dtddocumentor</em><xsl:text> from </xsl:text><a href="https://github.com/NCBITools/DtdAnalyzer">DtdAnalyzer</a></p>
-							<p><xsl:text>Updated on: </xsl:text><xsl:value-of select="$date"/><xsl:text> at </xsl:text><xsl:value-of select="$time"/></p>
-						</div>		
-					</div>			
-				</body>
+				<xsl:choose>
+					<xsl:when test="self::declarations">
+						<xsl:apply-templates select="self::node()" mode="content"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<body>
+							<div id="wrapper">
+								<div id="head"><a href="index.html"><h1><xsl:copy-of select="$title"/></h1></a></div>
+								<iframe id="nav" src="sidebar.html"><p>Sidebar</p></iframe>
+								<div id="content">
+									<div class="inner">
+										<xsl:apply-templates select="self::node()" mode="content"/>
+									</div>
+								</div>
+								<div id="foot">
+									<p class="right"><xsl:text>Made with </xsl:text><em>dtddocumentor</em><xsl:text> from </xsl:text><a href="https://github.com/NCBITools/DtdAnalyzer">DtdAnalyzer</a></p>
+									<p><xsl:text>Updated on: </xsl:text><xsl:value-of select="$date"/><xsl:text> at </xsl:text><xsl:value-of select="$time"/></p>
+								</div>		
+							</div>			
+						</body>
+					</xsl:otherwise>
+				</xsl:choose>
 			</html>
 		</xsl:result-document>
 	</xsl:template>
@@ -194,35 +203,43 @@
 	<!-- Sidebar -->
 	<!-- ========================= -->
 	
-	<xsl:template match="declarations">
-		<p class="sidebar-outer">Elements</p>
-		<ul class="sidebar-inner">
-			<xsl:apply-templates select="elements" mode="sidebar"/>
-		</ul>
-		<p class="sidebar-outer">Attributes</p>
-		<ul class="sidebar-inner">
-			<xsl:apply-templates select="attributes" mode="sidebar"/>
-		</ul>
-		<xsl:if test="parameterEntities">
-			<p class="sidebar-outer">Parameter Entities</p>
-			<ul class="sidebar-inner">
-				<xsl:apply-templates select="parameterEntities" mode="sidebar"/>
-			</ul>
-		</xsl:if>
-		<xsl:if test="generalEntities">
-			<p class="sidebar-outer">General Entities</p>
-			<ul class="sidebar-inner">
-				<xsl:apply-templates select="generalEntities" mode="sidebar"/>
-			</ul>
-		</xsl:if>
-		<xsl:if test="//annotation[@type='tags']">
-			<p class="sidebar-outer taglist">Tags</p>
-			<ul class="sidebar-inner">
-				<xsl:for-each select="distinct-values(//annotation[@type='tags']/tag)">
-					<li><a href="tag-{.}.html"><xsl:value-of select="."/></a></li>
-				</xsl:for-each>
-			</ul>
-		</xsl:if>
+	<xsl:template match="declarations" mode="content">
+		<body class="sidebar">
+			<div class="inner">
+				<xsl:if test="elements">
+					<p class="sidebar-outer">Elements</p>
+					<ul class="sidebar-inner">
+						<xsl:apply-templates select="elements" mode="sidebar"/>
+					</ul>
+				</xsl:if>
+				<xsl:if test="attributes">
+					<p class="sidebar-outer">Attributes</p>
+					<ul class="sidebar-inner">
+						<xsl:apply-templates select="attributes" mode="sidebar"/>
+					</ul>
+				</xsl:if>						
+				<xsl:if test="parameterEntities">
+					<p class="sidebar-outer">Parameter Entities</p>
+					<ul class="sidebar-inner">
+						<xsl:apply-templates select="parameterEntities" mode="sidebar"/>
+					</ul>
+				</xsl:if>
+				<xsl:if test="generalEntities">
+					<p class="sidebar-outer">General Entities</p>
+					<ul class="sidebar-inner">
+						<xsl:apply-templates select="generalEntities" mode="sidebar"/>
+					</ul>
+				</xsl:if>
+				<xsl:if test="//annotation[@type='tags']">
+					<p class="sidebar-outer taglist">Tags</p>
+					<ul class="sidebar-inner">
+						<xsl:for-each select="distinct-values(//annotation[@type='tags']/tag)">
+							<li><a href="tag-{.}.html"><xsl:value-of select="."/></a></li>
+						</xsl:for-each>
+					</ul>
+				</xsl:if>
+			</div>					
+		</body>
 	</xsl:template>
 	
 	<xsl:template match="elements" mode="sidebar">

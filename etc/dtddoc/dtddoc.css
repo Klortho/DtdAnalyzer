@@ -13,7 +13,7 @@ body, h2, .sidebar-outer{
 
 /* Main color (text areas) */
 
-#head, #nav, #content, .taglist{
+#head, .sidebar, #content, .taglist{
 	background: #fff; 
 }
 
@@ -49,6 +49,13 @@ body {
 	font-family: Calibri, Helvetica, sans-serif;
 }
 
+body.sidebar {
+	text-align:left;
+	width: 100%;
+	height: 100%;
+	overflow-y:scroll;
+}
+
 #wrapper {
 	margin:0 auto;
 	text-align:left;
@@ -71,7 +78,6 @@ body {
 	margin-left: 15px;
 	font-size: 1em; 
 	z-index: 4; 
-	overflow-y: scroll;
 }
 
 #content {
@@ -146,7 +152,7 @@ a:hover{
 	border-radius: 15px 0 0 15px;
 }
 
-#nav ul{
+body.sidebar ul{
 	padding-left:5px;
 	font-size: .85em;
 	line-height: 2;
