@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:functx="http://www.functx.com" version="2.0" exclude-result-prefixes="#all">
+<xsl:stylesheet
+	xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:functx="http://www.functx.com" 
+	version="2.0" 
+	exclude-result-prefixes="#all">
 
 	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 	
@@ -8,35 +14,35 @@
 	<xsl:param name="complete" select="'no'"/>
 
     <xsl:template match="/">
-    	<schema xmlns="http://purl.oclc.org/dsdl/schematron">
-    		<title>
+    	<sch:schema>
+    		<sch:title>
     			<xsl:text>ISO Schematron file created from </xsl:text>
     			<xsl:value-of select="if(declarations/title) then declarations/title else 'DTD'"/>
-    		</title>
-            <ns prefix="mml" uri="http://www.w3.org/1998/Math/MathML"/>
-            <ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
-            <ns prefix="xlink" uri="http://www.w3.org/1999/xlink"/>
-            <pattern id="heading">     	
-                <rule context="/">
-                	<report test="*">Report date: <value-of select="current-dateTime()"/></report>
-                </rule>
-            </pattern>
+    		</sch:title>
+            <sch:ns prefix="mml" uri="http://www.w3.org/1998/Math/MathML"/>
+            <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
+            <sch:ns prefix="xlink" uri="http://www.w3.org/1999/xlink"/>
+            <sch:pattern id="heading">     	
+                <sch:rule context="/">
+                	<sch:report test="*">Report date: <sch:value-of select="current-dateTime()"/></sch:report>
+                </sch:rule>
+            </sch:pattern>
             <xsl:apply-templates select="declarations/*"/>
-        </schema>
+        </sch:schema>
     </xsl:template>
 	
 	<xsl:template match="elements">
-		<pattern id="elements">
-			<title>Element Checks</title>
+		<sch:pattern id="elements">
+			<sch:title>Element Checks</sch:title>
 			<xsl:apply-templates/>
-		</pattern>
+		</sch:pattern>
 	</xsl:template>
 	
 	<xsl:template match="attributes">
-		<pattern id="attributes">
-			<title>Attribute Checks</title>
+		<sch:pattern id="attributes">
+			<sch:title>Attribute Checks</sch:title>
 			<xsl:apply-templates/>
-		</pattern>
+		</sch:pattern>
 	</xsl:template>
 	
 	<xsl:template match="generalEntities|parameterEntities"/>
@@ -46,7 +52,7 @@
     	<xsl:variable name="e-name">
        		<xsl:value-of select="@name"/>
     	</xsl:variable>
-    	<rule context="{concat('//',@name)}">	
+    	<sch:rule context="{concat('//',@name)}">	
     		<!--<xsl:comment><xsl:value-of select="content-model/@minified"/></xsl:comment>-->
     		<xsl:choose>
     			<xsl:when test="$complete = 'no'"/>
@@ -62,18 +68,38 @@
     					<xsl:with-param name="element" select="$element" tunnel="yes"/>
     				</xsl:apply-templates>
     			</xsl:otherwise>            		
-    		</xsl:choose>            	
-    		<xsl:copy-of select="annotations/annotation[@type='schematron']/*"/>
-    	</rule>
+    		</xsl:choose> 
+		    <xsl:for-each select="annotations/annotation[@type='schematron']/*">
+				<xsl:choose>
+					<xsl:when test="self::report">
+						<sch:report>
+							<xsl:copy-of select="@*"/>
+							<xsl:copy-of select="node()"/>
+						</sch:report>
+					</xsl:when>
+					
+					<xsl:when test="self::assert">
+						<sch:assert>
+							<xsl:copy-of select="@*"/>
+							<xsl:copy-of select="node()"/>
+						</sch:assert>
+					</xsl:when>
+					
+					<xsl:otherwise>
+						<xsl:copy-of select="."/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each>    		
+    	</sch:rule>
     </xsl:template>
 	
 	<xsl:template match="attribute">
 		<xsl:variable name="attribute" select="concat('@', @name)"/>
 		<xsl:if test="annotations/annotation[@type='schematron'] or ($complete='yes' and attributeDeclaration[@mode='#REQUIRED'] or attributeDeclaration[@mode='#FIXED'] or attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED'])">
 			<xsl:if test="annotations/annotation[@type='schematron']">
-				<rule context="{concat('//@',@name)}">
+				<sch:rule context="{concat('//@',@name)}">
 					<xsl:copy-of select="annotations/annotation[@type='schematron']/*"/>
-				</rule>
+				</sch:rule>
 			</xsl:if>			
 			<xsl:choose>
 				<xsl:when test="$complete = 'no'"/>
@@ -94,19 +120,19 @@
 	
 	<xsl:template match="attributeDeclaration[@mode='#REQUIRED']">
 		<xsl:param name="attribute"/>
-		<rule context="{concat('//', @element)}">
-			<assert test="{$attribute}">
+		<sch:rule context="{concat('//', @element)}">
+			<sch:assert test="{$attribute}">
 				<xsl:value-of select="$attribute"/>
 				<xsl:text> is a required attribute for </xsl:text>
 				<xsl:value-of select="('&lt;', @element, '&gt;')"/>
-			</assert>
-		</rule>
+			</sch:assert>
+		</sch:rule>
 	</xsl:template>
 	
 	<xsl:template match="attributeDeclaration[@mode='#FIXED']">
 		<xsl:param name="attribute"/>
-		<rule context="{concat('//', @element, '/', $attribute)}">
-			<assert>
+		<sch:rule context="{concat('//', @element, '/', $attribute)}">
+			<sch:assert>
 				<xsl:attribute name="test">
 					<xsl:text>. = '</xsl:text>
 					<xsl:value-of select="@defaultValue"/>
@@ -118,14 +144,14 @@
 				<xsl:text> and must equal "</xsl:text>
 				<xsl:value-of select="@defaultValue"/>
 				<xsl:text>"</xsl:text>
-			</assert>
-		</rule>
+			</sch:assert>
+		</sch:rule>
 	</xsl:template>
 	
 	<xsl:template match="attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']">
 		<xsl:param name="attribute"/>
-		<rule context="{concat('//', @element, '/', $attribute)}">
-			<assert>
+		<sch:rule context="{concat('//', @element, '/', $attribute)}">
+			<sch:assert>
 				<xsl:attribute name="test">
 					<xsl:variable name="values">
 						<xsl:for-each-group select="tokenize(translate(@type, '()', ''), '\|')" group-by=".">
@@ -143,8 +169,8 @@
 				<xsl:text> or</xsl:text>
 				<xsl:value-of select="tokenize(translate(string-join((tokenize(@type, '\|')), ', '), '()', ''), ',')[last()]"/>
 				<xsl:text> for the element </xsl:text><xsl:value-of select="concat('&lt;', @element, '&gt;')"/>
-			</assert>
-		</rule>
+			</sch:assert>
+		</sch:rule>
 	</xsl:template> 
 	
 	
@@ -174,12 +200,12 @@
     				</xsl:variable>
     				<xsl:value-of select="replace($allowed, ' \| \)', ')')"/>
     			</xsl:variable>
-    			<report>
+    			<sch:report>
     				<xsl:attribute name="test" select="$allowed-test"/>
-    				<xsl:value-of select="$element"/><xsl:text> cannot contain the following attributes: </xsl:text><value-of select="{concat('(', $allowed-test, ')/name()')}"/><xsl:text>.</xsl:text></report>
+    				<xsl:value-of select="$element"/><xsl:text> cannot contain the following attributes: </xsl:text><value-of select="{concat('(', $allowed-test, ')/name()')}"/><xsl:text>.</xsl:text></sch:report>
     		</xsl:when>
     		<xsl:otherwise>
-    			<report test="@*"><xsl:value-of select="$element"/> must not contain any attributes.</report>
+    			<sch:report test="@*"><xsl:value-of select="$element"/> must not contain any attributes.</sch:report>
     		</xsl:otherwise>
     	</xsl:choose>
     </xsl:template>
@@ -191,19 +217,19 @@
 	<xsl:template match="@minified">
         <xsl:param name="element" tunnel="yes"/>
         <xsl:if test="not(contains(., '#PCDATA'))">
-            <report test="child::text()[normalize-space()]">
+            <sch:report test="child::text()[normalize-space()]">
                 <xsl:value-of select="$element"/>
                 <xsl:text> should not contain #PCDATA</xsl:text>
-            </report>
+            </sch:report>
         </xsl:if>
         <xsl:if test=".='EMPTY'">
-            <report test="*">
+            <sch:report test="*">
                 <xsl:value-of select="$element"/>
                 <xsl:text> should be empty</xsl:text>
-            </report>
+            </sch:report>
         </xsl:if>
         <xsl:if test=".!='EMPTY' and not(starts-with(., '(#PCDATA)'))">
-            <report>
+            <sch:report>
                 <xsl:variable name="allowed-test">
                     <xsl:text>* except (</xsl:text>
                     <xsl:value-of select="replace(string-join((tokenize(translate(translate(substring-after(., '('), '|,', '  '), '?()*+', ''), '\s+')), ' | '), '#PCDATA', 'text()')"/>
@@ -211,13 +237,13 @@
                 </xsl:variable>
                 <xsl:attribute name="test" select="$allowed-test"/>
                 <xsl:value-of select="$element"/><xsl:text> cannot contain the following elements: </xsl:text><value-of select="{concat('(', $allowed-test, ')/name()')}"/>
-            </report>
+            </sch:report>
             
             <!-- ============================ -->
             <!-- Make element ordering report -->
             <!-- ============================ -->            
             <xsl:if test="not(ends-with(., '*')) and contains(., ',')">
-                <report>
+                <sch:report>
                     <xsl:attribute name="test">
                         <xsl:variable name="order-test">
                             <xsl:call-template name="ordering">
@@ -227,7 +253,7 @@
                         <xsl:value-of select="string-join((tokenize($order-test, ' or ')[position() != last()]), ' or ')"/>
                     </xsl:attribute>
                     <xsl:text>Child elements of </xsl:text><xsl:value-of select="$element"/><xsl:text> are out of order. <!--The correct order is: </xsl:text><xsl:value-of select="replace(replace(replace(replace(replace(., '\|', ' or '), ',', ', then: '), '\*', '[0 or more]'), '\+', '[1 or more]'), '\?', '[0 or 1]')"/>-->Element model: </xsl:text><xsl:value-of select="replace(replace(., ',', ', '), '\|', ' | ')"/>
-                </report>
+                </sch:report>
             </xsl:if>
         </xsl:if>
     </xsl:template>
@@ -286,7 +312,7 @@
                                     <xsl:value-of select="substring($inside-paren, string-length($inside-paren))"/>
                                 </xsl:variable>
                                 <xsl:if test="not(matches(translate($either, '()?,+*', ''), translate($or, '()?,+*', ''))) and not(matches(translate($or, '()?,+*', ''), translate($either, '()?,+*', '')))">
-                                    <assert>
+                                    <sch:assert>
                                         <xsl:attribute name="test">
                                             <xsl:text>if (</xsl:text>
                                             <xsl:value-of select="string-join((tokenize(translate($or, '?+*()', ''), ',')),' or ')"/>
@@ -302,7 +328,7 @@
                                         <xsl:text>&gt;) and (&lt;</xsl:text>
                                         <xsl:value-of select="string-join((tokenize(string-join((tokenize(translate($or, '?+*()', ''), ',')),'&gt; or &lt;'), '\|')),'&gt; or &lt;')"/>
                                         <xsl:text>&gt;)</xsl:text>
-                                    </assert>
+                                    </sch:assert>
                                 </xsl:if>
                                 <xsl:variable name="element" select="concat('&lt;',@name,'&gt;')"/>
                                 <xsl:choose>
@@ -312,24 +338,24 @@
                                     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                     <xsl:when test="ends-with($inside-paren, '?')">            
                                         <xsl:for-each select="tokenize(translate($or, '()?+*', ''), ',')">
-                                            <report>
+                                            <sch:report>
                                                 <xsl:attribute name="test">
                                                     <xsl:value-of select="concat('count(',., ') > 1')"/>
                                                 </xsl:attribute>
                                                 <xsl:value-of select="$element"/>
                                                 <xsl:text> cannot have more than one </xsl:text>
                                                 <xsl:value-of select="concat('&lt;',.,'&gt;')"/>
-                                            </report>
+                                            </sch:report>
                                         </xsl:for-each>
                                         <xsl:for-each select="tokenize(translate($either, '()?+*', ''), ',')">
-                                            <report>
+                                            <sch:report>
                                                 <xsl:attribute name="test">
                                                     <xsl:value-of select="concat('count(',., ') > 1')"/>
                                                 </xsl:attribute>
                                                 <xsl:value-of select="$element"/>
                                                 <xsl:text> cannot have more than one </xsl:text>
                                                 <xsl:value-of select="concat('&lt;',.,'&gt;')"/>
-                                            </report>
+                                            </sch:report>
                                         </xsl:for-each>
                                     </xsl:when>
 
@@ -341,14 +367,14 @@
                                         <xsl:comment><xsl:text>Either/Or: </xsl:text><xsl:copy-of select="$inside-paren"/></xsl:comment>
                                         <xsl:comment><xsl:text>Either: </xsl:text><xsl:copy-of select="$either"/></xsl:comment>
                                         <xsl:comment><xsl:text>Or: </xsl:text><xsl:copy-of select="$or"/></xsl:comment>
-                                        <assert>
+                                        <sch:assert>
                                             <xsl:attribute name="test">
                                                 <xsl:value-of select="concat('(', string-join((tokenize(translate($either, '?+*()', ''), ',')),' or '), ')')"/>
                                                 <xsl:text> or </xsl:text>
                                                 <xsl:value-of select="concat('(', string-join((tokenize(translate($or, '?+*()', ''), ',')),' or '), ')')"/>
                                               </xsl:attribute>
                                             <xsl:value-of select="$element"/><xsl:text> must contain at least one (&lt;</xsl:text><xsl:value-of select="string-join((tokenize(string-join((tokenize(translate($either, '?+*()', ''), ',')),'&gt; or &lt;'), '\|')),'&gt; or &lt;')"/><xsl:text>&gt;) or (&lt;</xsl:text><xsl:value-of select="string-join((tokenize(string-join((tokenize(translate($or, '?+*()', ''), ',')),'&gt; or &lt;'), '\|')),'&gt; or &lt;')"/><xsl:text>&gt;)</xsl:text>
-                                        </assert>
+                                        </sch:assert>
                                     </xsl:when>
                                     
                                     <!-- ~~~~~~~~~~~~~~~~~ -->
@@ -368,7 +394,7 @@
                                                 
                                                 <!-- At least one of either -->
                                                 <xsl:when test="ends-with(current-grouping-key(), '+')">
-                                                     <assert>
+                                                     <sch:assert>
                                                         <xsl:attribute name="test">
                                                             <xsl:value-of select="$entity-name"/><xsl:text> or </xsl:text>
                                                             <xsl:choose>
@@ -383,31 +409,31 @@
                                                             </xsl:choose>
                                                         </xsl:attribute>
                                                         <xsl:value-of select="$element"/><xsl:text> must contain at least one </xsl:text><xsl:value-of select="concat('&lt;', $entity-name, '&gt;')"/><xsl:text> or &lt;</xsl:text><xsl:value-of select="string-join((tokenize(string-join((tokenize(translate($or, '?+*()', ''), ',')),'&gt;/&lt;'), '\|')),'&gt;/&lt;')"/><xsl:text>&gt;</xsl:text>
-                                                    </assert>
+                                                    </sch:assert>
                                                 </xsl:when>
                                                 
                                                 <!-- No more than one -->
                                                 <xsl:when test="ends-with(current-grouping-key(), '?')">
-                                                    <report>
+                                                    <sch:report>
                                                         <xsl:attribute name="test">
                                                             <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
                                                         </xsl:attribute>
                                                         <xsl:value-of select="$element"/>
                                                         <xsl:text> cannot have more than one </xsl:text>
                                                         <xsl:value-of select="concat('&lt;',$entity-name,'&gt;')"/>
-                                                    </report>
+                                                    </sch:report>
                                                 </xsl:when>
                                                 
                                                 <!-- One of either and no more than one -->
                                                 <xsl:otherwise>
-                                                    <report>
+                                                    <sch:report>
                                                         <xsl:attribute name="test">
                                                             <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
                                                         </xsl:attribute>
                                                         <xsl:value-of select="$element"/> <xsl:text> cannot have more than one </xsl:text>
                                                         <xsl:value-of select="concat('&lt;',$entity-name,'&gt;')"/>
-                                                    </report>
-                                                    <assert>
+                                                    </sch:report>
+                                                    <sch:assert>
                                                         <xsl:attribute name="test">
                                                             <xsl:value-of select="$entity-name"/><xsl:text> or </xsl:text>
                                                             <xsl:choose>
@@ -422,7 +448,7 @@
                                                             </xsl:choose>
                                                         </xsl:attribute>
                                                         <xsl:value-of select="$element"/><xsl:text> must contain at least one </xsl:text><xsl:value-of select="concat('&lt;', $entity-name, '&gt;')"/><xsl:text> or &lt;</xsl:text><xsl:value-of select="string-join((tokenize(string-join((tokenize(translate($or, '?+*()', ''), ',')),'&gt;/&lt;'), '\|')),'&gt;/&lt;')"/><xsl:text>&gt;</xsl:text>
-                                                    </assert>
+                                                    </sch:assert>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xsl:for-each-group>
@@ -441,7 +467,7 @@
                                                 <xsl:when test="ends-with(current-grouping-key(), '+')">
                                                     <xsl:choose>
                                                         <xsl:when test="not(contains($either, '+') or contains($either, '?'))">
-                                                            <assert>
+                                                            <sch:assert>
                                                                 <xsl:attribute name="test">
                                                                     <xsl:value-of select="$entity-name"/><xsl:text> or </xsl:text>
                                                                     <xsl:choose>
@@ -454,28 +480,28 @@
                                                                     </xsl:choose>
                                                                 </xsl:attribute>
                                                                 <xsl:value-of select="$element"/><xsl:text> must contain at least one </xsl:text><xsl:value-of select="concat('&lt;', $entity-name, '&gt;')"/><xsl:text> or &lt;</xsl:text><xsl:value-of select="string-join((tokenize(string-join((tokenize(translate($either, '?+*()', ''), ',')),'&gt;/&lt;'), '\|')),'&gt;/&lt;')"/><xsl:text>&gt;</xsl:text>
-                                                            </assert>
+                                                            </sch:assert>
                                                         </xsl:when>
                                                     </xsl:choose>                                                    
                                                 </xsl:when>
                                                 
                                                 <!-- No more than one -->
                                                 <xsl:when test="ends-with(current-grouping-key(), '?')">
-                                                    <report>
+                                                    <sch:report>
                                                         <xsl:attribute name="test">
                                                             <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
                                                         </xsl:attribute>
                                                         <xsl:value-of select="$element"/>
                                                         <xsl:text> cannot have more than one </xsl:text>
                                                         <xsl:value-of select="concat('&lt;',$entity-name,'&gt;')"/>
-                                                    </report>
+                                                    </sch:report>
                                                 </xsl:when>
                                                 
                                                 <!-- One of either and no more than one -->
                                                 <xsl:otherwise>
                                                     <xsl:choose>
                                                         <xsl:when test="contains($either, '*')">
-                                                            <assert>
+                                                            <sch:assert>
                                                                 <xsl:attribute name="test">
                                                                     <xsl:value-of select="$entity-name"/><xsl:text> or </xsl:text>
                                                                     <xsl:choose>
@@ -488,14 +514,14 @@
                                                                     </xsl:choose>
                                                                 </xsl:attribute>
                                                                 <xsl:value-of select="$element"/><xsl:text> must contain at least one </xsl:text><xsl:value-of select="concat('&lt;', $entity-name, '&gt;')"/><xsl:text> or &lt;</xsl:text><xsl:value-of select="string-join((tokenize(string-join((tokenize(translate($either, '?+*()', ''), ',')),'&gt;/&lt;'), '\|')),'&gt;/&lt;')"/><xsl:text>&gt;</xsl:text>
-                                                            </assert>
-                                                            <report>
+                                                            </sch:assert>
+                                                            <sch:report>
                                                                 <xsl:attribute name="test">
                                                                     <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
                                                                 </xsl:attribute>
                                                                 <xsl:value-of select="$element"/> <xsl:text> cannot have more than one </xsl:text>
                                                                 <xsl:value-of select="concat('&lt;',$entity-name,'&gt;')"/>
-                                                            </report>
+                                                            </sch:report>
                                                         </xsl:when>
                                                     </xsl:choose>
                                                 </xsl:otherwise>
@@ -532,23 +558,23 @@
                     <!-- Text only tests -->
                     <!-- =============== -->
                     <xsl:when test="starts-with($str, '#PCDATA)')">
-                        <report>
+                        <sch:report>
                             <xsl:attribute name="test">
                                 <xsl:value-of select="'*'"/>
                             </xsl:attribute>
                             <xsl:value-of select="concat('&lt;',@name,'&gt;')"/>
                             <xsl:text> may contain only #PCDATA</xsl:text>
-                        </report>
+                        </sch:report>
                         <xsl:choose>
                             <xsl:when test="$str = '#PCDATA)*'"/>
                             <xsl:when test="$str = '#PCDATA)'">
-                                <assert>
+                                <sch:assert>
                                     <xsl:attribute name="test">
                                         <xsl:value-of select="'child::text()[normalize-space()]'"/>
                                     </xsl:attribute>
                                     <xsl:value-of select="concat('&lt;',@name,'&gt;')"/>
                                     <xsl:text> must contain #PCDATA</xsl:text>
-                                </assert>
+                                </sch:assert>
                             </xsl:when>
                         </xsl:choose>
                     </xsl:when>
@@ -585,35 +611,35 @@
                                     <!-- At least one of either -->
                                     <!-- ~~~~~~~~~~~~~~~~~~~~~~ -->
                                     <xsl:when test="ends-with(translate($entity, ')', ''), '+')">
-                                        <assert>
+                                        <sch:assert>
                                             <xsl:attribute name="test">
                                                 <xsl:value-of select="string-join((tokenize(translate($entity, '?+*()', ''), '\|')), ' or ')"/>
                                             </xsl:attribute>
                                             <xsl:value-of select="concat('&lt;',@name,'&gt;')"/>
                                             <xsl:text> must have at least one of: </xsl:text>
                                             <xsl:value-of select="string-join((tokenize(translate($entity, '?+*()', ''), '\|')), ' or ')"/>
-                                        </assert>
+                                        </sch:assert>
                                     </xsl:when>
                                     
                                     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                     <!-- No more than one of either -->
                                     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                     <xsl:when test="ends-with(translate($entity, ')', ''), '?')">
-                                        <report>
+                                        <sch:report>
                                             <xsl:attribute name="test">
                                                 <xsl:value-of select="concat('count(',string-join((tokenize(translate($entity, '?+*()', ''), '\|')), ' or '), ') > 1')"/>
                                             </xsl:attribute>
                                             <xsl:value-of select="concat('&lt;',@name,'&gt;')"/>
                                             <xsl:text> cannot have more than one of: </xsl:text>
                                             <xsl:value-of select="string-join((tokenize(translate($entity, '?+*()', ''), '\|')), ' or ')"/>
-                                        </report>
+                                        </sch:report>
                                     </xsl:when>
                                     
                                     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                     <!-- One of either and any number of either -->
                                     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                                     <xsl:otherwise>
-                                        <assert>
+                                        <sch:assert>
                                             <xsl:attribute name="test">
                                                 <xsl:text>if(</xsl:text>
                                                 <xsl:value-of select="translate(substring-before($entity, '|'), '(),*? |+~','')"/>
@@ -628,9 +654,9 @@
                                             <xsl:value-of select="concat('&lt;',translate(substring-before($entity, '|'), '(),*? |+~',''),'&gt;')"/>
                                             <xsl:text> and </xsl:text>
                                             <xsl:value-of select="concat('&lt;',translate(substring-after($entity, '|'), '(),*? |+~',''),'&gt;')"/>
-                                        </assert>
+                                        </sch:assert>
                                         <xsl:if test="not(contains($entity, '*'))">
-                                            <assert>
+                                            <sch:assert>
                                                 <xsl:attribute name="test">
                                                     <xsl:value-of select="translate(substring-before($entity, '|'), '(),*? |+~','')"/>
                                                     <xsl:text> or </xsl:text>
@@ -641,8 +667,8 @@
                                                 <xsl:value-of select="concat('&lt;',translate(substring-before($entity, '|'), '(),*? |+~',''),'&gt;')"/>
                                                 <xsl:text> or one </xsl:text>
                                                 <xsl:value-of select="concat('&lt;',translate(substring-after($entity, '|'), '(),*? |+~',''),'&gt;')"/>
-                                            </assert>
-                                            <report>
+                                            </sch:assert>
+                                            <sch:report>
                                                 <xsl:attribute name="test">
                                                     <xsl:value-of select="concat('count(', translate(substring-before($entity, '|'), '(),*? |+~',''), ') > 1')"/>
                                                     <xsl:text> or </xsl:text>
@@ -653,7 +679,7 @@
                                                 <xsl:value-of select="concat('&lt;',translate(substring-before($entity, '|'), '(),*? |+~',''),'&gt;')"/>
                                                 <xsl:text> or more than one </xsl:text>
                                                 <xsl:value-of select="concat('&lt;',translate(substring-after($entity, '|'), '(),*? |+~',''),'&gt;')"/>
-                                            </report>
+                                            </sch:report>
                                         </xsl:if>
                                     </xsl:otherwise>
                                 </xsl:choose>
@@ -679,50 +705,50 @@
                                             <!-- At least one -->
                                             <!-- ~~~~~~~~~~~~ -->
                                             <xsl:when test="ends-with(translate($entity, ')', ''), '+')">
-                                                <assert>
+                                                <sch:assert>
                                                     <xsl:attribute name="test">
                                                         <xsl:value-of select="$entity-name"/>
                                                     </xsl:attribute>
                                                     <xsl:value-of select="concat('&lt;',@name,'&gt;')"/>
                                                     <xsl:text> must have at least one </xsl:text>
                                                     <xsl:value-of select="concat('&lt;',$entity-name,'&gt;')"/>
-                                                </assert>
+                                                </sch:assert>
                                             </xsl:when>
                                             
                                             <!-- ~~~~~~~~~~~ -->
                                             <!-- Zero or one -->
                                             <!-- ~~~~~~~~~~~ -->
                                             <xsl:when test="ends-with(translate($entity, ')', ''), '?')">
-                                                <report>
+                                                <sch:report>
                                                     <xsl:attribute name="test">
                                                         <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
                                                     </xsl:attribute>
                                                     <xsl:value-of select="concat('&lt;',@name,'&gt;')"/>
                                                     <xsl:text> cannot have more than one </xsl:text>
                                                     <xsl:value-of select="concat('&lt;',$entity-name,'&gt;')"/>
-                                                </report>
+                                                </sch:report>
                                             </xsl:when>
                                             
                                             <!-- ~~~~~~~~~~~~~~~~ -->
                                             <!-- One and only one -->
                                             <!-- ~~~~~~~~~~~~~~~~ -->
                                             <xsl:otherwise>
-                                                <assert>
+                                                <sch:assert>
                                                     <xsl:attribute name="test">
                                                         <xsl:value-of select="$entity-name"/>
                                                     </xsl:attribute>
                                                     <xsl:value-of select="concat('&lt;',@name,'&gt;')"/>
                                                     <xsl:text> must have one </xsl:text>
                                                     <xsl:value-of select="concat('&lt;',$entity-name,'&gt;')"/>
-                                                </assert>
-                                                <report>
+                                                </sch:assert>
+                                                <sch:report>
                                                     <xsl:attribute name="test">
                                                         <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
                                                     </xsl:attribute>
                                                     <xsl:value-of select="concat('&lt;',@name,'&gt;')"/>
                                                     <xsl:text> cannot have more than one </xsl:text>
                                                     <xsl:value-of select="concat('&lt;',$entity-name,'&gt;')"/>
-                                                </report>
+                                                </sch:report>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </xsl:with-param>
