@@ -6,14 +6,14 @@
 	<xsl:param name="files"/>
 	<xsl:param name="date" select="format-date(current-date(),'[MNn] [D], [Y]')"/>
 	<xsl:param name="time" select="format-time(current-time(),'[h]:[m] P')"/>
-	<xsl:param name="dir" select='"doc"'/>
-  <xsl:param name='css' select='"dtddoc.css"'/>
-  <xsl:param name='filesuffixes' select='1'/>
+	<xsl:param name="dir" select="'doc'"/>
+	<xsl:param name="css" select="'dtddoc.css'"/>
+	<xsl:param name="filesuffixes" select="1"/>
 
 	<xsl:param name="exclude-elems" select="' '"/>
 	<xsl:param name="include-files"/>
 	
-	<xsl:key name='entitiesByLCName' match='entity' use='lower-case(@name)'/>
+	<xsl:key name="entitiesByLCName" match="entity" use="lower-case(@name)"/>
 
 	<xsl:variable name="title">
 		<xsl:choose>
@@ -66,39 +66,7 @@
 	<xsl:template match="dtd">
 		<xsl:apply-templates select="self::node()" mode="build-page"/>
 	</xsl:template>
-
-  <!--
-    This template computes an index number, when necessary, to append to a filename.
-    The context should be an <entity> element.
-    If there are other entities that have the same name as this one, ignoring case,
-    then we'll need to append a suffix ("-1", "-2", etc.) to the filenames for those.
-    Because computing the suffix is time-consuming, use the key to find out if there
-    are others with such clashing names.
-  -->  
-  <xsl:template name='makeIndex'>
-    <xsl:choose>
-      <xsl:when test='$filesuffixes'>
-        <xsl:variable name='lcname' select='lower-case(@name)'/>
-        <xsl:choose>
-          <xsl:when test='count(key("entitiesByLCName", $lcname)) > 1'>
-            <!-- both of these comment-out expressions still cause the whole thing to be
-              really slow.  For now, let's use position(), even though the number is not
-              guessable.  I think there must be an efficient XSLT 2.0 way to do this. -->
-<!--            <xsl:value-of select='count(preceding-sibling::entity[lower-case(@name) = $lcname])'/>-->
-<!--            <xsl:value-of select='count(preceding-sibling::entity[. = key("entitiesByLCName", $lcname)])'/> -->
-            <xsl:value-of select='position()'/> 
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text></xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text></xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  
+	
 
 	<!-- ========================= -->
 	<!-- Build Page -->
@@ -273,31 +241,31 @@
 		</xsl:for-each>
 	</xsl:template>
 	
-  <xsl:template match="parameterEntities" mode="sidebar">
-    <xsl:for-each select="entity">
-      <xsl:sort select="lower-case(@name)" order="ascending"/>
-      <xsl:call-template name="list-link">
-    		<xsl:with-param name="name" select="@name"/>
-    		<xsl:with-param name="type" select="'parameterEntities'"/>
-    	  <xsl:with-param name='index'>
-    	    <xsl:call-template name='makeIndex'/>
-    	  </xsl:with-param>
-    	</xsl:call-template>
-    </xsl:for-each>
-  </xsl:template>	
-  
-  <xsl:template match="generalEntities" mode="sidebar">
-    <xsl:for-each select="entity">
-      <xsl:sort select="lower-case(@name)" order="ascending"/>
-    	<xsl:call-template name="list-link">
-    		<xsl:with-param name="name" select="@name"/>
-    		<xsl:with-param name="type" select="'generalEntities'"/>
-    	  <xsl:with-param name='index'>
-    	    <xsl:call-template name='makeIndex'/>
-   	    </xsl:with-param>
-    	</xsl:call-template>
-    </xsl:for-each>
-  </xsl:template>	
+	<xsl:template match="parameterEntities" mode="sidebar">
+		<xsl:for-each select="entity">
+			<xsl:sort select="lower-case(@name)" order="ascending"/>
+			<xsl:call-template name="list-link">
+				<xsl:with-param name="name" select="@name"/>
+				<xsl:with-param name="type" select="'parameterEntities'"/>
+				<xsl:with-param name='index'>
+					<xsl:call-template name='makeIndex'/>
+				</xsl:with-param>
+			</xsl:call-template>
+		</xsl:for-each>
+	</xsl:template>	
+	
+	<xsl:template match="generalEntities" mode="sidebar">
+		<xsl:for-each select="entity">
+			<xsl:sort select="lower-case(@name)" order="ascending"/>
+			<xsl:call-template name="list-link">
+				<xsl:with-param name="name" select="@name"/>
+				<xsl:with-param name="type" select="'generalEntities'"/>
+				<xsl:with-param name='index'>
+					<xsl:call-template name='makeIndex'/>
+				</xsl:with-param>
+			</xsl:call-template>
+		</xsl:for-each>
+	</xsl:template>	
   
   
 	
@@ -305,9 +273,8 @@
 	<!-- Page Content -->
 	<!-- ========================= -->
 	
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-	<!-- Element Page -->
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<!-- ===== Element Page ===== -->
 
 	<xsl:template match="element" mode="content">
 		<h2>
@@ -370,9 +337,7 @@
 	</xsl:template>
 	
 
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-	<!-- Attribute Page -->
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!-- ===== Attribute Page ===== -->
 	
 	<xsl:template match="attribute" mode="content">
 		<h2><span class="pagetitle">Attribute: </span><xsl:value-of select="@name"/></h2>
@@ -394,7 +359,10 @@
 				</table>
 			</xsl:when>
 			<xsl:otherwise>
-				<p class="bold">Value: <span class="attvalue"><xsl:value-of select="attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)][1]/@type"/></span></p>
+				<p class="bold">Value: <span class="attvalue">
+					<xsl:value-of select="attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)][1]/@type"/>
+				</span>
+				</p>
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:apply-templates select="annotations/annotation[@type='model']"/>
@@ -413,9 +381,7 @@
 	</xsl:template>
 	
 	
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-	<!-- Entity Page -->
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!-- ===== Entity Page ===== -->
 	
 	<xsl:template match="entity" mode="content">
 		<h2><span class="pagetitle">Entity: </span><xsl:value-of select="@name"/></h2>
@@ -432,19 +398,18 @@
 	</xsl:template>
 	
 	
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-	<!-- Tag Page -->
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!-- ===== Tag Page ===== -->
 	
 	<xsl:template match="tag" mode="content">
 		<xsl:variable name="tag"><xsl:value-of select="."/></xsl:variable>
 		<h2><span class="pagetitle">Tag: </span><xsl:value-of select="$tag"/></h2>
 		<h3><xsl:text>Tagged with "</xsl:text><xsl:value-of select="$tag"/><xsl:text>"</xsl:text></h3>
 		<ul class="tags">
-			<xsl:for-each-group select="//*[annotations[annotation[tag=$tag]]][not(self::element and (@reachable='false' or matches(@name, $exclude-elems))) and 
-				not(self::attribute and (matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name))]
-				" group-by="parent::node()/name()">	
-				<h4 class="notetitle"><xsl:value-of select="if (current-grouping-key()='parameterEntities') then 'parameter entities' else if(current-grouping-key()='generalEntities') then 'general entities' else current-grouping-key()"/></h4>
+			<xsl:for-each-group select="//*[annotations[annotation[tag=$tag]]][not(self::element and (@reachable='false' or matches(@name, $exclude-elems))) 
+				and not(self::attribute and (matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name))]" 
+				group-by="parent::node()/name()">	
+				<h4 class="notetitle"><xsl:value-of select="if (current-grouping-key()='parameterEntities') then 'parameter entities' else 
+					if(current-grouping-key()='generalEntities') then 'general entities' else current-grouping-key()"/></h4>
 				<ul class="tags">
 					<xsl:for-each select="current-group()">
 						<xsl:sort select="translate(@name, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" order="ascending"/>
@@ -461,9 +426,7 @@
 	</xsl:template>
 
 
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-	<!-- Index Page -->
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->	
+	<!-- ===== Index Page ===== -->
 	
 	<xsl:template match="dtd" mode="content">
 		<h2><span class="pagetitle"><xsl:text> Documentation: </xsl:text></span><xsl:value-of select="@relSysId"/></h2>
@@ -496,15 +459,15 @@
 	<xsl:template name="list-link">
 		<xsl:param name="name"/>
 		<xsl:param name="type"/>
-	  <xsl:param name='index'/>
+		<xsl:param name="index"/>
 		
-  	<xsl:variable name="href">
-  		<xsl:call-template name="docFilename">
-  			<xsl:with-param name="name" select="$name"/>
-  			<xsl:with-param name="type" select="$type"/>
-  		  <xsl:with-param name='index' select='$index'/>
-  		</xsl:call-template>
-  	</xsl:variable>
+		<xsl:variable name="href">
+			<xsl:call-template name="docFilename">
+				<xsl:with-param name="name" select="$name"/>
+				<xsl:with-param name="type" select="$type"/>
+				<xsl:with-param name='index' select='$index'/>
+			</xsl:call-template>
+		</xsl:variable>
 		
 		<li>
 			<a href='{$href}'>
@@ -526,15 +489,20 @@
 		</li>
 	</xsl:template>
   
-	<!-- Constructs the filename for the documentation page for a thing, given its name and its type.
-		This same template is used both to contruct the output filename when the file is written, 
-		and to make the hyperlink to it in the navigation panel. -->
-	
+
+	<!-- ===== 	docFilename Template  ===== -->
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Notes: Constructs the filename for the documentation page 
+		for a thing, given its name and its type. This same 
+		template is used both to contruct the output filename 
+		when the file is written, and to make the hyperlink to it 
+		in the navigation panel.
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->  	
 	<xsl:template name="docFilename">
 		<xsl:param name="name"/>
 		<xsl:param name="type"/>
 		<xsl:param name='index'/>
-
+		
 		<xsl:choose>
 			<xsl:when test="$type='element'">
 				<xsl:text>el-</xsl:text>
@@ -547,19 +515,54 @@
 			<xsl:when test="$type='parameterEntities'">
 				<xsl:text>pe-</xsl:text>
 				<xsl:value-of select="$name"/>
-		    <xsl:if test='$index != ""'>
-		      <xsl:value-of select='concat("-", $index)'/>
-		    </xsl:if>
+				<xsl:if test='$index != ""'>
+					<xsl:value-of select='concat("-", $index)'/>
+				</xsl:if>
 			</xsl:when>
 			<xsl:when test="$type='generalEntities'">
 				<xsl:text>ge-</xsl:text>
 				<xsl:value-of select="$name"/>
-			  <xsl:if test='$index != ""'>
-			    <xsl:value-of select='concat("-", $index)'/>
-			  </xsl:if>
+				<xsl:if test='$index != ""'>
+					<xsl:value-of select='concat("-", $index)'/>
+				</xsl:if>
 			</xsl:when>
 		</xsl:choose>
 		<xsl:text>.html</xsl:text>
+	</xsl:template>
+	
+	<!-- ===== 	makeIndex Template  ===== -->
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Notes: This template computes an index number, when 
+		necessary, to append to a filename. The context should 
+		be an <entity> element. If there are other entities 
+		that have the same name as this one, ignoring case, 
+		then we'll need to append a suffix ("-1", "-2", etc.) 
+		to the filenames for those. Because computing the suffix 
+		is time-consuming, use the key to find out if there are 
+		others with such clashing names.
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->  
+	<xsl:template name="makeIndex">
+		<xsl:choose>
+			<xsl:when test="$filesuffixes">
+				<xsl:variable name="lcname" select="lower-case(@name)"/>
+				<xsl:choose>
+					<xsl:when test="count(key('entitiesByLCName', $lcname)) > 1">
+						<!-- both of these commented-out expressions still cause the whole thing to be
+							really slow. For now, let's use position(), even though the number is not
+							guessable. I think there must be an efficient XSLT 2.0 way to do this. -->
+						<!--<xsl:value-of select="count(preceding-sibling::entity[lower-case(@name) = $lcname])"/>-->
+						<!--<xsl:value-of select="count(preceding-sibling::entity[. = key("entitiesByLCName", $lcname)])"/>-->
+						<xsl:value-of select="position()"/> 
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text></xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text></xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 </xsl:stylesheet>
