@@ -167,21 +167,23 @@
 					</script>
 				</head>
 				<body>
-					<div id="head"><a href="index.html"><h1><xsl:copy-of select="$title"/></h1></a></div>
-					<div id="nav">
-						<div class="inner">
-							<xsl:apply-templates select="/declarations"/>
+					<div id="wrapper">
+						<div id="head"><a href="index.html"><h1><xsl:copy-of select="$title"/></h1></a></div>
+						<div id="nav">
+							<div class="inner">
+								<xsl:apply-templates select="/declarations"/>
+							</div>
 						</div>
-					</div>
-					<div id="content">
-						<div class="inner">
-							<xsl:apply-templates select="self::node()" mode="content"/>
+						<div id="content">
+							<div class="inner">
+								<xsl:apply-templates select="self::node()" mode="content"/>
+							</div>
 						</div>
-					</div>
-					<div id="foot">
-						<p><xsl:text>Made with </xsl:text><em>dtddocumentor</em><xsl:text> from </xsl:text><a href="https://github.com/NCBITools/DtdAnalyzer">DtdAnalyzer</a></p>
-						<p><xsl:text>Updated on: </xsl:text><xsl:value-of select="$date"/><xsl:text> at </xsl:text><xsl:value-of select="$time"/></p>
-					</div>
+						<div id="foot">
+							<p class="right"><xsl:text>Made with </xsl:text><em>dtddocumentor</em><xsl:text> from </xsl:text><a href="https://github.com/NCBITools/DtdAnalyzer">DtdAnalyzer</a></p>
+							<p><xsl:text>Updated on: </xsl:text><xsl:value-of select="$date"/><xsl:text> at </xsl:text><xsl:value-of select="$time"/></p>
+						</div>		
+					</div>			
 				</body>
 			</html>
 		</xsl:result-document>
