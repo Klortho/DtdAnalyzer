@@ -553,12 +553,14 @@
 				<xsl:variable name="lcname" select="lower-case(@name)"/>
 				<xsl:choose>
 					<xsl:when test="count(key('entitiesByLCName', $lcname)) > 1">
-						<!-- both of these commented-out expressions still cause the whole thing to be
-							really slow. For now, let's use position(), even though the number is not
-							guessable. I think there must be an efficient XSLT 2.0 way to do this. -->
-						<!--<xsl:value-of select="count(preceding-sibling::entity[lower-case(@name) = $lcname])"/>-->
-						<!--<xsl:value-of select="count(preceding-sibling::entity[. = key("entitiesByLCName", $lcname)])"/>-->
-						<xsl:value-of select="position()"/> 
+						<!-- 
+						  This preceding-sibling expression is relatively slow, and was causing
+						  performance problems when running against JATS-type DTDs (which have hundreds
+						  of entities, and the sidebar was included in every page.
+						  But now that the sidebar is in a separate iframe, that doesn't matter.
+							There must be a better XSLT 2.0 way to do this, but I don't know it [cfm]. 
+						-->
+						<xsl:value-of select="count(preceding-sibling::entity[lower-case(@name) = $lcname])"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:text></xsl:text>
