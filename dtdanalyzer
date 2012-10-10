@@ -6,8 +6,7 @@ SEP=':'
 if [ $(uname -s | grep -ic 'cygwin\|mingw') -gt 0 ]; then SEP=';'; fi
 for jar in "$DTDANALYZER_ROOT"/lib/*.jar "$DTDANALYZER_ROOT"/lib/*/*.jar
 do
-  if [ ! -e "$jar" ]; then continue; fi
   CP="$CP$SEP$jar"
 done
 LOGCONFIG=${LOGCONFIG:-file:$DTDANALYZER_ROOT/etc/log4j.properties}
-exec java -cp "$CP" -Xmx1G "-Dlog4j.configuration=${LOGCONFIG}" gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer "$@"
+exec java -cp "$CP" -Xmx256M "-Dlog4j.configuration=${LOGCONFIG}" gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer "$@"

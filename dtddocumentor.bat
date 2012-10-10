@@ -42,7 +42,7 @@ shift
 if not (%1)==() goto CHECKOPTS
 
 rem Run the dtdanalyzer with the dtddocumentor stylesheet, and send the output to nul
-java -cp %CP% -Xmx1G "-Dlog4j.configuration=%LOGCONFIG%" ^
+java -cp %CP% -Xmx256M "-Dlog4j.configuration=%LOGCONFIG%" ^
      gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer ^
      -x "%DTDANALYZER_ROOT%/xslt/dtddocumentor.xsl" ^
      %SOURCEDTD% %CATOPT% %TITLEOPT% %ROOTSOPT% %DOCPROC% %CSSSKIN% %DESTDIR% 
