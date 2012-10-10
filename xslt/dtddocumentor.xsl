@@ -104,6 +104,12 @@
 		<xsl:result-document href="{$file}">
 			<html>
 				<head>
+				  <!-- 
+				    Sidebar gets <base target="_parent"/> so that links will open in the parent window. 
+				  -->
+				  <xsl:if test='self::declarations'>
+				    <base target="_parent" />
+				  </xsl:if>
 					<xsl:if test="not(self::declarations)">
 						<title>
 						  <xsl:copy-of select="$title"/>
