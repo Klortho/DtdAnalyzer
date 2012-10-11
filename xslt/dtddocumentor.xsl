@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
+<xsl:stylesheet xmlns:pmc="http://www.ncbi.nlm.nih.gov/pmc/ns"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+                version="2.0">
 
 	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
@@ -11,7 +14,8 @@
 	<xsl:param name="filesuffixes" select="1"/>
 
 	<xsl:param name="exclude-elems" select="' '"/>
-	<xsl:param name="include-files"/>
+  <xsl:param name="exclude-except" select="' '"/>
+  <xsl:param name="include-files"/>
 	
 	<xsl:key name="entitiesByLCName" match="entity" use="lower-case(@name)"/>
 
@@ -39,7 +43,7 @@
 	<!-- ========================= -->
 	
 	<xsl:template match="elements">
-		<xsl:apply-templates select="element[not(matches(@name, $exclude-elems)) and not(@reachable='false')]" mode="build-page"/>
+		<xsl:apply-templates select="element[pmc:included(@name) and not(@reachable='false')]" mode="build-page"/>
 	</xsl:template>
 	
 	<xsl:template match="attributes">
@@ -48,7 +52,7 @@
 			<xsl:variable name="notexcluded">	
 				<xsl:for-each select="attributeDeclaration">
 					<xsl:choose>
-						<xsl:when test="matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name">0</xsl:when>
+						<xsl:when test="not(pmc:included(@element)) or @element=//element[@reachable='false']/@name">0</xsl:when>
 						<xsl:otherwise>1</xsl:otherwise>
 					</xsl:choose>
 				</xsl:for-each>
@@ -217,7 +221,7 @@
 	</xsl:template>
 	
 	<xsl:template match="elements" mode="sidebar">
-		<xsl:for-each select="element[not(matches(@name, $exclude-elems)) and not(@reachable='false')]">
+		<xsl:for-each select="element[pmc:included(@name) and not(@reachable='false')]">
 			<xsl:sort select="@name" order="ascending"/>
 			<xsl:call-template name="list-link">
 				<xsl:with-param name="name" select="@name"/>
@@ -233,7 +237,7 @@
 			<xsl:variable name="notexcluded">
 				<xsl:for-each select="attributeDeclaration">
 					<xsl:choose>
-						<xsl:when test="matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name">0</xsl:when>
+						<xsl:when test="not(pmc:included(@element)) or @element=//element[@reachable='false']/@name">0</xsl:when>
 						<xsl:otherwise>1</xsl:otherwise>
 					</xsl:choose>
 				</xsl:for-each>
@@ -317,7 +321,7 @@
 				<xsl:if test="content-model/@spec='mixed' or content-model/@spec='text'">
 					<li>PCDATA</li>
 				</xsl:if>
-				<xsl:for-each select="content-model//child[not(matches(., $exclude-elems))]">
+				<xsl:for-each select="content-model//child[ pmc:included(name(.)) ]">
 					<xsl:sort select="."/>
 					<xsl:call-template name="list-link">
 						<xsl:with-param name="name" select="."/>
@@ -328,10 +332,10 @@
 		</xsl:if>
 		<xsl:apply-templates select="annotations/annotation[@type='tags']"/>
 		<xsl:apply-templates select="annotations/annotation[@type='example']"/>
-		<xsl:if test="context/parent[not(matches(@name, $exclude-elems))][@name=//element[not(@reachable='false')]/@name]">
+		<xsl:if test="context/parent[ pmc:included(@name) ][@name=//element[not(@reachable='false')]/@name]">
 			<h3>May be contained in:</h3>
 			<ul class="parents">
-				<xsl:for-each select="context/parent[not(matches(@name, $exclude-elems))][@name=//element[not(@reachable='false')]/@name]">
+				<xsl:for-each select="context/parent[ pmc:included(@name) ][@name=//element[not(@reachable='false')]/@name]">
 					<xsl:sort select="@name"/>
 					<xsl:call-template name="list-link">
 						<xsl:with-param name="name" select="@name"/>
@@ -349,10 +353,15 @@
 		<h2><span class="pagetitle">Attribute: </span><xsl:value-of select="@name"/></h2>
 		<xsl:apply-templates select="annotations/annotation[@type='note']"/>
 		<xsl:choose>
-			<xsl:when test="count(distinct-values(attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)]/@type)) > 1">
+			<xsl:when test="count(distinct-values(
+			                  attributeDeclaration[not( not(pmc:included(@element)) or @element=//element[@reachable='false']/@name )]/@type
+			                )) > 1">
 				<table>
 					<tr><th>Value</th><th>In Elements</th></tr>
-					<xsl:for-each-group select="attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)]" group-by="@type">
+					<xsl:for-each-group select="attributeDeclaration[
+					                              not( not(pmc:included(@element)) or @element=//element[@reachable='false']/@name )
+					                            ]" 
+					                    group-by="@type">
 						<tr class="attvalue">
 							<td><xsl:value-of select="current-grouping-key()"/></td>
 							<td>
@@ -366,7 +375,9 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<p class="bold">Value: <span class="attvalue">
-					<xsl:value-of select="attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)][1]/@type"/>
+					<xsl:value-of select="attributeDeclaration[
+					                        not( not(pmc:included(@element)) or @element=//element[@reachable='false']/@name )
+					                      ][1]/@type"/>
 				</span>
 				</p>
 			</xsl:otherwise>
@@ -376,7 +387,9 @@
 		<xsl:apply-templates select="annotations/annotation[@type='example']"/>		
 		<h3>May be in elements:</h3>
 		<ul class="parents">
-			<xsl:for-each select="attributeDeclaration[not(matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name)]">
+			<xsl:for-each select="attributeDeclaration[
+			                        not( not(pmc:included(@element)) or @element=//element[@reachable='false']/@name )
+			                      ]">
 				<xsl:sort select="@element"/>
 				<xsl:call-template name="list-link">
 					<xsl:with-param name="name" select="@element"/>
@@ -411,8 +424,9 @@
 		<h2><span class="pagetitle">Tag: </span><xsl:value-of select="$tag"/></h2>
 		<h3><xsl:text>Tagged with "</xsl:text><xsl:value-of select="$tag"/><xsl:text>"</xsl:text></h3>
 		<ul class="tags">
-			<xsl:for-each-group select="//*[annotations[annotation[tag=$tag]]][not(self::element and (@reachable='false' or matches(@name, $exclude-elems))) 
-				and not(self::attribute and (matches(@element, $exclude-elems) or @element=//element[@reachable='false']/@name))]" 
+			<xsl:for-each-group select="//*[annotations[annotation[tag=$tag]]][not(self::element and
+			  (@reachable='false' or not(pmc:included(@name)) )) 
+				and not(self::attribute and ( @element and not(pmc:included(@element)) or @element=//element[@reachable='false']/@name))]" 
 				group-by="parent::node()/name()">	
 				<h4 class="notetitle"><xsl:value-of select="if (current-grouping-key()='parameterEntities') then 'parameter entities' else 
 					if(current-grouping-key()='generalEntities') then 'general entities' else current-grouping-key()"/></h4>
@@ -572,5 +586,11 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
+  
+  <xsl:function name='pmc:included' as="xs:boolean">
+    <xsl:param name='elemName' as="xs:string"/>
+    <xsl:value-of select='not(matches($elemName, $exclude-elems)) or
+                          matches($elemName, $exclude-except)'/>
+  </xsl:function>
+
 </xsl:stylesheet>
