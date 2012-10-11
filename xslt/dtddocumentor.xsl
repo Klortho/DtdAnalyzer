@@ -497,7 +497,7 @@
 	<!-- General Templates-->
 	<!-- ========================= -->
 
-	<xsl:template match="annotation">
+	<xsl:template match="annotation[not(@type='schematron')]">
 		<div class="{@type}">
 			<xsl:if test="@type='example' or @type='tags'">
 				<h3 class="notetitle">
@@ -512,6 +512,8 @@
 			</xsl:if>
 		</div>
 	</xsl:template>
+	
+	<xsl:template match="annotation[@type='schematron']"/>
 
 	<xsl:template match="tag">
 		<a href="tag-{.}.html" class="tag">
