@@ -185,7 +185,7 @@ public class SComment {
         m = genEntLink.matcher(s);
         s = m.replaceAll("<a href='ge-$1.html'>&$1;</a>");
         m = elemLink.matcher(s);
-        s = m.replaceAll("<a href='$1.html'>&lt;$1&gt;</a>");
+        s = m.replaceAll("<a href='el-$1.html'>&lt;$1&gt;</a>");
         
         if (!commentProcessor.equals("")) {
             try {
