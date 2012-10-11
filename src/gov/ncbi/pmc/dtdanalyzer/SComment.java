@@ -162,7 +162,10 @@ public class SComment {
     private static Pattern paramEntLink = Pattern.compile("(?<!\\\\)%(\\S+?);");
     private static Pattern genEntLink = Pattern.compile("(?<!\\\\)&(\\S+?);");
     
-
+    // This pattern is used in HTML-style annotations, and removes the backslashes that
+    // the user may have put in to disable auto-linking.  (In Markdown mode, pandoc
+    // removes these for us.)
+    private static Pattern backslashes = Pattern.compile("\\\\(?=[\\`@%&])");
 
     /**
      * This method takes care of converting a structure comment section into Markdown.
@@ -206,6 +209,8 @@ public class SComment {
             }
         }
         else {
+            m = backslashes.matcher(s);
+            s = m.replaceAll("");
             html = s;
         }
         return html;

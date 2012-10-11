@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--~~ Test DTD html-annotations.dtd
+<p>This test file test features of the DTD documentor when HTML-style
+  (not Markdown) annotations are used.</p>
+<p>Nice  `<banana>!</p>
+<p>Link to an attribute:  @attr.  </p>
+<p>Now, here, we use the "\@" sign, but we don't want it to be turned into a link,
+  so it precedes it with a backslash: <a href='mailto:mail\@nih.gov'>mail\@nih.gov</a>.
+  The backslash should <em>not</em> show up in the final result!</p>
+~~-->
+
+<!ELEMENT banana (split)*>
+<!ELEMENT split (#PCDATA)>
+
