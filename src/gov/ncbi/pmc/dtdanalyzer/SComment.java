@@ -205,6 +205,9 @@ public class SComment {
                 System.err.println("Error interpreting comment as markdown: " + e.getMessage());
             }
         }
+        else {
+            html = s;
+        }
         return html;
     }
     

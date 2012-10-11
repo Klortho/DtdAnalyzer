@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--~~ Test DTD external.dtd
+<p>Nice  `<banana>!</p>
+~~-->
+
 <!ELEMENT banana (split)*>
 <!ELEMENT split (#PCDATA)>
 
