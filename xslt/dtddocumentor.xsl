@@ -385,6 +385,7 @@
 						<th>In Elements</th>
 					</tr>
 					<xsl:for-each-group select="attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]" group-by="@type">
+						<xsl:sort select="count(current-group()/@element)" order="ascending"/>
 						<tr class="attvalue">
 							<td>
 								<xsl:value-of select="current-grouping-key()"/>
