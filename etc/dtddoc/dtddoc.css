@@ -178,6 +178,10 @@ ul.tags{
 	font-family: monospace;
 }
 
+.notes{
+	margin-bottom:30px;
+}
+
 .model{
 	margin: 30px auto;
 }
