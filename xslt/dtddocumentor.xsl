@@ -314,7 +314,7 @@
 			</span>
 			<xsl:value-of select="@name"/>
 		</h2>
-		<xsl:apply-templates select="annotations/annotation[@type='note']"/>
+		<xsl:apply-templates select="annotations/annotation[@type='notes']"/>
 		<xsl:variable name="e-name">
 			<xsl:value-of select="@name"/>
 		</xsl:variable>
@@ -376,7 +376,7 @@
 			<span class="pagetitle">Attribute: </span>
 			<xsl:value-of select="@name"/>
 		</h2>
-		<xsl:apply-templates select="annotations/annotation[@type='note']"/>
+		<xsl:apply-templates select="annotations/annotation[@type='notes']"/>
 		<xsl:choose>
 			<xsl:when test="count(distinct-values(attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]/@type)) > 1">
 				<table>
@@ -429,7 +429,7 @@
 			<span class="pagetitle">Entity: </span>
 			<xsl:value-of select="@name"/>
 		</h2>
-		<xsl:apply-templates select="annotations/annotation[@type='note']"/>
+		<xsl:apply-templates select="annotations/annotation[@type='notes']"/>
 		<xsl:if test="value != ''">
 			<h3>Content Model</h3>
 			<p class="content-model">
