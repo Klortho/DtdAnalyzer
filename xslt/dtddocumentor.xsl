@@ -329,10 +329,26 @@
 					</xsl:call-template>
 				</xsl:for-each>
 			</ul>			
+			<xsl:if test="content-model//child[pmc:included(.)]">
+				<h4>May Contain:</h4>
+				<ul class="children">
+					<xsl:if test="content-model/@spec='mixed' or content-model/@spec='text'">
+						<li>PCDATA</li>
+					</xsl:if>
+					<xsl:for-each select="content-model//child[pmc:included(.)]">
+						<xsl:sort select="."/>
+						<xsl:call-template name="list-link">
+							<xsl:with-param name="name" select="."/>
+							<xsl:with-param name="type" select="'element'"/>
+						</xsl:call-template>
+					</xsl:for-each>
+				</ul>
+			</xsl:if>			
 		</xsl:if>
 		<xsl:apply-templates select="annotations/annotation[@type='tags']"/>
 		<xsl:apply-templates select="annotations/annotation[@type='example']"/>
 		<xsl:if test="context/parent[ pmc:included(@name) ][@name=//element[not(@reachable='false')]/@name]">
+		<xsl:if test="context/parent[pmc:included(@name)][@name=//element[not(@reachable='false')]/@name]">
 			<h3>May be contained in:</h3>
 			<ul class="parents">
 				<xsl:for-each select="context/parent[ pmc:included(@name) ][@name=//element[not(@reachable='false')]/@name]">
