@@ -110,17 +110,19 @@ public class XMLWriter {
      */
     private void processDtdModule() {
         DtdModule dtd = model.getDtdModule();
-        openStartTag("dtd");
-          makeAttribute("relSysId", dtd.getRelSysId());
-          makeAttribute("systemId", dtd.getSystemId());
-          makeAttribute("publicId", dtd.getPublicId());
-        closeStartTag();
-          // Process any dtd-level annotations, if there are any
-          SComment dtdAnnotations = scomments.getSComment(SComment.MODULE, dtd.getRelSysId());
-          if (dtdAnnotations != null) {
-              processSComment(dtdAnnotations);
-          }
-        makeEndTag("dtd");
+        if (dtd != null) {
+            openStartTag("dtd");
+              makeAttribute("relSysId", dtd.getRelSysId());
+              makeAttribute("systemId", dtd.getSystemId());
+              makeAttribute("publicId", dtd.getPublicId());
+            closeStartTag();
+              // Process any dtd-level annotations, if there are any
+              SComment dtdAnnotations = scomments.getSComment(SComment.MODULE, dtd.getRelSysId());
+              if (dtdAnnotations != null) {
+                  processSComment(dtdAnnotations);
+              }
+            makeEndTag("dtd");
+        }
     }
     
    /**

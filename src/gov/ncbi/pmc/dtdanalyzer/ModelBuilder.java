@@ -47,7 +47,7 @@ public class ModelBuilder {
         if (_dtdTitle != null) {
             dtdTitle = _dtdTitle;
         }
-        else {
+        else if (getDtdModule() != null) {
             SComment dtdSComment = scomments.getSComment(SComment.MODULE, getDtdModule().getRelSysId());
             if (dtdSComment != null) {
                 dtdTitle = dtdSComment.getTitle();

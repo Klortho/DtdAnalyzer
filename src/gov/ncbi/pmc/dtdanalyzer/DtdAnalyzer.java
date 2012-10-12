@@ -98,9 +98,9 @@ public class DtdAnalyzer {
         }
         
         catch (Exception e) {
-            System.err.println( "Could not process the DTD. ");
+            System.err.println( "Could not process the DTD.  Message from the parser:");
             System.err.println(e.getMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
             System.exit(1);
         }
 

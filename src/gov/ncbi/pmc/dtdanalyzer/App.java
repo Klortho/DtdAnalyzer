@@ -198,6 +198,7 @@ public class App {
                 // Set up catalog resolution
                 PMCBootStrapper bootstrapper = new PMCBootStrapper();
                 CatalogManager catalogManager = new CatalogManager(); 
+                catalogManager.setIgnoreMissingProperties(true);
                 URL oasisCatalog = catalogManager.getClass().getResource(App.OASIS_DTD);
                 bootstrapper.addMapping(App.OASIS_PUBLIC_ID, oasisCatalog.toString());
                 catalogManager.setBootstrapResolver(bootstrapper);
