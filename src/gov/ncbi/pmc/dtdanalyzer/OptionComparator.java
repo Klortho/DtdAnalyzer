@@ -14,18 +14,24 @@ import org.apache.commons.cli.*;
  */
 public class OptionComparator implements Comparator {
 
-    private String order;
+    // This is a list of long option names that defines the order.
+    private String[] optList;
 
-    public OptionComparator(String _order) {
-        order = _order;
+    public OptionComparator(String[] _optList) {
+        optList = _optList;
     }
 
     public int compare(Object o1, Object o2) {
-        String opt1 = ((Option) o1).getOpt();
-        int opt1i = opt1 == null ? 1000 : order.indexOf(opt1);
-        
-        String opt2 = ((Option) o2).getOpt();
-        int opt2i = opt2 == null ? 1000 : order.indexOf(opt2);
+        //String opt1 = ((Option) o1).getOpt();
+        //int opt1i = opt1 == null ? 1000 : order.indexOf(opt1);
+        String opt1 = ((Option) o1).getLongOpt();
+        String opt2 = ((Option) o2).getLongOpt();
+        int opt1i = 1000;
+        int opt2i = 1000;
+        for (int i = 0; i < optList.length; ++i) {
+            if (opt1.equals(optList[i])) opt1i = i;
+            if (opt2.equals(optList[i])) opt2i = i;
+        }
         
         return opt1i - opt2i;
     }

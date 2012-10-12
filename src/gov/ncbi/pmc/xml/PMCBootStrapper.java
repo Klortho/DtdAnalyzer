@@ -11,7 +11,7 @@ import org.xml.sax.InputSource;
 
 /**
  *
- * Identifies location of the DTD needed to parse an OASIS catalog. Do
+ * Identifies location of the DTD needed to parse an OASIS catalog. Due
  * to a quirk in the implementation org.apache.xml.resolver.helpers.BootstrapResolver,
  * the Public ID used for the oasis DTD does not actually match the Public Id 
  * used at PubMedCentral (or, indeed, most other places). As a result, the BootStrapper 

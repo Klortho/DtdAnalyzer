@@ -8,12 +8,9 @@ package gov.ncbi.pmc.dtdanalyzer;
 
 import org.apache.commons.cli.*;
 import java.io.*;
-import java.net.*;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
-import gov.ncbi.pmc.xml.PMCBootStrapper;
-import org.apache.xml.resolver.*;
 import org.apache.xml.resolver.tools.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -27,21 +24,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class DtdAnalyzer {
     
-    // CONSTANTS
-    
-    // ID for SAX driver
-    public static final String SAX_DRIVER_PROPERTY = "org.xml.sax.driver";                               
-    // SAX driver implementation
-    public static final String SAX_DRIVER_DEFAULT = "org.apache.xerces.parsers.SAXParser";               
-    // ID for transformer
-    public static final String TRANSFORMER_FACTORY_PROPERTY = "javax.xml.transform.TransformerFactory";  
-    // Transformer implementation - default to Saxon 9, per this documentation page:
-    // http://www.saxonica.com/documentation/using-xsl/embedding/jaxp-transformation.xml
-    public static final String TRANSFORMER_FACTORY_DEFAULT = "net.sf.saxon.TransformerFactoryImpl";     
-    // Path to reach OASIS dtd
-    public static final String OASIS_DTD = "/org/apache/xml/resolver/etc/catalog.dtd";                   
-    // Public id of Oasis DTD
-    public static final String OASIS_PUBLIC_ID = "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN";  
+    private static App app;
     
     /**
      * Main execution point. Checks arguments, then converts the DTD into XML.
@@ -51,328 +34,122 @@ public class DtdAnalyzer {
      * distribution. However, other implementations can be specified through the
      * System properties.
      */
-    public static void main (String[] args){
+    public static void main (String[] args) {
+        String[] optList = {
+            "help", "doc", "system", "public", "catalog", "xslt", "title", "roots", "docproc",
+            "markdown", "param"
+        };
+        app = new App(args, optList, 
+            "dtdanalyzer [-h] [-d <xml-file> | -s <system-id> | -p <public-id>] " +
+            "[-c <catalog>] [-x <xslt>] [-t <title>] [<out>]",
+            "\nThis utility analyzes a DTD and writes an XML output file."
+        );
+        Options options = app.getActiveOpts();
 
-        // create Options object
-        Options options = new Options();
-        options.addOption( "h", "help", false, "Get help." );
-        options.addOption( 
-            OptionBuilder
-                .withLongOpt( "doc" )
-                .withDescription("Specify an XML document used to find the DTD. This could be just a \"stub\" " +
-                    "file, that contains nothing other than the doctype declaration and a root element. " +
-                    "This file doesn't need to be valid according to the DTD.")
-                .hasArg()
-                .withArgName("xml-file")
-                .create('d') 
-        );
-        options.addOption( 
-            OptionBuilder
-                .withLongOpt( "system" )
-                .withDescription("Use the given system identifier to find the DTD. This could be a relative " +
-                    "pathname, if the DTD exists in a file on your system, or an HTTP URL.")
-                .hasArg()
-                .withArgName("system-id")
-                .create('s') 
-        );
-        options.addOption( 
-            OptionBuilder
-                .withLongOpt( "public" )
-                .withDescription("Use the given public identifier to find the DTD. This would be used in " +
-                    "conjunction with an OASIS catalog file.")
-                .hasArg()
-                .withArgName("public-id")
-                .create('p') 
-        );
-        options.addOption( 
-            OptionBuilder
-                .withLongOpt( "catalog" )
-                .withDescription("Specify a file to use as the OASIS catalog, to resolve public identifiers.")
-                .hasArg()
-                .withArgName("catalog-file")
-                .create('c') 
-        );
-        options.addOption( 
-            OptionBuilder
-                .withLongOpt( "xslt" )
-                .withDescription("An XSLT script to run to post-process the output. This is optional.")
-                .hasArg()
-                .withArgName("xslt")
-                .create('x') 
-        );
-        options.addOption( 
-            OptionBuilder
-                .withLongOpt( "title" )
-                .withDescription("Specify the title of this DTD. This will be output within a <title> " +
-                    "element under the root <declarations> element of the output XML.")
-                .hasArg()
-                .withArgName("dtd-title")
-                .create('t') 
-        );
-        options.addOption(
-            OptionBuilder
-                .withLongOpt("roots")
-                .withDescription("Specify the set of possible root elements for documents conforming " + 
-                    "to this DTD.  These elements will be tagged with a 'root=true' attribute in " +
-                    "the output.  This will also cause the DtdAnalyzer to find those elements that " +
-                    "are not reachable from this set of possible root elements, and to tag those " +
-                    "with a 'reachable=false' attribute.  The argument to this " +
-                    "should be a space-delimited list of element names. ")
-                .hasArg()
-                .withArgName("roots")
-                .create('r')
-        );
-        options.addOption(
-            OptionBuilder
-                .withLongOpt("docproc")
-                .withDescription("Command to use to process structured comments.  This command should " +
-                    "take its input on stdin, and produce valid XHTML on stdout.")
-                .hasArg()
-                .withArgName("cmd")
-                .create()
-        );
-        options.addOption(
-            OptionBuilder
-                .withLongOpt("markdown")
-                .withDescription("Causes structured comments to be processed as Markdown. " +
-                    "Requires pandoc to be installed on the system, and accessible to this process. " +
-                    "Same as \"--docproc 'pandoc'\".")
-                .create('m')
-        );
-        options.addOption(
-            OptionBuilder
-                .withLongOpt("param")
-                .hasArgs(2)
-                .withValueSeparator()
-                .withDescription("Parameter name & value to pass to the XSLT.  You can use multiple " +
-                    "instances of this option.")
-                .withArgName( "param=value" )
-                .create("P")
-        );
+        // Get the parsed command line arguments
+        CommandLine line = app.getLine();
+    
+        // At least one of these must be given
+        if (!line.hasOption("d") && !line.hasOption("s") && !line.hasOption("p")) {
+            app.usageError("At least one of -d, -s, or -p must be specified!");
+        }
 
 
-        // create the command line parser
-        CommandLineParser clp = new PosixParser();
+        // There should be at most one thing left on the line, which, if present, specifies the
+        // output file.
+        Result out = null;
+        String[] rest = line.getArgs();
+        if (rest.length == 0) {
+            out = new StreamResult(System.out);
+        }
+        else if (rest.length == 1) {
+            out = new StreamResult(new File(rest[0]));            
+        }
+        else {
+            app.usageError("Too many arguments!");
+        }
+
+        
+
+        // Perform set-up and parsing here.  The output of this step is a fully chopped up
+        // and recorded representation of the DTD, stored in the DtdEventHandler object.
+        
+        DTDEventHandler dtdEvents = new DTDEventHandler();
         try {
-            // parse the command line arguments
-            CommandLine line = clp.parse( options, args );
-        
-            if ( line.hasOption( "h" ) ) {
-                printUsage(options);
-                System.exit(0);
-            }
-            else {
-                if (!line.hasOption("d") && !line.hasOption("s") && !line.hasOption("p")) {
-                    throw new ParseException("At least one of -d, -s, or -p must be specified!");
-                }
-            }
-
-            // Check that, if given, the argument to -d is a valid file
+            XMLReader parser = XMLReaderFactory.createXMLReader();
+            parser.setContentHandler(dtdEvents);
+            parser.setErrorHandler(dtdEvents);
+            parser.setProperty( "http://xml.org/sax/properties/lexical-handler", dtdEvents); 
+            parser.setProperty( "http://xml.org/sax/properties/declaration-handler", dtdEvents);
+            parser.setFeature("http://xml.org/sax/features/validation", true);
+            
+            // Resolve entities if we have a catalog
+            CatalogResolver resolver = app.getResolver();
+            if ( resolver != null ) parser.setEntityResolver(resolver); 
+            
+            // Run the parse to capture all events and create an XML representation of the DTD.
+            // XMLReader's parse method either takes a system id as a string, or an InputSource
             if (line.hasOption("d")) {
-                File xml = new File(line.getOptionValue("d"));
-                if ( ! xml.exists() || ! xml.isFile() ) {
-                    System.err.println("Error: " + xml.toString() + " is not a file" );
-                    System.exit(1);
-                }
-            }
-            
-            // Otherwise, construct a stub file in a string
-            String xmlFileStr = "<!DOCTYPE root ";
-            if (!line.hasOption("d")) {
-                if (line.hasOption("s")) {
-                    xmlFileStr += "SYSTEM \"" + line.getOptionValue("s") + "\">";
-                }
-                else {
-                    xmlFileStr += "PUBLIC \"" + line.getOptionValue("p") + "\" \"\">";
-                }
-                String publicId = line.getOptionValue("p");
-            }
-            xmlFileStr += "\n\n<root/>\n";
-            //System.out.println("xmlFileStr is '" + xmlFileStr + "'\n\n");
-
-            File catalog = null;
-            if (line.hasOption("c")) {
-                catalog = new File(line.getOptionValue("d"));
-                if ( ! catalog.exists() || ! catalog.isFile() ) {
-                    System.err.println("Error: Specified catalog " + catalog.toString() + " is not a file" );
-                    System.exit(1);
-                }
-            }
-
-            File xsl = null;
-            if (line.hasOption("x")) {
-                xsl = new File(line.getOptionValue("x"));
-                if ( ! xsl.exists() || ! xsl.isFile() ) {
-                    System.err.println("Error: Specified xsl " + xsl.toString() + " is not a file" );
-                    System.exit(1);
-                }
-            }
-            
-            String dtdTitle = null;
-            if (line.hasOption("t")) dtdTitle = line.getOptionValue("t");
-            //System.err.println("title is " + dtdTitle);
-            
-            String[] roots = null;
-            if (line.hasOption("r")) {
-                roots = line.getOptionValue("r").split("\\s");
-            }
-            
-            if (line.hasOption("m")) {
-                SComment.setCommentProcessor("pandoc");            
-            }
-            else if (line.hasOption("docproc")) {
-                SComment.setCommentProcessor(line.getOptionValue("docproc"));
-            }
-
-            String[] xsltParams = null;
-            int numXsltParams = 0;
-            if (line.hasOption("P")) {
-                xsltParams = line.getOptionValues("P");
-                numXsltParams = xsltParams.length / 2;
-                //System.err.println("num of params: " + num);
-                for (int i = 0; i < numXsltParams; ++i) {
-                    // parameter name can't be empty
-                    if (xsltParams[i*2].length() == 0) {
-                        System.err.println("XSLT parameter name can't be empty");
-                        System.exit(1);
-                    }
-                }
-            }
-    
-            Result out = null;
-            String[] rest = line.getArgs();
-            if (rest.length == 0) {
-                out = new StreamResult(System.out);
-            }
-            else if (rest.length == 1) {
-                out = new StreamResult(new File(rest[0]));            
+                parser.parse(line.getOptionValue("d"));
             }
             else {
-                throw new ParseException("Too many arguments!");
+                parser.parse(app.getDummyXmlFile());
             }
+        }
 
-            DTDEventHandler dtdEvents = new DTDEventHandler();
-            
-            // Set System properties for parsing and transforming
-            if ( System.getProperty(SAX_DRIVER_PROPERTY) == null )
-                System.setProperty(SAX_DRIVER_PROPERTY, SAX_DRIVER_DEFAULT);     
-            
-            if ( System.getProperty(TRANSFORMER_FACTORY_PROPERTY) == null )
-                System.setProperty(TRANSFORMER_FACTORY_PROPERTY, TRANSFORMER_FACTORY_DEFAULT);
-            
-    
-            // Perform set-up and parsing here
-            try {
-                CatalogResolver resolver = null;
-                
-                // Set up catalog resolution, but only if we have a catalog!
-                if ( catalog != null ){
-                    PMCBootStrapper bootstrapper = new PMCBootStrapper();
-                    CatalogManager catalogManager = new CatalogManager(); 
-                    URL oasisCatalog = catalogManager.getClass().getResource(OASIS_DTD);
-                    bootstrapper.addMapping(OASIS_PUBLIC_ID, oasisCatalog.toString());
-                    catalogManager.setBootstrapResolver(bootstrapper);
-                    catalogManager.setCatalogFiles(catalog.toString());
-                    resolver = new CatalogResolver(catalogManager); 
-                }//if
-                
-                // Set up the parser
-                XMLReader parser = XMLReaderFactory.createXMLReader();
-                parser.setContentHandler(dtdEvents);
-                parser.setErrorHandler(dtdEvents);
-                parser.setProperty( "http://xml.org/sax/properties/lexical-handler", dtdEvents); 
-                parser.setProperty( "http://xml.org/sax/properties/declaration-handler", dtdEvents);
-                parser.setFeature("http://xml.org/sax/features/validation", true);
-                
-                // Resolve entities if we have a catalog
-                if ( resolver != null )
-                    parser.setEntityResolver(resolver); 
-                
-                // Run the parse to capture all events and create an XML representation of the DTD.
-                // XMLReader's parse method either takes a system id as a string, or an InputSource
-                if (line.hasOption("d")) {
-                    parser.parse(line.getOptionValue("d"));
-                }
-                else {
-                    parser.parse(new InputSource(new StringReader(xmlFileStr)));
-                }
-            }
-
-            catch (EndOfDTDException ede){
-                // ignore: this is a normal exception raised to signal the end of processing
-            }
-            
-            catch (Exception e){
-                System.err.println( "Could not process the DTD. ");
-                System.err.println(e.getMessage());
-                e.printStackTrace();
-                System.exit(1);
-            }
-        
-            ModelBuilder model = new ModelBuilder(dtdEvents, dtdTitle);
-            try {
-                if (roots != null) model.findReachable(roots);
-            }
-            catch (Exception e) {
-                // This is not fatal.
-                System.err.println("Error trying to find reachable nodes from set of roots: " +
-                    e.getMessage());
-            }
-            XMLWriter writer = new XMLWriter(model);
-            
-            // Now run the transformation
-            try{
-                InputStreamReader reader = writer.getXML();    
-                TransformerFactory f = TransformerFactory.newInstance();
-                // If no xsl was specified, use the identity transformer
-                Transformer stylesheet = null;
-                if (xsl == null) {
-                    stylesheet = f.newTransformer();
-                }
-                else {
-                    stylesheet = f.newTransformer(new StreamSource(xsl));
-                }
-                if (numXsltParams > 0) {
-                    for (int i = 0; i < numXsltParams; ++i) {
-                        stylesheet.setParameter(xsltParams[2*i], xsltParams[2*i+1]);
-                    }
-                }
-                
-                // Use this constructor because Saxon always 
-                // looks for a system id even when a reader is used as the source  
-                // If no string is provided for the sysId, we get a null pointer exception
-                Source xmlSource = new StreamSource(reader, "");
-                stylesheet.transform(xmlSource, out);
-            }
-            catch(Exception e){ 
-                System.err.println("Could not run the transformation: " + e.getMessage());
-                e.printStackTrace(System.out);
-            }     
+        catch (EndOfDTDException ede) {
+            // ignore: this is a normal exception raised to signal the end of processing
         }
         
-        // Catch errors from parsing command line arguments
-        catch( ParseException exp ) {
-            System.out.println(exp.getMessage());
-            printUsage(options);
+        catch (Exception e) {
+            System.err.println( "Could not process the DTD. ");
+            System.err.println(e.getMessage());
+            e.printStackTrace();
             System.exit(1);
         }
-    }
-   
-   /**
-    * Outputs usage message
-    */
-    private static void printUsage(Options options) {
-        // automatically generate the help statement
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.setSyntaxPrefix("Usage:  ");
-        OptionComparator c = new OptionComparator("hsdpcxPtrm");
-        formatter.setOptionComparator(c);
 
-        formatter.printHelp(
-            "dtdanalyzer [-h] [-d <xml-file> | -s <system-id> | -p <public-id>] " +
-              "[-c <catalog>] [-x <xslt>] [-t <title>] [<out>]", 
-            "\nThis utility analyzes a DTD and writes an XML output file.",
-            options, "");
+
+        // The next step is to mung the data from the parsed DTD a bit, building derived
+        // data structures.  The output of this step is stored in the ModelBuilder object.
+
+        ModelBuilder model = new ModelBuilder(dtdEvents, app.getDtdTitle());
+        String[] roots = app.getRoots();
+        try {
+            if (roots != null) model.findReachable(roots);
+        }
+        catch (Exception e) {
+            // This is not fatal.
+            System.err.println("Error trying to find reachable nodes from set of roots: " +
+                e.getMessage());
+        }
+        XMLWriter writer = new XMLWriter(model);
+
+
+        // Now run the XSLT transformation.  This defaults to the identity transform, if
+        // no XSLT was specified.
+
+        try {
+            InputStreamReader reader = writer.getXML();
+            
+            Transformer xslt = app.getXslt();
+            String[] xsltParams = app.getXsltParams();
+            int numXsltParams = xsltParams.length / 2;
+            if (numXsltParams > 0) {
+                for (int i = 0; i < numXsltParams; ++i) {
+                    xslt.setParameter(xsltParams[2*i], xsltParams[2*i+1]);
+                }
+            }
+            
+            // Use this constructor because Saxon always 
+            // looks for a system id even when a reader is used as the source  
+            // If no string is provided for the sysId, we get a null pointer exception
+            Source xmlSource = new StreamSource(reader, "");
+            xslt.transform(xmlSource, out);
+        }
+
+        catch (Exception e){ 
+            System.err.println("Could not run the transformation: " + e.getMessage());
+            e.printStackTrace(System.out);
+        }     
     }
-   
 }
