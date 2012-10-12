@@ -1,8 +1,11 @@
 @echo off
-set DTDANALYZER_HOME=%~dp0
-set CP="%DTDANALYZER_HOME%build"
-call :findjars "%DTDANALYZER_HOME%lib"
-set LOGCONFIG=file:%DTDANALYZER_HOME%etc/log4j.properties
+set SCRIPTDIR=%~dp0
+rem For DTDANALYZER_HOME, strip off the trailing backslash
+set DTDANALYZER_HOME=%SCRIPTDIR:~0,-1%
+
+set CP="%DTDANALYZER_HOME%\build"
+call :findjars "%DTDANALYZER_HOME%\lib"
+set LOGCONFIG=file:%DTDANALYZER_HOME%/etc/log4j.properties
 java -cp %CP% -Xmx256M "-Dlog4j.configuration=%LOGCONFIG%" ^
      "-DDTDANALYZER_HOME=%DTDANALYZER_HOME%" ^
      gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer %*
