@@ -1,2 +1,8 @@
 build
-doc
+bldsrc
+bldtests
+DtdAnalyzer.war
+DtdAnalyzer-*.tar.gz
+DtdAnalyzer-*.zip
+doc/javadoc
+lib/DtdAnalyzer-*.jar
