@@ -9,4 +9,5 @@ do
   CP="$CP$SEP$jar"
 done
 LOGCONFIG=${LOGCONFIG:-file:$DTDANALYZER_ROOT/etc/log4j.properties}
-exec java -cp "$CP" -Xmx256M "-Dlog4j.configuration=${LOGCONFIG}" gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer "$@"
+exec java -cp "$CP" -Xmx256M "-Dlog4j.configuration=${LOGCONFIG}" \
+     gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer "$@"

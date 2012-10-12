@@ -1,5 +1,5 @@
 /*
- * DtdAnalyzer.java
+ * DtdDocumentor.java
  */
 
 package gov.ncbi.pmc.dtdanalyzer;
@@ -18,7 +18,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * a provided stylesheet. This is a bare-bones application intended for
  * demonstration and debugging.
  */
-public class DtdAnalyzer {
+
+public class DtdDocumentor {
     
     private static App app;
     
@@ -32,13 +33,14 @@ public class DtdAnalyzer {
      */
     public static void main (String[] args) {
         String[] optList = {
-            "help", "doc", "system", "public", "catalog", "xslt", "title", "roots", "docproc",
-            "markdown", "param"
+            "help", "doc", "system", "public", 
+            "catalog", "title", "roots", "docproc", "markdown", "param"
         };
         app = new App(args, optList, 
-            "dtdanalyzer [-h] [-d <xml-file> | -s <system-id> | -p <public-id>] " +
-            "[-c <catalog>] [-x <xslt>] [-t <title>] [<out>]",
-            "\nThis utility analyzes a DTD and writes an XML output file."
+            "dtddocumentor [-h] [-d <xml-file> | -s <system-id> | -p <public-id>] " +
+            "[-c <catalog>] [-t <title>] [-r <roots>] [-m] [-dir <dir>]",
+            "\nThis utility generates HTML documentation from a DTD.  The above " +
+            "is a summary of arguments; the complete list is below."
         );
         Options options = app.getActiveOpts();
 
@@ -51,17 +53,9 @@ public class DtdAnalyzer {
         }
 
 
-        // There should be at most one thing left on the line, which, if present, specifies the
-        // output file.
-        Result out = null;
+        // There should be nothing left on the line.
         String[] rest = line.getArgs();
-        if (rest.length == 0) {
-            out = new StreamResult(System.out);
-        }
-        else if (rest.length == 1) {
-            out = new StreamResult(new File(rest[0]));            
-        }
-        else {
+        if (rest.length > 0) {
             app.usageError("Too many arguments!");
         }
 
@@ -121,13 +115,15 @@ public class DtdAnalyzer {
         XMLWriter writer = new XMLWriter(model);
 
 
-        // Now run the XSLT transformation.  This defaults to the identity transform, if
-        // no XSLT was specified.
+        // Now run the XSLT transformation.  This will be the dtddocumentor.xslt
+        // stylesheet
 
         try {
             InputStreamReader reader = writer.getXML();
             
-            Transformer xslt = app.getXslt();
+            File xslFile = new File("/home/maloneyc/git/NCBITools/DtdAnalyzer/xslt/dtddocumentor.xsl");
+            Transformer xslt = 
+                TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
             String[] xsltParams = app.getXsltParams();
             int numXsltParams = xsltParams.length / 2;
             if (numXsltParams > 0) {
@@ -140,7 +136,7 @@ public class DtdAnalyzer {
             // looks for a system id even when a reader is used as the source  
             // If no string is provided for the sysId, we get a null pointer exception
             Source xmlSource = new StreamSource(reader, "");
-            xslt.transform(xmlSource, out);
+            xslt.transform(xmlSource, new StreamResult(System.out));
         }
 
         catch (Exception e){ 

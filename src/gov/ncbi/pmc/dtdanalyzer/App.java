@@ -98,7 +98,7 @@ public class App {
 
     // If --params was given, this holds the keys and values in an array.  Even
     // indeces are keys, odd indeces are values.
-    String[] xsltParams = null;
+    String[] xsltParams = new String[0];
     
     /**
      * Constructor.  The list of options should be in the same order that you want them
