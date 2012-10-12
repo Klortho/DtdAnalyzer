@@ -7,7 +7,7 @@
   <property name="project.path" value="gov/ncbi/pmc/dtdanalyzer"/>
   <property name="src" value="src"/>
   <property name="src.tests" value="test"/>
-  <property name="build" value="bldsrc"/>
+  <property name="build" value="build"/>
   <property name="build.tests" value="bldtests"/>
   <property name="lib" value="lib"/>
   <property name="doc" value="doc"/>

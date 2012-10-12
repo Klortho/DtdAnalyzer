@@ -19,7 +19,6 @@ public class DtdModule {
         
     /**
      * Constructor.
-     * FIXME:  test with various weird system ids.  In particular, a system id with no slash.
      */    
     public DtdModule( Locator locator ) {
         publicId = locator.getPublicId();
@@ -33,8 +32,8 @@ public class DtdModule {
             baseUri = new URI(parentDir);
         }
         catch (URISyntaxException e) {
+            // I don't think this should ever happen, so let's just report it and keep going.
             System.err.println("ERROR trying to make a URI from dtd system id: " + e.getMessage());
-            // FIXME:  what to do here?
         }
         
     }

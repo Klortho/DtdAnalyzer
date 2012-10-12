@@ -39,22 +39,15 @@ public class Entities {
      * @param type
      * @throws Exception
      * @return  */    
-    public Entity getEntity(String name, int type) throws Exception{
-        Entity entity;
-        
-        switch (type){
-            case Entity.PARAMETER_ENTITY:
-                entity = (Entity)parameterEntities.get(makeKey(name, type));
-                break;
-            
-            case Entity.GENERAL_ENTITY:
-                 entity = (Entity)generalEntities.get(makeKey(name, type));
-                break;
-                
-            default:
-                throw new Exception( "Invalid Entity type");
-        }                
-        return entity;
+    public Entity getEntity(String name, int type) throws Exception 
+    {
+        if (type == Entity.PARAMETER_ENTITY) {
+            return (Entity) parameterEntities.get(makeKey(name, type));
+        }
+        else if (type == Entity.GENERAL_ENTITY) {
+            return (Entity) generalEntities.get(makeKey(name, type));
+        }
+        else throw new Exception( "Invalid Entity type");
     }
     
     /**

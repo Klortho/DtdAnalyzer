@@ -313,78 +313,85 @@ public class DTDEventHandler
     public void comment(char[] text, int start, int length) 
         throws org.xml.sax.SAXException 
     {
-        String fullComment = new String(text, start, length).trim();
-        
-        // Make sure this is a special comment
-        if (!fullComment.startsWith("~~")) return;
-
-        // Match the beginning and ending "~~", and the identifier line.       
-        Pattern p = Pattern.compile("\\A~~[ \\t]*(.*?)[ \\t]*\\n(.*)~~", Pattern.DOTALL);
-        Matcher m = p.matcher(fullComment);
-        if (!m.find()) {
-            // FIXME:  throw an exception here, if in "strict" mode.
-            System.err.println("Malformed structured comment staring at " + 
-                locator.getSystemId() + ", line " + locator.getLineNumber());
-            return;
-        }
-        
-        // Pull out the identifier, and create a new SComment object
-        String identifier = m.group(1);
-        SComment sc = new SComment(identifier);
-        
-        // If this comment type is MODULE, then the name has to come from the system id
-        // of the beast that we are currently parsing.  We'll convert this into a 
-        // relative URI, and use that for the name.
-        if (sc.getType() == SComment.MODULE) {
-            String curSysId = locator.getSystemId();
-            String relSysId = dtdModule.relativize(curSysId);
-            sc.setName(relSysId);
-        }
-
-        // comment will hold everything after the first line, and up to but not including
-        // the final ~~.
-        String comment = m.group(2);
-        
-        // Next we'll parse the rest of the comment
-        
-        // This pattern matches the current text section, plus the intro line of the next
-        // section, if there is one; or the end-of-input, if not.
-        p = Pattern.compile("(.*?)((\\n~~[ \\t]*(\\S+)[ \\t]*\\n)|\\z)", Pattern.DOTALL);
-        
-        // sectionName stores the name of the next annotation section.  The first section is 
-        // implicitly defined to be "notes".
-        String sectionName = "notes";
-        
-        // sp points to the next character in the input string that we want to match
-        int sp = 0;  
-        // We'll find each annotation section until done
-        boolean done = false;
-        while (!done) {
-            m = p.matcher(comment.substring(sp));
-            if (m.find()) {
-                String sectionText = m.group(1);
-                sp += m.end();
-                
-                // Add this section to the SComment
-                sc.addSection(sectionName, sectionText);
-                
-                // If there's no next intro line, then we're done.
-                if (m.group(2).equals("")) {
-                    done = true;
+        try {
+            String fullComment = new String(text, start, length).trim();
+            
+            // Make sure this is a special comment
+            if (!fullComment.startsWith("~~")) return;
+    
+            // Match the beginning and ending "~~", and the identifier line.       
+            Pattern p = Pattern.compile("\\A~~[ \\t]*(.*?)[ \\t]*\\n(.*)~~", Pattern.DOTALL);
+            Matcher m = p.matcher(fullComment);
+            if (!m.find()) {
+                throw new Exception("Malformed structured comment");
+            }
+            
+            // Pull out the identifier, and create a new SComment object
+            String identifier = m.group(1);
+            SComment sc = new SComment(identifier);
+            
+            // If this comment type is MODULE, then the name has to come from the system id
+            // of the beast that we are currently parsing.  We'll convert this into a 
+            // relative URI, and use that for the name.
+            if (sc.getType() == SComment.MODULE) {
+                String curSysId = locator.getSystemId();
+                String relSysId = dtdModule.relativize(curSysId);
+                sc.setName(relSysId);
+            }
+    
+            // comment will hold everything after the first line, and up to but not including
+            // the final ~~.
+            String comment = m.group(2);
+            
+            // Next we'll parse the rest of the comment
+            
+            // This pattern matches the current text section, plus the intro line of the next
+            // section, if there is one; or the end-of-input, if not.
+            p = Pattern.compile("(.*?)((\\n~~[ \\t]*(\\S+)[ \\t]*\\n)|\\z)", Pattern.DOTALL);
+            
+            // sectionName stores the name of the next annotation section.  The first section is 
+            // implicitly defined to be "notes".
+            String sectionName = "notes";
+            
+            // sp points to the next character in the input string that we want to match
+            int sp = 0;  
+            // We'll find each annotation section until done
+            boolean done = false;
+            while (!done) {
+                m = p.matcher(comment.substring(sp));
+                if (m.find()) {
+                    String sectionText = m.group(1);
+                    sp += m.end();
+                    
+                    // Add this section to the SComment
+                    sc.addSection(sectionName, sectionText);
+                    
+                    // If there's no next intro line, then we're done.
+                    if (m.group(2).equals("")) {
+                        done = true;
+                    }
+                    else {
+                        sectionName = m.group(4);
+                    }
                 }
                 else {
-                    sectionName = m.group(4);
+                    // I don't think we'll ever see this.
+                    throw new Exception("Malformed annotated comment section, starting at " + 
+                                        locator.getSystemId() + ", line " +
+                                        locator.getLineNumber());
                 }
             }
-            else {
-                // FIXME:  throw an exception here, if in "strict" mode.
-                System.err.println("Malformed annotated comment section.");
-                done = true;
-            }
+            
+            // Add this SComment object to the collection
+            allSComments.addSComment(sc);
         }
-        
-        // Add this SComment object to the collection
-        allSComments.addSComment(sc);
+        catch (Exception e) {
+            System.err.println("Error while interpreting structured comment ending at\n" + 
+                locator.getSystemId() + ", line " + locator.getLineNumber() + ".\n" +
+                "Did you remember to use the right comment processor?\n" +
+                e.getMessage() );
+            System.exit(1);
+        }
     }
 
 
@@ -406,23 +413,22 @@ public class DTDEventHandler
      * are files that make up the DTD.
      */
     public void startEntity(String str) throws org.xml.sax.SAXException {
-      try {
-        if (str.equals("[dtd]")) {
-            dtdModule = new DtdModule(locator);
-            Entity.setBaseUri(dtdModule.getBaseUri());
-        }
-
-        else if (str.charAt(0) == '%') {
-            Entity e = allEntities.getEntity(str.substring(1), Entity.PARAMETER_ENTITY);
-            if (e.isExternal()) {
-                e.setIncluded(true);
+        try {
+            if (str.equals("[dtd]")) {
+                dtdModule = new DtdModule(locator);
+                Entity.setBaseUri(dtdModule.getBaseUri());
+            }
+    
+            else if (str.charAt(0) == '%') {
+                Entity e = allEntities.getEntity(str.substring(1), Entity.PARAMETER_ENTITY);
+                if (e.isExternal()) {
+                    e.setIncluded(true);
+                }
             }
         }
-
-      }
-      catch (Exception e) {
-          // FIXME:  fix this exception handling
-      }
+        catch (Exception e) {
+            // this should never happen.
+        }
     }
     
 } //DTDEventHandler

@@ -6,8 +6,12 @@ package gov.ncbi.pmc.dtdanalyzer;
 
 import java.util.*;
 import java.io.*;
-import org.apache.commons.io.*;
 import java.util.regex.*;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.SAXParser;
+import org.apache.commons.io.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Holds a single instance of a structured comment ("scomment") from the DTD.
@@ -67,7 +71,27 @@ public class SComment {
      * List of sections, indexed by section name.
      */
     private HashMap sections = new HashMap();
+
+    /**
+     * Here is an XML parser that we use to check the validity of structured 
+     * comments as we see them.
+     */
+    private static SAXParser commentChecker = init();
     
+    private static SAXParser init() {
+        SAXParser sp = null;
+        try {
+            sp = SAXParserFactory.newInstance().newSAXParser();
+        }
+        catch (Exception e) {
+            System.err.println("Fatal error during initialization:  " + e.getMessage());
+            System.exit(1);
+        }
+        return sp;
+    }
+    
+
+
     /**
      * Creates a new instance of an SComment.  The argument is the identifer
      * such as "<split>" or "!dtd".  It is parsed first to determine the target type.
@@ -128,26 +152,44 @@ public class SComment {
      * Special handling:
      *   tags - convert into a list of <tag> elements
      *   schematron - pass-thru
-     *   anything else - process as Markdown
+     *   anything else - eitehr pass-thru or process as Markdown
      */
-    public void addSection(String name, String text) {
+    public void addSection(String name, String text) throws Exception
+    {
+        String sectionString = "";
+        
         if (name.equals("tags")) {
             String[] tags = text.split("\\s+");
             String tagElems = "";
             for (int i = 0; i < tags.length; ++i) {
                 if (tags[i].equals("")) continue;
-                // FIXME:  Need to handle well-formedness errors.
-                tagElems += "<tag>" + tags[i] + "</tag>";
-                //System.err.println("tag: '" + tags[i] + "'");
+                sectionString += "<tag>" + tags[i] + "</tag>";
             }
-            sections.put(name, tagElems);
         }
         else if (name.equals("schematron")) {
-            sections.put(name, text);
+            sectionString = text;
         }
         else {
-            sections.put(name, convertMarkdown(text));
+            sectionString = convertMarkdown(text);
         }
+
+        // Need to check that this new section is a well-formed node set.  So, we'll
+        // try to parse it as XML.
+        try {
+            InputSource xmlstr = new InputSource(new StringReader("<foo>" + sectionString + "</foo>"));
+            DefaultHandler dh = new DefaultHandler();
+            commentChecker.parse(xmlstr, dh);
+        }
+        catch (Exception e) {
+            throw new Exception(
+                "\nThe following annotation, after processing, is not valid XML:\n" +
+                "-------------------------------------------------------------\n" +
+                sectionString + "\n" +
+                "-------------------------------------------------------------\n");
+        }
+
+        sections.put(name, sectionString);
+
     }
 
     // Here's the regular expression for a hyperlink to another element in the documentation

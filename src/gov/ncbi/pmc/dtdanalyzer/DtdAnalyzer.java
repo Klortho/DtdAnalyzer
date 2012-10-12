@@ -12,6 +12,7 @@ import javax.xml.transform.stream.*;
 import org.apache.xml.resolver.tools.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
+import javax.xml.parsers.*;
 
 /**
  * Creates XML representation of an XML DTD and then transforms it using
@@ -31,6 +32,24 @@ public class DtdAnalyzer {
      * System properties.
      */
     public static void main (String[] args) {
+      /*
+        try {
+            SAXParserFactory f = SAXParserFactory.newInstance();
+            SAXParser commentParser = f.newSAXParser();
+            
+            InputSource xmlstr = new InputSource(new StringReader("<foo>bar</foo>"));
+            DefaultHandler dh = new DefaultHandler();
+            commentParser.parse(xmlstr, dh);
+        }
+        catch (Exception e) {
+            System.err.println("Caught exception:  " + e.getMessage());
+        }
+        System.exit(0);
+      */
+
+
+
+
         String[] optList = {
             "help", "doc", "system", "public", "catalog", "xslt", "title", "roots", "docproc",
             "markdown", "param"

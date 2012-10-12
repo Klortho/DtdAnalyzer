@@ -157,7 +157,8 @@ public class Entity {
                 relSysId = baseUri.relativize(new URI(sysId)).toString();
             }
             catch (URISyntaxException e) {
-                // FIXME: what to do here?
+                // I don't think this should ever happen, so let's just report it and keep going.
+                System.err.println("ERROR trying to make a URI from dtd system id: " + e.getMessage());
             }
         }
     }
