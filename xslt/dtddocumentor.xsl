@@ -3,16 +3,34 @@
 
 	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
+  <!-- Question:  what is $files for?  Doesn't seem to be used. -->
 	<xsl:param name="files"/>
+
+  <!-- Current date and time, for stamping onto each output page -->
 	<xsl:param name="date" select="format-date(current-date(),'[MNn] [D], [Y]')"/>
 	<xsl:param name="time" select="format-time(current-time(),'[h]:[m] P')"/>
+  
+  <!-- The directory to which to write the results -->
 	<xsl:param name="dir" select="'doc'"/>
+  
+  <!-- CSS file to include -->
 	<xsl:param name="css" select="'dtddoc.css'"/>
+  
+  <!-- JS file to include -->
+  <xsl:param name='js' select='"expand.js"'/>
+
+  <!-- Allows user to add more CSS and JS files, if they want.  -->
+  <xsl:param name="include-files"/>
+  
+  <!-- This should be 1 if we are supposed to create suffixes for filenames that otherwise
+    would differ only by case. -->
 	<xsl:param name="filesuffixes" select="1"/>
 
+  <!-- Exclude all the elements that match the regular expression $exclude-elems, 
+    except those that match the regular expression $exclude-except. -->
 	<xsl:param name="exclude-elems" select="' '"/>
 	<xsl:param name="exclude-except" select="' '"/>
-	<xsl:param name="include-files"/>
+  
 
 	<xsl:key name="entitiesByLCName" match="entity" use="lower-case(@name)"/>
 
@@ -141,12 +159,15 @@
 						</xsl:for-each>
 					</xsl:if>
 					<!-- Default javascript (includes jquery) -->
-					<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js">
+					<script type="text/javascript" 
+					  src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js">
 						// <![CDATA[//]]>
 					</script>
-					<script type="text/javascript" src="expand.js">
-						// <![CDATA[//]]>
-					</script>
+				  <xsl:if test='$js != ""'>
+  					<script type="text/javascript" src="{$js}">
+  						// <![CDATA[//]]>
+  					</script>
+				  </xsl:if>
 				</head>
 				<xsl:choose>
 					<xsl:when test="self::declarations">

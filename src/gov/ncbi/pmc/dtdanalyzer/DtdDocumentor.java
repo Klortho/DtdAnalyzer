@@ -10,6 +10,8 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
 import org.apache.xml.resolver.tools.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -33,12 +35,13 @@ public class DtdDocumentor {
      */
     public static void main (String[] args) {
         String[] optList = {
-            "help", "doc", "system", "public", 
-            "catalog", "title", "roots", "docproc", "markdown", "param"
+            "help", "doc", "system", "public", "dir",
+            "catalog", "title", "roots", "docproc", "markdown", "param",
+            "css", "js", "include", "nosuffixes", "exclude", "exclude-except"
         };
         app = new App(args, optList, 
             "dtddocumentor [-h] [-d <xml-file> | -s <system-id> | -p <public-id>] " +
-            "[-c <catalog>] [-t <title>] [-r <roots>] [-m] [-dir <dir>]",
+            "[-dir <dir>] [-c <catalog>] [-t <title>] [-r <roots>] [-m]",
             "\nThis utility generates HTML documentation from a DTD.  The above " +
             "is a summary of arguments; the complete list is below."
         );
@@ -59,7 +62,6 @@ public class DtdDocumentor {
             app.usageError("Too many arguments!");
         }
 
-        
 
         // Perform set-up and parsing here.  The output of this step is a fully chopped up
         // and recorded representation of the DTD, stored in the DtdEventHandler object.
@@ -121,7 +123,7 @@ public class DtdDocumentor {
         try {
             InputStreamReader reader = writer.getXML();
             
-            File xslFile = new File("/home/maloneyc/git/NCBITools/DtdAnalyzer/xslt/dtddocumentor.xsl");
+            File xslFile = new File(app.getHome(), "xslt/dtddocumentor.xsl");
             Transformer xslt = 
                 TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
             String[] xsltParams = app.getXsltParams();
@@ -132,11 +134,58 @@ public class DtdDocumentor {
                 }
             }
             
+            // Now get the dir, css, etc. options and pass those in as params
+            String dir = app.getDir();
+            if (dir == null) dir = "doc";
+            xslt.setParameter("dir", dir);
+            
+            // We set the defaults for css and js here, which should match the default in the 
+            // stylesheet, so that we can copy it into the destination directory
+            String css = app.getCss();
+            if (css == null) css = "dtddoc.css";
+            xslt.setParameter("css", css);
+            
+            String js = app.getJs();
+            if (js == null) js = "expand.js";
+            xslt.setParameter("js", js);
+            
+            String include = app.getInclude();
+            if (include != null) xslt.setParameter("include-files", include);
+            
+            boolean suffixes = app.getSuffixes();
+            xslt.setParameter("filesuffixes", suffixes);
+            
+            String excludeElems = app.getExcludeElems();
+            if (excludeElems != null) xslt.setParameter("exclude-elems", excludeElems);
+            
+            String excludeExcept = app.getExcludeExcept();
+            if (excludeExcept != null) xslt.setParameter("exclude-except", excludeExcept);
+            
             // Use this constructor because Saxon always 
             // looks for a system id even when a reader is used as the source  
             // If no string is provided for the sysId, we get a null pointer exception
             Source xmlSource = new StreamSource(reader, "");
-            xslt.transform(xmlSource, new StreamResult(System.out));
+            Result r = new StreamResult(new NullOutputStream());
+            xslt.transform(xmlSource, r);
+            
+            // Copy the css and js files in, if they exist in our etc/dtddoc directory,
+            // and don't exist already in the target directory.
+            File destDir = new File(dir);
+            File srcFile;
+            File destFile;
+            srcFile = new File(app.getHome(), "etc/dtddoc/" + css);
+            destFile = new File(destDir, css);
+            if (srcFile.exists() && !destFile.exists()) {
+                FileUtils.copyFile(srcFile, destFile);
+            }
+            srcFile = new File(app.getHome(), "etc/dtddoc/" + js);
+            destFile = new File(destDir, js);
+            if (srcFile.exists() && !destFile.exists()) {
+                FileUtils.copyFile(srcFile, destFile);
+            }
+            
+
+            System.out.println("Done, documention is in the " + dir + " directory.");
         }
 
         catch (Exception e){ 

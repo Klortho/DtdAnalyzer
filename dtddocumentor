@@ -1,13 +1,14 @@
 #!/bin/bash
 
-DTDANALYZER_ROOT="$( dirname "${BASH_SOURCE[0]}" )"
-CP="$DTDANALYZER_ROOT/build"
+DTDANALYZER_HOME="$( dirname "${BASH_SOURCE[0]}" )"
+CP="$DTDANALYZER_HOME/build"
 SEP=':'
 if [ $(uname -s | grep -ic 'cygwin\|mingw') -gt 0 ]; then SEP=';'; fi
-for jar in "$DTDANALYZER_ROOT"/lib/*.jar "$DTDANALYZER_ROOT"/lib/*/*.jar
+for jar in "$DTDANALYZER_HOME"/lib/*.jar "$DTDANALYZER_HOME"/lib/*/*.jar
 do
   CP="$CP$SEP$jar"
 done
-LOGCONFIG=${LOGCONFIG:-file:$DTDANALYZER_ROOT/etc/log4j.properties}
+LOGCONFIG=${LOGCONFIG:-file:$DTDANALYZER_HOME/etc/log4j.properties}
 exec java -cp "$CP" -Xmx256M "-Dlog4j.configuration=${LOGCONFIG}" \
-     gov.ncbi.pmc.dtdanalyzer.DtdDocumentor "$@"
+           "-DDTDANALYZER_HOME=$DTDANALYZER_HOME" \
+           gov.ncbi.pmc.dtdanalyzer.DtdDocumentor "$@"

@@ -57,9 +57,13 @@ public class App {
                        
     // Public id of Oasis DTD
     public static final String OASIS_PUBLIC_ID = "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN";  
-    
+
     // Stores the actual command line arguments used, this should be passed in directly from main()
     String[] args;
+
+    // Value of the DTDANALYZER_HOME system property
+    private File home;
+
     
     // This is the Options object that gives the list of all of the command-line options
     // that are in effect for this particular invokation.  (The list will differ depending on the
@@ -94,17 +98,33 @@ public class App {
     private String dtdTitle = null;
 
     // If --roots was given, this holds the values as an array.
-    String[] roots = null;
+    private String[] roots = null;
 
     // If --params was given, this holds the keys and values in an array.  Even
     // indeces are keys, odd indeces are values.
-    String[] xsltParams = new String[0];
+    private String[] xsltParams = new String[0];
+    
+    
+    // DtdDocumentor options, to be passed in as XSLT params
+    
+    private String dir = null;
+    private String css = null;
+    private String js = null;
+    private String include = null;
+    private boolean suffixes = true;
+    private String excludeElems = null;
+    private String excludeExcept = null;    
+
     
     /**
      * Constructor.  The list of options should be in the same order that you want them
      * to be output in the usage message.
      */
     public App(String[] args, String[] optList, String _cmdLineSyntax, String _usageHeader) {
+        String homeStr = System.getProperty("DTDANALYZER_HOME");
+        if (homeStr == null) homeStr = ".";
+        home = new File(homeStr);
+        
         initAllOpts();
         oc = new OptionComparator(optList);
         cmdLineSyntax = _cmdLineSyntax;
@@ -235,11 +255,42 @@ public class App {
                     }
                 }
             }
+            
+            // Check for and store all of the dtddocumentor options
+            if (line.hasOption("dir")) {
+                dir = line.getOptionValue("dir");
+            }
+            if (line.hasOption("css")) {
+                css = line.getOptionValue("css");
+            }
+            if (line.hasOption("js")) {
+                js = line.getOptionValue("js");
+            }
+            if (line.hasOption("include")) {
+                include = line.getOptionValue("include");
+            }
+            if (line.hasOption("nosuffixes")) {
+                suffixes = false;
+            }
+            if (line.hasOption("exclude")) {
+                excludeElems = line.getOptionValue("exclude");
+            }
+            if (line.hasOption("exclude-except")) {
+                excludeExcept = line.getOptionValue("exclude-except");
+            }
 
         }
         catch( ParseException exp ) {
             usageError(exp.getMessage());
         }
+    }
+    
+    /**
+     * Get the home directory.  This is passed in from our startup scripts as the value of
+     * the DTDANALYZER_HOME system property.
+     */
+    public File getHome() {
+        return home;
     }
 
     /**
@@ -299,11 +350,69 @@ public class App {
         return xsltParams;
     }
 
+    /**
+     * If --dir was given, this returns that value, otherwise null.
+     */
+    public String getDir() {
+        return dir;
+    }
+
+    /**
+     * If --css was given, this returns the value, otherwise null.
+     */
+    public String getCss() {
+        return css;
+    }
+
+    /**
+     * If --js was given, this returns the value, otherwise null.
+     */
+    public String getJs() {
+        return js;
+    }
+
+    /**
+     * If --include was given, this returns the value, otherwise null.
+     */
+    public String getInclude() {
+        return include;
+    }
+
+    /**
+     * If --nosuffixes was given, this returns false, otherwise true.
+     */
+    public boolean getSuffixes() {
+        return suffixes;
+    }
+
+    /**
+     * If --exclude was given, this returns the value, otherwise null.
+     */
+    public String getExcludeElems() {
+        return excludeElems;
+    }
+
+    /**
+     * If --exclude-except was given, this returns the value, otherwise null.
+     */
+    public String getExcludeExcept() {
+        return excludeExcept;
+    }    
+
+
 
 
 
     /**
-     * This initializes the allOpts hash.
+     * This initializes the allOpts hash.  Note that we're using the long option
+     * name as the key to this hash.  That's required, because the array of names that 
+     * each driver class passes into the constructor here as optList is used for two
+     * different things:  1, to pull the Option object out of the allOpts hash; and 
+     * 2, in OptionComparator to sort the options for the usage message.  The OptionComparator
+     * requires those values to match the long option names.
+     *
+     * What this means is that any two driver classes (for example, dtdanalyzer and dtddocumentor)
+     * can't have options that have the same long option name but mean different things.
      */
     private void initAllOpts() {
         allOpts.put("help", new Option("h", "help", false, "Get help"));
@@ -400,6 +509,70 @@ public class App {
                 .withArgName( "param=value" )
                 .create("P")
         );
+        allOpts.put("dir",
+            OptionBuilder
+                .withLongOpt("dir")
+                .withDescription("Specify the directory to which to write the output files.")
+                .hasArg()
+                .withArgName("dir")
+                .create()
+        );
+        allOpts.put("css",
+            OptionBuilder
+                .withLongOpt("css")
+                .withDescription("Specify a css file to add to each HTML.  " +
+                    "Defaults to dtddoc.css.")
+                .hasArg()
+                .withArgName("file")
+                .create()
+        );
+        allOpts.put("js",
+            OptionBuilder
+                .withLongOpt("js")
+                .withDescription("Specify a javascript file to add to each HTML.  " +
+                    "Defaults to expand.js.")
+                .hasArg()
+                .withArgName("file")
+                .create()
+        );
+        allOpts.put("include",
+            OptionBuilder
+                .withLongOpt("include")
+                .withDescription("Allows you to specify any number of additional " +
+                    "CSS and/or JS files.  This should be a space-delimited list.")
+                .hasArg()
+                .withArgName("files")
+                .create()
+        );
+        allOpts.put("nosuffixes",
+            OptionBuilder
+                .withLongOpt("nosuffixes")
+                .withDescription("If this option is given, it prevents the documentor " +
+                    "from adding suffixes to output filenames.  By default, these are " +
+                    "added to prevent problems on Windows machines when filenames differ " +
+                    "only by case (for example, \"leftarrow.html\" and \"LeftArrow\".html). ")
+                .create()
+        );
+        allOpts.put("exclude",
+            OptionBuilder
+                .withLongOpt("exclude")
+                .withDescription("List of elements that should be excluded from the " +
+                    "documentation.  This should be space-delimited.")
+                .hasArg()
+                .withArgName("elems")
+                .create()
+        );
+        allOpts.put("exclude-except",
+            OptionBuilder
+                .withLongOpt("exclude-except")
+                .withDescription("List of exceptions to the elements that should " +
+                    "be excluded.")
+                .hasArg()
+                .withArgName("elems")
+                .create()
+        );
+
+
     }
     
    /**

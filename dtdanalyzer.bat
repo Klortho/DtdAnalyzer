@@ -1,9 +1,10 @@
 @echo off
-set DTDANALYZER_ROOT=%~dp0
-set CP="%DTDANALYZER_ROOT%build"
-call :findjars "%DTDANALYZER_ROOT%lib"
-set LOGCONFIG=file:%DTDANALYZER_ROOT%etc/log4j.properties
+set DTDANALYZER_HOME=%~dp0
+set CP="%DTDANALYZER_HOME%build"
+call :findjars "%DTDANALYZER_HOME%lib"
+set LOGCONFIG=file:%DTDANALYZER_HOME%etc/log4j.properties
 java -cp %CP% -Xmx256M "-Dlog4j.configuration=%LOGCONFIG%" ^
+     "-DDTDANALYZER_HOME=%DTDANALYZER_HOME%" ^
      gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer %*
 exit /B
 
