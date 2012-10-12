@@ -400,7 +400,7 @@
 		<xsl:apply-templates select="annotations/annotation[@type='notes']"/>
 		<xsl:choose>
 			<xsl:when test="count(distinct-values(attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]/@type)) > 1">
-				<table>
+				<table class="attvaltable">
 					<tr>
 						<th>Value</th>
 						<th>In Elements</th>
