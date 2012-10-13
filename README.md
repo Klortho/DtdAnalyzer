@@ -2,14 +2,14 @@
 
 DtdAnalyzer provides a set of tools:
 
-* ''dtdanalyzer'' - creates an XML representation (using elements and attributes) 
+* **dtdanalyzer** - creates an XML representation (using elements and attributes) 
   of an XML DTD
-* ''dtddocumentor'' - generates pretty HTML documentation, including annotations (if 
+* **dtddocumentor** - generates pretty HTML documentation, including annotations (if 
   present) from specially-formatted comments of the DTD
-* ''compare-dtds.xsl'' - compares two DTDs and generate a report of differences
-* ''scaffold.xsl'' - generates XSLT scaffolding that can be used as a starting point 
+* **compare-dtds.xsl** - compares two DTDs and generate a report of differences
+* **scaffold.xsl** - generates XSLT scaffolding that can be used as a starting point 
   for writing a transform from one schema to another
-* ''dtdschematron.xsl'' - generates a schematron file from the DTD, including extra 
+* **dtdschematron.xsl** - generates a schematron file from the DTD, including extra 
   schematron rules (if present) from specially-formatted comments of the DTD
 
 ##Quick start
@@ -30,7 +30,7 @@ file.
 
 The next command produces HTML documentation for that DTD.  It should run for a 
 little while and then announce that it's done, and that the documentation is in the 
-''doc'' subdirectory.  Open the index.html file there in a browser.
+`doc` subdirectory.  Open the index.html file there in a browser.
 
     dtddocumentor -–system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \\
         --exclude mml: --exclude-except mml:math
