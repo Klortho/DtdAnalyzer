@@ -1,124 +1,53 @@
 ﻿#DtdAnalyzer
 
-##Overview
+DtdAnalyzer provides a set of tools:
 
-This tool will create an XML representation (using elements and attributes)
-of an XML DTD.
+* ''dtdanalyzer'' - creates an XML representation (using elements and attributes) 
+  of an XML DTD
+* ''dtddocumentor'' - generates pretty HTML documentation, including annotations (if 
+  present) from specially-formatted comments of the DTD
+* ''compare-dtds.xsl'' - compares two DTDs and generate a report of differences
+* ''scaffold.xsl'' - generates XSLT scaffolding that can be used as a starting point 
+  for writing a transform from one schema to another
+* ''dtdschematron.xsl'' - generates a schematron file from the DTD, including extra 
+  schematron rules (if present) from specially-formatted comments of the DTD
 
-##Usage
+##Quick start
 
-    dtdanalyzer [options] [<output file>]
+From the [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads), grab
+the latest released version in tar or gzip format, and unzip it to a directory on
+your machine (either Windows or Unix).  Open a command/shell window, and make sure 
+that the unzip root directory is in your PATH (or, specify the path to the tools
+explicitly on the command line).  Then, try one of the following commands.
 
-All options have a short and a long form.   At least one option must be given that specifies
-the DTD that is to be processed:
-* -s, --system *system-id* - Use the given system identifier to find the DTD.  This could
-  be a relative pathname, if the DTD exists in a file on your system, or an HTTP URL.
-* -d, --doc *xml-file* - Specify an XML file used to find the DTD.  This could be just a "stub"
-  file, that contains nothing other than the doctype declaration and a root element.  This
-  file doesn't need to be valid according to the DTD.
-* -p, --public *public-id* - Use the given public identifier to find the DTD.  This would
-  be used in conjunction with an OASIS catalog file.
+The following command processes the [Journal Archiving and 
+Interchange](http://jats.nlm.nih.gov/archiving/1.0/dtd.html) flavor of the 
+[NLM/NISO Journal Article Tag Suite](http://jats.nlm.nih.gov/), and write the output to a
+file.
 
-Other possible options and arguments are:
-* -h,--help - Print usage information and exit.
-* -c, --catalog *catalog-file* - Specify a file to use as the OASIS catalog, 
-  to resolve public identifiers
-* -x, --xslt *xslt-file* - An XSLT script to run to post-process the output.  
-  This is optional.
-* -P,--param *param=value* - Parameter name & value to pass to the XSLT.
-  You can use multiple instances of this option.
-* -t, --title *dtd-title* - Specify the title of this DTD.  This will be output 
-  within a &lt;title>
-  element under the root &lt;declarations> element of the output XML.
-* -r, --roots *roots* -  Specify the set of possible root elements for 
-  documents conforming to this DTD. These elements will be tagged with a 
-  'root=true' attribute in the output.  This will also cause the 
-  DtdAnalyzer to find those elements that are not reachable from this set 
-  of possible root elements, and to tag those with a 'reachable=false' 
-  attribute.  The argument to this should be a space-delimited list of 
-  element names.
-* -m,--markdown - Causes structured comments to be processed as 
-  Markdown. Requires pandoc to be installed on the system, and accessible 
-  to this process. Same as "--docproc pandoc". 
-* --docproc *cmd* - Command to use to process structured comments.  
-  This command should take its input on stdin, and produce valid XHTML 
-  fragments on stdout (i.e. not a complete XHTML document).
-* &lt;output file> - Name of the file to write the output to.  If this argument is not given,
-  the output is written to standard out.
-
-##Examples
-
-Process the NISO JATS Journal Archiving and Interchange DTD, and write the output to a
-file:
-
-    dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
+    dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \\
         JATS-archivearticle1.daz.xml
 
+The next command produces HTML documentation for that DTD.  It should run for a 
+little while and then announce that it's done, and that the documentation is in the 
+''doc'' subdirectory.  Open the index.html file there in a browser.
 
-##Development environment / getting started
+    dtddocumentor -–system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \\
+        --exclude mml: --exclude-except mml:math
 
-The development environment for this project is very rudimentary at present,
-and uses make.  To use the scripts that come with the package, first set the
-environment variable $DTDANALYZER_HOME to the root of the git repository.
-For example (Unix):
+##Documentation
 
-    git clone git://github.com/NCBITools/DtdAnalyzer.git
-    cd DtdAnalyzer
-    export DTDANALZER_HOME=`pwd`
+Detailed documentation i̶s̶ will be available on the [GitHub 
+wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 
-Next, set up your environment using either the
-setenv.sh or setenv.bat scripts in the scripts directory.  On Unix,
-
-    . script/setenv.sh
-
-On Windows,
-
-    script\setenv
-
-To build the project, use make.  For example, the following should build both
-the Javadoc documentation and compile the Java classes.  (At the time of this
-writing, though, the "t" target, which is the self-test, is not working.)
-
-    make
-
-The Makefile targets are:
-
-* all - default target, everything below.
-* clean - deletes intermediate files
-* bin - compiles all .java → .class; results go into 'class' directory
-* doc - builds javadocs; puts results into 'doc'
-* t - runs the script over the test file in the 'test' directory
-
-To run, for example, from the test directory:
-
-    dtdanalyzer --doc archiving-3.0.xml out.xml
-
-
-##Dependencies
-
-The following jar files are required.  You can use the script getlibs.sh to download and
-unpack these, if you like (Unix only).
-
-* [Apache Commons CLI](http://commons.apache.org/cli/), version 1.2:
-commons-cli-1.2.jar  
-* [Apache xml-commons](http://xerces.apache.org/xml-commons/) resolver, 
-version 1.2:  resolver.jar  
-* [Apache Xerces2 Java parser](http://xerces.apache.org/#xerces2-j), 
-version 2.11.0:  xml-apis.jar and xercesImpl.jar  
-* [Saxon Home Edition](http://www.saxonica.com), version 9.4.0.6:
-saxon9he.jar
-* [Apache Commons IO](http://commons.apache.org/io/), version 2.4:
-commons-io-2.4.jar
-
-For structured comments in Markdown format:
-
-* [Pandoc](http://johnmacfarlane.net/pandoc/) is highly recommended.  The "-m" command-line switch uses this.  You'll need to download and install it on your system following the [installation instructions](http://johnmacfarlane.net/pandoc/installing.html).  You could also substitute any other comment-processor that you want (even other formats), and use the "--docproc" option to pass the command into dtdanalyzer.
-
-* 
 ##Discussion forum / mailing list
 
-Please join the <a href='https://groups.google.com/d/forum/dtdanalyzer'>DtdAnalyzer Google group</a>
+This software is in alpha stage. 
+
+Join the [DtdAnalyzer Google group](https://groups.google.com/d/forum/dtdanalyzer) 
 for discussions.
+
+File bug reports at the [GitHub issues page](https://github.com/NCBITools/DtdAnalyzer/issues).
 
 ##Public domain
 
