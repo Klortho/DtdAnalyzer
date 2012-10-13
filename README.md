@@ -37,7 +37,7 @@ little while and then announce that it's done, and that the documentation is in 
 
 ##Documentation
 
-Detailed documentation i̶s̶ will be available on the [GitHub 
+Detailed documentation is available on the [GitHub 
 wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 
 ##Discussion forum / mailing list
