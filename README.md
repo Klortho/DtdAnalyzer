@@ -17,10 +17,11 @@ DtdAnalyzer provides a set of tools:
 * From the [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads), grab
   the latest released version in zip or .tar.gz format, and unzip it to a directory on
   your machine (either Windows or Unix).  Let's call that directory **_DAZ_**.
-  *Note:  don't use the "Zip" download button on the
+  
+  _**Note:**  don't use the "Zip" download button on the
   main GitHub page!  Make sure that you grab one of the distribution files from the 
   [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads).  They are 
-  different!*
+  different!_
 
 * Open a command/shell window, then try this command (which analyzers the [Journal 
   Archiving and Interchange](http://jats.nlm.nih.gov/archiving/1.0/dtd.html) flavor 
@@ -29,12 +30,12 @@ DtdAnalyzer provides a set of tools:
 
   On Windows:
 
-      **_%DAZ%_**\dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd ^
+      %DAZ%\dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd ^
           JATS-archivearticle1.daz.xml
 
   On Unix:
   
-      **_$DAZ_**/dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
+      $DAZ/dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
           JATS-archivearticle1.daz.xml
 
 * Check that you have sensible results in the output file, `JATS-archivearticle1.daz.xml`.
@@ -43,7 +44,7 @@ As another example, the next command produces HTML documentation for that DTD.  
 little while and then announce that it's done, and that the documentation is in the 
 `doc` subdirectory.  Only the Unix version of this command is shown.
 
-    **_$DAZ_**/dtddocumentor -–system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
+    $DAZ/dtddocumentor -–system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
         --exclude mml: --exclude-except mml:math
 
 Open the `doc/index.html` file there in a browser, and check that it looks correct.
