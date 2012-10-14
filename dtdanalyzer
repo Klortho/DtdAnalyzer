@@ -1,14 +1,31 @@
 #!/bin/bash
 
+# Figure out DTDANALYZER_HOME, which is the directory in which this script
+# resides.  Note that this won't follow symlinks, so you can't run this 
+# utility through a symlink.
 DTDANALYZER_HOME="$( dirname "${BASH_SOURCE[0]}" )"
+
+# Add the build directory to the classpath.  This script is used both by
+# developers and users.  For developers, the .class files in the build
+# directory will be found first.  Users don't have a build directory.
 CP="$DTDANALYZER_HOME/build"
+
+# The path separator character is usually ":", unless we're on cygwin
 SEP=':'
 if [ $(uname -s | grep -ic 'cygwin\|mingw') -gt 0 ]; then SEP=';'; fi
+
+# Add all the .jar files in the lib subdirectory to the classpath
 for jar in "$DTDANALYZER_HOME"/lib/*.jar "$DTDANALYZER_HOME"/lib/*/*.jar
 do
   CP="$CP$SEP$jar"
 done
+
+# We're not using log4j yet, but we might in the future.  Until then, this
+# shouldn't do any harm.
 LOGCONFIG=${LOGCONFIG:-file:$DTDANALYZER_HOME/etc/log4j.properties}
+
+# And, execute!  Setting the DTDANALYZER_HOME system property so that 
+# the utility can find supplementary files like XSLT, CSS and JS.
 exec java -cp "$CP" -Xmx256M "-Dlog4j.configuration=${LOGCONFIG}" \
            "-DDTDANALYZER_HOME=$DTDANALYZER_HOME" \
            gov.ncbi.pmc.dtdanalyzer.DtdAnalyzer "$@"
