@@ -14,13 +14,16 @@ DtdAnalyzer provides a set of tools:
 
 ##Quick start
 
-* From the [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads), grab
-  the latest released version in `.zip` or `.tar.gz` format.
-
+* Download the latest release, either as a zip file:  
+  [DtdAnalyzer-0.1.zip](https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.zip); 
+  or as a gzipped tar: 
+  [DtdAnalyzer-0.1.tar.gz](https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.tar.gz).
+  
   _**Note:**  Do not use the "Zip" download button on the
-  main GitHub page!  Make sure that you grab one of the distribution files from the 
-  [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads).  They are 
-  different!_
+  main GitHub page, or the "Download as zip" or "Download as tar.gz" buttons on the 
+  [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads)!  
+  Any of those buttons downloads the *source files*, not the pre-built packages.
+  They are different!_
 
 * Unzip that file on your machine.  Let's call the root directory of the unzipped 
   package "**_DAZ_**", and assume that you have an environment variable set to point 
