@@ -23,8 +23,8 @@ DtdAnalyzer provides a set of tools:
   different!_
 
 * Unzip that file on your machine.  Let's call the root directory of the unzipped 
-  package "**_DAZ_**", and assume you have an environment variable set to point to 
-  that.  Alternatively, you could make sure you put that directory into your 
+  package "**_DAZ_**", and assume that you have an environment variable set to point 
+  to that.  Alternatively, you could make sure you include that directory into your 
   **_PATH_**.
   
 * Open a command/shell window, then try the following command (which analyzers the 
