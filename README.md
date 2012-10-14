@@ -38,12 +38,12 @@ DtdAnalyzer provides a set of tools:
 
       export PATH=$PATH:-path-to-dtdanalyzer-package-
 
-* Open a command/shell window, then try the following command (which analyzers the 
+* Try the following command (which analyzes the 
   [Journal Archiving and Interchange](http://jats.nlm.nih.gov/archiving/1.0/dtd.html) 
   flavor of the [NLM/NISO Journal Article Tag Suite](http://jats.nlm.nih.gov/), and 
-  writes the output to a file:
+  writes the output to a file):
 
-      dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd JATS-archivearticle1.daz.xml
+      dtdanalyzer -s http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd JATS-archivearticle1.daz.xml
 
 * Check that you have sensible results in the output file, `JATS-archivearticle1.daz.xml`.
 
@@ -51,9 +51,13 @@ DtdAnalyzer provides a set of tools:
   run for a little while and then announce that it's done, and that the documentation is in 
   the `doc` subdirectory.
 
-      dtddocumentor -–system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd --exclude mml: --exclude-except mml:math
+      dtddocumentor -s http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd --exclude mml: --exclude-except mml:math
 
 * Open the `doc/index.html` file there in a browser, and check that it looks correct.
+
+* Run `dtdanalyzer --help` or `dtddocumentor --help` for more complete usage information, 
+  or continue by visiting the documentation pages on the [GitHub 
+  wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 
 ##Documentation
 
