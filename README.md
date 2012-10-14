@@ -44,14 +44,14 @@ DtdAnalyzer provides a set of tools:
 
 * Check that you have sensible results in the output file, `JATS-archivearticle1.daz.xml`.
 
-As another example, the next command produces HTML documentation for that DTD.  It should 
-run for a little while and then announce that it's done, and that the documentation is in 
-the `doc` subdirectory.  Only the Unix version of this command is shown.
+* As another example, the next command produces HTML documentation for that DTD.  It should 
+  run for a little while and then announce that it's done, and that the documentation is in 
+  the `doc` subdirectory.  Only the Unix version of this command is shown.
 
-    $DAZ/dtddocumentor -–system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
-        --exclude mml: --exclude-except mml:math
+      $DAZ/dtddocumentor -–system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \
+          --exclude mml: --exclude-except mml:math
 
-Open the `doc/index.html` file there in a browser, and check that it looks correct.
+* Open the `doc/index.html` file there in a browser, and check that it looks correct.
 
 ##Documentation
 
