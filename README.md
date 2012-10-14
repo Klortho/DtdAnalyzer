@@ -14,14 +14,14 @@ DtdAnalyzer provides a set of tools:
 
 ##Quick start
 
-* Download the latest release, either as a zip file:  
-  [DtdAnalyzer-0.1.zip](https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.zip); 
-  or as a gzipped tar: 
+* Download the latest release, either as a zip file:
+  [DtdAnalyzer-0.1.zip](https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.zip);
+  or as a gzipped tar:
   [DtdAnalyzer-0.1.tar.gz](https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.tar.gz).
   
   _**Note:**  Do not use the "Zip" download button on the
   main GitHub page, or the "Download as zip" or "Download as tar.gz" buttons on the 
-  [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads)!  
+  [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads)!
   Any of those buttons downloads the *source files*, not the pre-built packages.
   They are different!_
 
