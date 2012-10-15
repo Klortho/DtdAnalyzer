@@ -14,26 +14,50 @@ DtdAnalyzer provides a set of tools:
 
 ##Quick start
 
-From the [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads), grab
-the latest released version in tar or gzip format, and unzip it to a directory on
-your machine (either Windows or Unix).  Open a command/shell window, and make sure 
-that the unzip root directory is in your PATH (or, specify the path to the tools
-explicitly on the command line).  Then, try one of the following commands.
+* Download the latest release, either as a zip file:
+  [DtdAnalyzer-0.1.zip](https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.zip);
+  or as a gzipped tar:
+  [DtdAnalyzer-0.1.tar.gz](https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.tar.gz).
+  
+  _**Note:**  Do not use the "Zip" download button on the
+  main GitHub page, or the "Download as zip" or "Download as tar.gz" buttons on the 
+  [downloads page](https://github.com/NCBITools/DtdAnalyzer/downloads)!
+  Any of those buttons downloads the *source files*, not the pre-built packages.
+  They are different!_
 
-The following command processes the [Journal Archiving and 
-Interchange](http://jats.nlm.nih.gov/archiving/1.0/dtd.html) flavor of the 
-[NLM/NISO Journal Article Tag Suite](http://jats.nlm.nih.gov/), and write the output to a
-file.
+* Unzip that file on your machine.
 
-    dtdanalyzer --system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \\
-        JATS-archivearticle1.daz.xml
+* Open up a Windows command or a bash shell window.  Add the path to the package root
+  to your PATH environment variable.
 
-The next command produces HTML documentation for that DTD.  It should run for a 
-little while and then announce that it's done, and that the documentation is in the 
-`doc` subdirectory.  Open the index.html file there in a browser.
+  On Windows:
 
-    dtddocumentor -–system http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd \\
-        --exclude mml: --exclude-except mml:math
+      set PATH=%PATH%;-path-to-dtdanalyzer-package-
+
+  On Unix:
+
+      export PATH=$PATH:-path-to-dtdanalyzer-package-
+
+* Try the following command (which analyzes the 
+  [Journal Archiving and Interchange](http://jats.nlm.nih.gov/archiving/1.0/dtd.html) 
+  flavor of the [NLM/NISO Journal Article Tag Suite](http://jats.nlm.nih.gov/), and 
+  writes the output to a file):
+
+      dtdanalyzer -s http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd JATS-archivearticle1.daz.xml
+
+* Check that you have sensible results in the output file, `JATS-archivearticle1.daz.xml`.
+
+* As another example, the next command produces HTML documentation for that DTD.  It should 
+  run for a little while and then announce that it's done, and that the documentation is in 
+  the `doc` subdirectory.
+
+      dtddocumentor -s http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd --exclude mml: --exclude-except mml:math
+
+* Open the `doc/index.html` file there in a browser, and check that it looks correct.
+
+* Run `dtdanalyzer --help` or `dtddocumentor --help` for more complete usage information, 
+  or continue by visiting the documentation pages on the [GitHub 
+  wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 
 ##Documentation
 
