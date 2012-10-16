@@ -49,26 +49,26 @@
 
         <h2><a name="quick-start" class="anchor" href="#quick-start"><span class="mini-icon mini-icon-link"></span></a>Quick start</h2>
         <ul>
-          <li>Download the latest release, either as a zip file:  <a href="https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.1.zip">DtdAnalyzer-0.1.1.zip</a>; or as a gzipped tar: <a href="https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.1.tar.gz">DtdAnalyzer-0.1.1.tar.gz</a>.
+          <li><p>Download the latest release, either as a zip file:  <a href="https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.1.zip">DtdAnalyzer-0.1.1.zip</a>; or as a gzipped tar: <a href="https://github.com/downloads/NCBITools/DtdAnalyzer/DtdAnalyzer-0.1.1.tar.gz">DtdAnalyzer-0.1.1.tar.gz</a>.</p>
             <p><em><strong>Note:</strong>  Do not use the "Zip" download button on the main GitHub page, or the "Download as zip" or "Download as tar.gz" buttons on the <a href="https://github.com/NCBITools/DtdAnalyzer/downloads">downloads page</a>! Any of those buttons downloads the <em>source files</em>, not the pre-built packages. They are different!</em></p>
           </li>
-          <li>Unzip that file on your machine.</li>
-          <li>Open up a Windows command or a bash shell window.  Add the path to the package root
-        to your PATH environment variable.
+          <li><p>Unzip that file on your machine.</p></li>
+          <li><p>Open up a Windows command or a bash shell window.  Add the path to the package root
+        to your PATH environment variable.</p>
             <p>On Windows:</p>
             <pre><code>set PATH=%PATH%;-path-to-dtdanalyzer-package-</code></pre>
             <p>On Unix:</p>
             <pre><code>export PATH=$PATH:-path-to-dtdanalyzer-package-</code></pre>
           </li>
-          <li>Try the following command (which analyzes the <a href="http://jats.nlm.nih.gov/archiving/1.0/dtd.html">Journal Archiving and Interchange</a> flavor of the <a href="http://jats.nlm.nih.gov/">NLM/NISO Journal Article Tag Suite</a>, and writes the output to a file):
+          <li><p>Try the following command (which analyzes the <a href="http://jats.nlm.nih.gov/archiving/1.0/dtd.html">Journal Archiving and Interchange</a> flavor of the <a href="http://jats.nlm.nih.gov/">NLM/NISO Journal Article Tag Suite</a>, and writes the output to a file):</p>
             <pre><code>dtdanalyzer -s http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd JATS-archivearticle1.daz.xml</code></pre>
           </li>
-          <li>Check that you have sensible results in the output file, <code>JATS-archivearticle1.daz.xml</code>.</li>
-          <li>As another example, the next command produces HTML documentation for that DTD.  It should run for a little while and then announce that it's done, and that the documentation is in the <code>doc</code> subdirectory.
+          <li><p>Check that you have sensible results in the output file, <code>JATS-archivearticle1.daz.xml</code>.</p></li>
+          <li><p>As another example, the next command produces HTML documentation for that DTD.  It should run for a little while and then announce that it's done, and that the documentation is in the <code>doc</code> subdirectory.</p>
             <pre><code>dtddocumentor -s http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd --exclude mml: --exclude-except mml:math</code></pre>
           </li>
-          <li>Open the <code>doc/index.html</code> file there in a browser, and check that it looks correct.</li>
-          <li>Run <code>dtdanalyzer --help</code> or <code>dtddocumentor --help</code> for more complete usage information, or continue by visiting the documentation pages on the <a href="https://github.com/NCBITools/DtdAnalyzer/wiki">GitHub wiki</a>.</li>
+          <li><p>Open the <code>doc/index.html</code> file there in a browser, and check that it looks correct.</p></li>
+          <li><p>Run <code>dtdanalyzer --help</code> or <code>dtddocumentor --help</code> for more complete usage information, or continue by visiting the documentation pages on the <a href="https://github.com/NCBITools/DtdAnalyzer/wiki">GitHub wiki</a>.</p></li>
         </ul>
 
         <h2><a name="documentation" class="anchor" href="#documentation"><span class="mini-icon mini-icon-link"></span></a>Documentation</h2>
