@@ -12,6 +12,13 @@ DtdAnalyzer provides a set of tools:
 * **dtdschematron.xsl** - generates a schematron file from the DTD, including extra 
   schematron rules (if present) from specially-formatted comments of the DTD
 
+## Home page and documentation
+
+The home page for this project is at http://ncbitools.github.com/DtdAnalyzer/.
+
+Detailed documentation is available on the [GitHub 
+wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
+
 ##Quick start
 
 * Download the latest release, either as a zip file:
@@ -58,11 +65,6 @@ DtdAnalyzer provides a set of tools:
 * Run `dtdanalyzer --help` or `dtddocumentor --help` for more complete usage information, 
   or continue by visiting the documentation pages on the [GitHub 
   wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
-
-##Documentation
-
-Detailed documentation is available on the [GitHub 
-wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 
 ##Discussion forum / mailing list
 

@@ -220,6 +220,7 @@ public class App {
                 else {
                     // If no xsl was specified, use the identity transformer
                     xslt = f.newTransformer();
+                    xslt.setOutputProperty(OutputKeys.INDENT, "yes");
                 }
             }
             catch (TransformerConfigurationException e) {

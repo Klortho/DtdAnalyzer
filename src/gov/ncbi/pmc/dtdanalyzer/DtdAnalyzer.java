@@ -147,6 +147,7 @@ public class DtdAnalyzer {
             InputStreamReader reader = writer.getXML();
             
             Transformer xslt = app.getXslt();
+            
             String[] xsltParams = app.getXsltParams();
             int numXsltParams = xsltParams.length / 2;
             if (numXsltParams > 0) {
