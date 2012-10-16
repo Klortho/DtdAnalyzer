@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <project name="DtdAnalyzer" basedir="." default="all">
 
   <property name="name" value="DtdAnalyzer"/>
-  <property name="version" value="0.1.1"/>
+  <property name="version" value="0.1.2-dev"/>
   <property name="project.package" value="gov.ncbi.pmc.dtdanalyzer"/>
   <property name="project.path" value="gov/ncbi/pmc/dtdanalyzer"/>
   <property name="src" value="src"/>
