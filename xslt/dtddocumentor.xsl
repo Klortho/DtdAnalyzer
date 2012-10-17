@@ -3,9 +3,6 @@
 
 	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
-  <!-- Question:  what is $files for?  Doesn't seem to be used. -->
-	<xsl:param name="files"/>
-
   <!-- Current date and time, for stamping onto each output page -->
 	<xsl:param name="date" select="format-date(current-date(),'[MNn] [D], [Y]')"/>
 	<xsl:param name="time" select="format-time(current-time(),'[h]:[m] P')"/>
@@ -194,7 +191,7 @@
 										<xsl:text>Made with </xsl:text>
 										<em>dtddocumentor</em>
 										<xsl:text> from </xsl:text>
-										<a href="https://github.com/NCBITools/DtdAnalyzer">DtdAnalyzer</a>
+										<a href="http://ncbitools.github.com/DtdAnalyzer/">DtdAnalyzer</a>
 									</p>
 									<p>
 										<xsl:text>Updated on: </xsl:text>
