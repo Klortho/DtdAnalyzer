@@ -17,7 +17,7 @@
     	<sch:schema>
     		<sch:title>
     			<xsl:text>ISO Schematron file created from </xsl:text>
-    			<xsl:value-of select="if(declarations/title) then declarations/title else 'DTD'"/>
+    			<xsl:value-of select="if(declarations/title) then declarations/title else /declarations/dtd/@relSysId"/>
     		</sch:title>
             <sch:ns prefix="mml" uri="http://www.w3.org/1998/Math/MathML"/>
             <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -39,10 +39,18 @@
 	</xsl:template>
 	
 	<xsl:template match="attributes">
-		<sch:pattern id="attributes">
-			<sch:title>Attribute Checks</sch:title>
-			<xsl:apply-templates/>
-		</sch:pattern>
+		<xsl:if test="attribute[annotations/annotation[@type='schematron']]">
+			<sch:pattern id="attributes">
+				<sch:title>User Attribute Checks</sch:title>
+				<xsl:apply-templates select="attribute[annotations/annotation[@type='schematron']]"/>
+			</sch:pattern>
+		</xsl:if>
+		<xsl:if test="$complete='yes' and attribute[attributeDeclaration[@mode='#REQUIRED']] or attribute[attributeDeclaration[@mode='#FIXED']] or attribute[attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']]">
+			<sch:pattern id="attributes">
+				<sch:title>DTD Attribute Checks</sch:title>
+				<xsl:apply-templates select="attribute[attributeDeclaration[@mode='#REQUIRED']] | attribute[attributeDeclaration[@mode='#FIXED']] | attribute[attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']]"/>
+			</sch:pattern>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="generalEntities|parameterEntities"/>
@@ -52,64 +60,65 @@
     	<xsl:variable name="e-name">
        		<xsl:value-of select="@name"/>
     	</xsl:variable>
-    	<sch:rule context="{concat('//',@name)}">	
-    		<!--<xsl:comment><xsl:value-of select="content-model/@minified"/></xsl:comment>-->
-    		<xsl:choose>
-    			<xsl:when test="$complete = 'no'"/>
-    			<xsl:otherwise>
-    				<xsl:apply-templates select="/declarations/attributes" mode="element">
-    					<xsl:with-param name="element" select="$element"/>
-    					<xsl:with-param name="e-name" select="$e-name"/>
-    				</xsl:apply-templates>
-    				<xsl:call-template name="model-entities">
-    					<xsl:with-param name="str" select="substring-after(content-model/@minified, '(')"/>
-    				</xsl:call-template>
-    				<xsl:apply-templates select="content-model/@minified">
-    					<xsl:with-param name="element" select="$element" tunnel="yes"/>
-    				</xsl:apply-templates>
-    			</xsl:otherwise>            		
-    		</xsl:choose> 
-		    <xsl:for-each select="annotations/annotation[@type='schematron']/*">
-				<xsl:choose>
-					<xsl:when test="self::report">
-						<sch:report>
-							<xsl:copy-of select="@*"/>
-							<xsl:copy-of select="node()"/>
-						</sch:report>
-					</xsl:when>
-					
-					<xsl:when test="self::assert">
-						<sch:assert>
-							<xsl:copy-of select="@*"/>
-							<xsl:copy-of select="node()"/>
-						</sch:assert>
-					</xsl:when>
-					
-					<xsl:otherwise>
-						<xsl:copy-of select="."/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:for-each>    		
-    	</sch:rule>
+    	<xsl:if test="annotations/annotation[@type='schematron'] or $complete='yes'">
+    		<sch:rule context="{@name}">
+    			<xsl:apply-templates select="annotations/annotation[@type='schematron']"/>
+    			
+    			<!--<xsl:comment><xsl:value-of select="content-model/@minified"/></xsl:comment>-->
+    			<xsl:choose>
+    				<xsl:when test="$complete = 'no'"/>
+    				<xsl:otherwise>
+    					<xsl:apply-templates select="/declarations/attributes" mode="element">
+    						<xsl:with-param name="element" select="$element"/>
+    						<xsl:with-param name="e-name" select="$e-name"/>
+    					</xsl:apply-templates>
+    					<xsl:call-template name="model-entities">
+    						<xsl:with-param name="str" select="substring-after(content-model/@minified, '(')"/>
+    					</xsl:call-template>
+    					<xsl:apply-templates select="content-model/@minified">
+    						<xsl:with-param name="element" select="$element" tunnel="yes"/>
+    					</xsl:apply-templates>
+    				</xsl:otherwise>            		
+    			</xsl:choose> 
+    		</sch:rule>
+    	</xsl:if>
     </xsl:template>
 	
-	<xsl:template match="attribute">
+	<xsl:template match="attribute[annotations/annotation[@type='schematron']]">
+		<sch:rule context="{concat('@', @name)}">
+			<xsl:apply-templates select="annotations/annotation[@type='schematron']/*"/>
+		</sch:rule>
+	</xsl:template>
+	
+	<xsl:template match="attribute[attributeDeclaration[@mode='#REQUIRED']] | attribute[attributeDeclaration[@mode='#FIXED']] | attribute[attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']]">
 		<xsl:variable name="attribute" select="concat('@', @name)"/>
-		<xsl:if test="annotations/annotation[@type='schematron'] or ($complete='yes' and attributeDeclaration[@mode='#REQUIRED'] or attributeDeclaration[@mode='#FIXED'] or attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED'])">
-			<xsl:if test="annotations/annotation[@type='schematron']">
-				<sch:rule context="{concat('//@',@name)}">
-					<xsl:copy-of select="annotations/annotation[@type='schematron']/*"/>
-				</sch:rule>
-			</xsl:if>			
-			<xsl:choose>
-				<xsl:when test="$complete = 'no'"/>
-				<xsl:otherwise>
-					<xsl:apply-templates select="attributeDeclaration[@mode='#REQUIRED'], attributeDeclaration[@mode='#FIXED'], attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']">
-						<xsl:with-param name="attribute" select="$attribute"/>
-					</xsl:apply-templates>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:if>
+		<xsl:apply-templates select="attributeDeclaration[@mode='#REQUIRED'], attributeDeclaration[@mode='#FIXED'], attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']">
+			<xsl:with-param name="attribute" select="$attribute"/>
+		</xsl:apply-templates>
+	</xsl:template>
+	
+	<xsl:template match="annotation[@type='schematron']">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template match="annotation[@type='schematron']/*">
+		<xsl:choose>
+			<xsl:when test="self::report">
+				<sch:report>
+					<xsl:copy-of select="@*" copy-namespaces="no"/>
+					<xsl:copy-of select="*|text()" copy-namespaces="no"/>
+				</sch:report>
+			</xsl:when>
+			<xsl:when test="self::assert">
+				<sch:assert>
+					<xsl:copy-of select="@*" copy-namespaces="no"/>
+					<xsl:copy-of select="*|text()" copy-namespaces="no"/>
+				</sch:assert>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="." copy-namespaces="no"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<!-- =================== -->
@@ -120,7 +129,7 @@
 	
 	<xsl:template match="attributeDeclaration[@mode='#REQUIRED']">
 		<xsl:param name="attribute"/>
-		<sch:rule context="{concat('//', @element)}">
+		<sch:rule context="{@element}">
 			<sch:assert test="{$attribute}">
 				<xsl:value-of select="$attribute"/>
 				<xsl:text> is a required attribute for </xsl:text>
@@ -131,7 +140,7 @@
 	
 	<xsl:template match="attributeDeclaration[@mode='#FIXED']">
 		<xsl:param name="attribute"/>
-		<sch:rule context="{concat('//', @element, '/', $attribute)}">
+		<sch:rule context="{concat(@element, '/', $attribute)}">
 			<sch:assert>
 				<xsl:attribute name="test">
 					<xsl:text>. = '</xsl:text>
@@ -150,7 +159,7 @@
 	
 	<xsl:template match="attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']">
 		<xsl:param name="attribute"/>
-		<sch:rule context="{concat('//', @element, '/', $attribute)}">
+		<sch:rule context="{concat(@element, '/', $attribute)}">
 			<sch:assert>
 				<xsl:attribute name="test">
 					<xsl:variable name="values">
@@ -279,9 +288,8 @@
                         </xsl:variable>
                         <xsl:choose>
                             
-                            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                            <!-- Zero or more of any: no tests -->
-                            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                        	<!-- ===== Zero or more of any: no tests ===== -->
+                        	
                             <xsl:when test="ends-with($inside-paren, '*')">
                               <xsl:call-template name="model-entities">
                                     <xsl:with-param name="str" select="substring-after(substring($str, string-length($inside-paren)), ',')"/>
@@ -291,9 +299,8 @@
                                 </xsl:call-template>
                             </xsl:when>
                             
-                            <!-- ~~~~~~~~~~~~~~~ -->
-                            <!-- Either/Or tests -->
-                            <!-- ~~~~~~~~~~~~~~~ -->
+                        	<!-- ===== Either/Or tests ===== -->
+                        	
                             <xsl:when test="starts-with($inside-paren, '(') and contains(translate($inside-paren, '+?*', ''), ')|') and not(contains($inside-paren, ',('))">
                                 <xsl:variable name="or" select="substring-after(substring-after($inside-paren, ')'),'|')"/>
                                 <xsl:variable name="either">
@@ -333,9 +340,8 @@
                                 <xsl:variable name="element" select="concat('&lt;',@name,'&gt;')"/>
                                 <xsl:choose>
                                     
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <!-- No more than one of either side -->
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                                	<!-- ===== No more than one of either side ===== -->
+                                	
                                     <xsl:when test="ends-with($inside-paren, '?')">            
                                         <xsl:for-each select="tokenize(translate($or, '()?+*', ''), ',')">
                                             <sch:report>
@@ -359,9 +365,8 @@
                                         </xsl:for-each>
                                     </xsl:when>
 
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <!-- Minimum one of either side -->
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                                	<!-- ===== Minimum one of either side ===== -->
+
                                     <xsl:when test="ends-with($inside-paren, '+')">
                                         <xsl:comment>NO TEST HERE YET</xsl:comment>
                                         <xsl:comment><xsl:text>Either/Or: </xsl:text><xsl:copy-of select="$inside-paren"/></xsl:comment>
@@ -377,23 +382,23 @@
                                         </sch:assert>
                                     </xsl:when>
                                     
-                                    <!-- ~~~~~~~~~~~~~~~~~ -->
-                                    <!-- Either side tests -->
-                                    <!-- ~~~~~~~~~~~~~~~~~ -->
-                                    <xsl:otherwise>
+                                	<!-- ===== Either side tests ===== -->
+                                    
+                                	<xsl:otherwise>
                                         
-                                        <!-- ,,,,,,,,,,,, -->
-                                        <!-- Either tests -->
-                                        <!-- '''''''''''' -->
-                                        <xsl:for-each-group select="tokenize(translate($either, '()', ''), ',')" group-by=".">
+                                        <!-- ~~~~~ Either tests ~~~~~ -->
+
+                                		<xsl:for-each-group select="tokenize(translate($either, '()', ''), ',')" group-by=".">
                                             <xsl:variable name="entity-name" select="translate(current-grouping-key(), '+?*~ ', '')"/>
                                             <xsl:choose>
                                                 
                                                 <!-- No tests -->
-                                                <xsl:when test="ends-with(current-grouping-key(), '*')"/>
+                                        
+                                            	<xsl:when test="ends-with(current-grouping-key(), '*')"/>
                                                 
                                                 <!-- At least one of either -->
-                                                <xsl:when test="ends-with(current-grouping-key(), '+')">
+                                                
+                                            	<xsl:when test="ends-with(current-grouping-key(), '+')">
                                                      <sch:assert>
                                                         <xsl:attribute name="test">
                                                             <xsl:value-of select="$entity-name"/><xsl:text> or </xsl:text>
@@ -413,6 +418,7 @@
                                                 </xsl:when>
                                                 
                                                 <!-- No more than one -->
+                                            	
                                                 <xsl:when test="ends-with(current-grouping-key(), '?')">
                                                     <sch:report>
                                                         <xsl:attribute name="test">
@@ -425,7 +431,8 @@
                                                 </xsl:when>
                                                 
                                                 <!-- One of either and no more than one -->
-                                                <xsl:otherwise>
+                                                
+                                            	<xsl:otherwise>
                                                     <sch:report>
                                                         <xsl:attribute name="test">
                                                             <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
@@ -453,18 +460,19 @@
                                             </xsl:choose>
                                         </xsl:for-each-group>
                                         
-                                        <!-- ,,,,,,,, -->
-                                        <!-- Or tests -->
-                                        <!-- '''''''' -->
+                                        <!-- ~~~~~ Or tests ~~~~~ -->
+
                                         <xsl:for-each-group select="tokenize(translate($or, '()', ''), ',')" group-by=".">
                                             <xsl:variable name="entity-name" select="translate(current-grouping-key(), '+?*~ ', '')"/>
                                             <xsl:choose>
                                                 
                                                 <!-- No tests -->
+                                            	
                                                 <xsl:when test="ends-with(current-grouping-key(), '*')"/>
                                                    
                                                 <!-- At least one -->
-                                                <xsl:when test="ends-with(current-grouping-key(), '+')">
+                                                
+                                            	<xsl:when test="ends-with(current-grouping-key(), '+')">
                                                     <xsl:choose>
                                                         <xsl:when test="not(contains($either, '+') or contains($either, '?'))">
                                                             <sch:assert>
@@ -486,7 +494,8 @@
                                                 </xsl:when>
                                                 
                                                 <!-- No more than one -->
-                                                <xsl:when test="ends-with(current-grouping-key(), '?')">
+                                                
+                                            	<xsl:when test="ends-with(current-grouping-key(), '?')">
                                                     <sch:report>
                                                         <xsl:attribute name="test">
                                                             <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
@@ -498,7 +507,8 @@
                                                 </xsl:when>
                                                 
                                                 <!-- One of either and no more than one -->
-                                                <xsl:otherwise>
+                                                
+                                            	<xsl:otherwise>
                                                     <xsl:choose>
                                                         <xsl:when test="contains($either, '*')">
                                                             <sch:assert>
@@ -537,10 +547,9 @@
                                 </xsl:call-template>
                             </xsl:when>
                             
-                            <!-- ~~~~~~~~~ -->
-                            <!-- Moving on -->
-                            <!-- ~~~~~~~~~ -->
-                            <xsl:otherwise>
+                        	<!-- ===== Moving on ===== -->
+
+                        	<xsl:otherwise>
                                 <xsl:call-template name="model-entities">
                                     <xsl:with-param name="str" select="substring-after(substring($str, string-length($inside-paren)), ',')"/>
                                     <xsl:with-param name="output">
@@ -602,15 +611,14 @@
                             <xsl:when test="contains($entity, '|')">
                                 <xsl:choose>
                                     
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <!-- Zero or more of any: no tests -->
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                                    
+                                	<!-- ===== Zero or more of any: no tests ===== -->
+                                	
                                     <xsl:when test="ends-with($entity, '*')"/>
                                     
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <!-- At least one of either -->
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <xsl:when test="ends-with(translate($entity, ')', ''), '+')">
+                                	<!-- ===== At least one of either ===== -->
+                                    
+                                	<xsl:when test="ends-with(translate($entity, ')', ''), '+')">
                                         <sch:assert>
                                             <xsl:attribute name="test">
                                                 <xsl:value-of select="string-join((tokenize(translate($entity, '?+*()', ''), '\|')), ' or ')"/>
@@ -621,10 +629,9 @@
                                         </sch:assert>
                                     </xsl:when>
                                     
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <!-- No more than one of either -->
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <xsl:when test="ends-with(translate($entity, ')', ''), '?')">
+                                	<!-- ===== No more than one of either ===== -->
+
+                                	<xsl:when test="ends-with(translate($entity, ')', ''), '?')">
                                         <sch:report>
                                             <xsl:attribute name="test">
                                                 <xsl:value-of select="concat('count(',string-join((tokenize(translate($entity, '?+*()', ''), '\|')), ' or '), ') > 1')"/>
@@ -635,10 +642,9 @@
                                         </sch:report>
                                     </xsl:when>
                                     
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <!-- One of either and any number of either -->
-                                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                                    <xsl:otherwise>
+                                	<!-- ===== One of either and any number of either ===== -->
+
+                                	<xsl:otherwise>
                                         <sch:assert>
                                             <xsl:attribute name="test">
                                                 <xsl:text>if(</xsl:text>
@@ -695,16 +701,14 @@
                                         <xsl:copy-of select="$output"/>
                                         <xsl:choose>
                                             
-                                            <!-- ~~~~~~~~~~~~~~~~~~~~~~ -->
-                                            <!-- Zero or more: no tests -->
-                                            <!-- ~~~~~~~~~~~~~~~~~~~~~~ -->
+                                        	<!-- ===== Zero or more: no tests ===== -->
+ 
                                             <xsl:when test="ends-with(translate($entity, ')', ''), '*')"/>
                                                 
                                             
-                                            <!-- ~~~~~~~~~~~~ -->
-                                            <!-- At least one -->
-                                            <!-- ~~~~~~~~~~~~ -->
-                                            <xsl:when test="ends-with(translate($entity, ')', ''), '+')">
+                                        	<!-- ===== At least one ===== -->
+ 
+                                        	<xsl:when test="ends-with(translate($entity, ')', ''), '+')">
                                                 <sch:assert>
                                                     <xsl:attribute name="test">
                                                         <xsl:value-of select="$entity-name"/>
@@ -715,10 +719,9 @@
                                                 </sch:assert>
                                             </xsl:when>
                                             
-                                            <!-- ~~~~~~~~~~~ -->
-                                            <!-- Zero or one -->
-                                            <!-- ~~~~~~~~~~~ -->
-                                            <xsl:when test="ends-with(translate($entity, ')', ''), '?')">
+                                        	<!-- ===== Zero or one ===== -->
+
+                                        	<xsl:when test="ends-with(translate($entity, ')', ''), '?')">
                                                 <sch:report>
                                                     <xsl:attribute name="test">
                                                         <xsl:value-of select="concat('count(',$entity-name, ') > 1')"/>
@@ -729,10 +732,9 @@
                                                 </sch:report>
                                             </xsl:when>
                                             
-                                            <!-- ~~~~~~~~~~~~~~~~ -->
-                                            <!-- One and only one -->
-                                            <!-- ~~~~~~~~~~~~~~~~ -->
-                                            <xsl:otherwise>
+                                        	<!-- ===== One and only one ===== -->
+
+                                        	<xsl:otherwise>
                                                 <sch:assert>
                                                     <xsl:attribute name="test">
                                                         <xsl:value-of select="$entity-name"/>
@@ -787,7 +789,9 @@
                                 <xsl:copy-of select="$output"/>
                                 <xsl:for-each-group select="tokenize($entity, '\|')" group-by=".">
                                     <xsl:variable name="entity-name" select="translate(current-grouping-key(),'(),*? |+~','')"/>
-                                    <xsl:value-of select="concat($entity-name, '[preceding-sibling::')"/><xsl:value-of select="string-join((tokenize(translate(translate(substring-after($str,','), '+?*()~ ', ''), '|,', '  '), ' ')), ' or preceding-sibling::')"/><xsl:text>] or </xsl:text>
+                                    <xsl:value-of select="concat($entity-name, '[preceding-sibling::')"/>
+                                	<xsl:value-of select="string-join((tokenize(translate(translate(substring-after($str,','), '+?*()~ ', ''), '|,', '  '), ' ')), ' or preceding-sibling::')"/>
+                                	<xsl:text>] or </xsl:text>
                                 </xsl:for-each-group>
                             </xsl:with-param>
                         </xsl:call-template>                                
@@ -798,7 +802,9 @@
                             <xsl:with-param name="str" select="substring-after($str,',')"/>
                             <xsl:with-param name="output">
                                 <xsl:copy-of select="$output"/>
-                                <xsl:value-of select="concat($entity-name, '[preceding-sibling::')"/><xsl:value-of select="string-join((tokenize(translate(translate(substring-after($str,','), '+?*()~ ', ''), '|,', '  '), ' ')), ' or preceding-sibling::')"/><xsl:text>] or </xsl:text>
+                                <xsl:value-of select="concat($entity-name, '[preceding-sibling::')"/>
+                            	<xsl:value-of select="string-join((tokenize(translate(translate(substring-after($str,','), '+?*()~ ', ''), '|,', '  '), ' ')), ' or preceding-sibling::')"/>
+                            	<xsl:text>] or </xsl:text>
                             </xsl:with-param>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -828,7 +834,10 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name="content" select="string-join((                             substring-before($str, ')'),                             substring-before(substring-after($str, ')'), ')')),                             ')')"/>
+                        <xsl:variable name="content" select="string-join((
+                        	substring-before($str, ')'), 
+                        	substring-before(substring-after($str, ')'), ')')), 
+                        	')')"/>
                         <xsl:value-of select="substring-after($content, '(')"/>
                         <xsl:value-of select="translate(substring($str, string-length($content) + 1, 2), '|,', '~')"/>
                     </xsl:otherwise>
@@ -843,7 +852,11 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name="content" select="string-join((                             substring-before($str, ')'),                              substring-before(substring-after($str, ')'), ')'),                             substring-before(substring-after(substring-after($str, ')'), ')'), ')')),                              ')')"/>
+                        <xsl:variable name="content" select="string-join((
+                        	substring-before($str, ')'),
+                        	substring-before(substring-after($str, ')'), ')'),
+                        	substring-before(substring-after(substring-after($str, ')'), ')'), ')')),
+                        	')')"/>
                         <xsl:value-of select="substring-after($content, '(')"/>
                         <xsl:value-of select="translate(substring($str, string-length($content) + 1, 2), '|,', '~')"/>
                     </xsl:otherwise>
@@ -858,7 +871,11 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name="content" select="string-join((                             substring-before($str, ')'),                              substring-before(substring-after($str, ')'), ')'),                              substring-before(substring-after(substring-after($str, ')'), ')'), ')'),                              substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')')),                              ')')"/>
+                        <xsl:variable name="content" select="string-join(( substring-before($str, ')'), 
+                        	substring-before(substring-after($str, ')'), ')'),
+                        	substring-before(substring-after(substring-after($str, ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')')),
+                        	')')"/>
                         <xsl:value-of select="substring-after($content, '(')"/>
                         <xsl:value-of select="translate(substring($str, string-length($content) + 1, 2), '|,', '~')"/>
                     </xsl:otherwise>
@@ -873,7 +890,13 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name="content" select="string-join((                             substring-before($str, ')'),                              substring-before(substring-after($str, ')'), ')'),                              substring-before(substring-after(substring-after($str, ')'), ')'), ')'),                              substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')')),                             ')')"/>
+                        <xsl:variable name="content" select="string-join((
+                        	substring-before($str, ')'),
+                        	substring-before(substring-after($str, ')'), ')'),
+                        	substring-before(substring-after(substring-after($str, ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')')),
+                        	')')"/>
                         <xsl:value-of select="substring-after($content, '(')"/>
                         <xsl:value-of select="translate(substring($str, string-length($content) + 1, 2), '|,', '~')"/>
                     </xsl:otherwise>
@@ -888,7 +911,14 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name="content" select="string-join((                             substring-before($str, ')'),                              substring-before(substring-after($str, ')'), ')'),                              substring-before(substring-after(substring-after($str, ')'), ')'), ')'),                               substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')')),                             ')')"/>
+                        <xsl:variable name="content" select="string-join(( 
+                        	substring-before($str, ')'),
+                        	substring-before(substring-after($str, ')'), ')'),
+                        	substring-before(substring-after(substring-after($str, ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')')),
+                        	')')"/>
                         <xsl:value-of select="substring-after($content, '(')"/>
                         <xsl:value-of select="translate(substring($str, string-length($content) + 1, 2), '|,', '~')"/>
                     </xsl:otherwise>
@@ -903,7 +933,15 @@
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name="content" select="string-join((                             substring-before($str, ')'),                              substring-before(substring-after($str, ')'), ')'),                              substring-before(substring-after(substring-after($str, ')'), ')'), ')'),                              substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'), ')')),                             ')')"/>
+                        <xsl:variable name="content" select="string-join((
+                        	substring-before($str, ')'),
+                        	substring-before(substring-after($str, ')'), ')'),
+                        	substring-before(substring-after(substring-after($str, ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), 
+                        	substring-before(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'),
+                        	substring-before(substring-after(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'), ')')),
+                        	')')"/>
                         <xsl:value-of select="substring-after($content, '(')"/>
                         <xsl:value-of select="translate(substring($str, string-length($content) + 1, 2), '|,', '~')"/>
                     </xsl:otherwise>
@@ -919,7 +957,16 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:variable name="content"
-                            select="string-join((                             substring-before($str, ')'),                              substring-before(substring-after($str, ')'), ')'),                              substring-before(substring-after(substring-after($str, ')'), ')'), ')'),                              substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'),                              substring-before(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'), ')'),                             substring-before(substring-after(substring-after(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'), ')'), ')')),                             ')')"/>
+                            select="string-join((
+                            substring-before($str, ')'),
+                            substring-before(substring-after($str, ')'), ')'),
+                            substring-before(substring-after(substring-after($str, ')'), ')'), ')'),
+                            substring-before(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'),
+                            substring-before(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'),
+                            substring-before(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'),
+                            substring-before(substring-after(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'), ')'),
+                            substring-before(substring-after(substring-after(substring-after(substring-after(substring-after(substring-after(substring-after($str, ')'), ')'), ')'), ')'), ')'), ')'), ')'), ')')),
+                            ')')"/>
                         <xsl:value-of select="substring-after($content, '(')"/>
                         <xsl:value-of select="translate(substring($str, string-length($content) + 1, 2), '|,', '~')"/>
                     </xsl:otherwise>
