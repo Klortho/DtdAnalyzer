@@ -1,17 +1,13 @@
 # DtdAnalyzer Release Notes
 
-## Yet to be released changes
-
-### Features
-
 ### Enhancements
+
+* Add count of number of elements changed, removed, and added to comparison report.
+* Several enhancements to the schematron generator stylesheet
 
 ### Bug fixes
 
-### Performance
-
-### Other
-
+* Fixed link to home page in documentor output
 
 ## DtdAnalyzer v0.1.1 - 2012-10-15
 
