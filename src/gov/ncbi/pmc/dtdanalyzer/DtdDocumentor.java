@@ -35,7 +35,7 @@ public class DtdDocumentor {
      */
     public static void main (String[] args) {
         String[] optList = {
-            "help", "doc", "system", "public", "dir",
+            "help", "version", "doc", "system", "public", "dir",
             "catalog", "title", "roots", "docproc", "markdown", "param",
             "css", "js", "include", "nosuffixes", "exclude", "exclude-except"
         };

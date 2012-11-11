@@ -51,11 +51,11 @@ public class DtdAnalyzer {
 
 
         String[] optList = {
-            "help", "doc", "system", "public", "catalog", "xslt", "title", "roots", "docproc",
-            "markdown", "param"
+            "help", "version", "doc", "system", "public", "catalog", "xslt", "title", 
+            "roots", "docproc", "markdown", "param"
         };
         app = new App(args, optList, 
-            "dtdanalyzer [-h] [-d <xml-file> | -s <system-id> | -p <public-id>] " +
+            "dtdanalyzer [-d <xml-file> | -s <system-id> | -p <public-id>] " +
             "[-c <catalog>] [-x <xslt>] [-t <title>] [<out>]",
             "\nThis utility analyzes a DTD and writes an XML output file."
         );

@@ -10,6 +10,7 @@ import org.apache.commons.cli.*;
 import java.util.HashMap;
 import java.io.*;
 import java.net.*;
+import java.util.Properties;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 import org.xml.sax.*;
@@ -37,6 +38,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class App {
 
+    /////////////////////////////////////////
     // CONSTANTS
 
     // ID for SAX driver
@@ -58,6 +60,13 @@ public class App {
     // Public id of Oasis DTD
     public static final String OASIS_PUBLIC_ID = "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN";
 
+    /////////////////////////////////////////
+    
+    // Application version number, from app.properties
+    String version = "unknown";
+    // Build time, from app.properties
+    String buildtime = "unknown";
+    
     // Stores the actual command line arguments used, this should be passed in directly from main()
     String[] args;
 
@@ -125,6 +134,16 @@ public class App {
         if (homeStr == null) homeStr = ".";
         home = new File(homeStr);
 
+        // Read the package properties file
+        Properties props = new Properties();
+        try {
+            props.load(new FileInputStream( new File(homeStr, "app.properties") ));
+            version = props.getProperty("version");
+            buildtime = props.getProperty("buildtime");
+        } catch (IOException e) {
+            System.err.println("Warning:  failed to read app.properties file.");
+        }
+        
         initAllOpts();
         oc = new OptionComparator(optList);
         cmdLineSyntax = _cmdLineSyntax;
@@ -151,6 +170,16 @@ public class App {
             // Handle --help:
             if ( line.hasOption( "h" ) ) {
                 printUsage();
+                System.exit(0);
+            }
+            
+            // Hanlde --version:
+            if ( line.hasOption("v") ) {
+                System.out.println(
+                    "DtdAnalyzer utility, version " + version + "\n" +
+                    "Built " + buildtime + "\n" +
+                    "See http://ncbitools.github.com/DtdAnalyzer/"
+                );
                 System.exit(0);
             }
 
@@ -418,6 +447,12 @@ public class App {
      */
     private void initAllOpts() {
         allOpts.put("help", new Option("h", "help", false, "Get help"));
+        allOpts.put("version",
+            OptionBuilder
+                .withLongOpt( "version" )
+                .withDescription("Print version number and exit.")
+                .create("v")
+        );
         allOpts.put("doc",
             OptionBuilder
                 .withLongOpt( "doc" )
