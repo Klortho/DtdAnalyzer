@@ -25,30 +25,12 @@ public class DtdAnalyzer {
     
     /**
      * Main execution point. Checks arguments, then converts the DTD into XML.
-     * Once it has the XML, it transforms it using the specified XSL. The output
-     * is placed in the specified location. Application currently uses Xerces and
+     * This application currently uses Xerces and
      * Saxon because these are known to work well and will be bundled with this
      * distribution. However, other implementations can be specified through the
      * System properties.
      */
     public static void main (String[] args) {
-      /*
-        try {
-            SAXParserFactory f = SAXParserFactory.newInstance();
-            SAXParser commentParser = f.newSAXParser();
-            
-            InputSource xmlstr = new InputSource(new StringReader("<foo>bar</foo>"));
-            DefaultHandler dh = new DefaultHandler();
-            commentParser.parse(xmlstr, dh);
-        }
-        catch (Exception e) {
-            System.err.println("Caught exception:  " + e.getMessage());
-        }
-        System.exit(0);
-      */
-
-
-
 
         String[] optList = {
             "help", "version", "doc", "system", "public", "catalog", "xslt", "title", 

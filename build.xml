@@ -51,7 +51,7 @@
     <exclude name="velocity.log"/>
   </patternset>
 
-  <property name="execfiles" value="dtdanalyzer dtddocumentor"/>
+  <property name="execfiles" value="dtdanalyzer dtddocumentor dtdcompare"/>
 
   <target name="clean" description="Deletes all generated artifacts">
     <delete dir="${build}" failonerror="false"/>

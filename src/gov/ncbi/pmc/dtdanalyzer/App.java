@@ -95,8 +95,12 @@ public class App {
     private CommandLine line;
 
     // If -s or -p was given, this is the dummy input XML file:
-    private InputSource dummyXmlFile;
+    private InputSource dummyXmlFile = null;
 
+    // If two options -s or -p were given (for comparison), this is the 
+    // second dummy XML file
+    private InputSource dummyXmlFile2 = null;
+    
     // If --catalog was given, this will be the CatalogResolver
     private CatalogResolver resolver = null;
 
@@ -212,7 +216,12 @@ public class App {
                 String publicId = line.getOptionValue("p");
                 xmlFileStr += "\n\n<root/>\n";
 
-                dummyXmlFile = new InputSource(new StringReader(xmlFileStr));
+                if (dummyXmlFile == null) {
+                    dummyXmlFile = new InputSource(new StringReader(xmlFileStr));
+                }
+                else {
+                    dummyXmlFile2 = new InputSource(new StringReader(xmlFileStr));
+                }
             }
 
 
@@ -344,6 +353,15 @@ public class App {
     public InputSource getDummyXmlFile() {
         return dummyXmlFile;
     }
+
+    /**
+     * If two of -s and/or -p were used (for dtdcompare), this should hold the 
+     * second dummy XML file
+     */
+    public InputSource getDummyXmlFile2() {
+        return dummyXmlFile2;
+    }
+
 
     /**
      * If --catalog was given, this will return a valid object, otherwise null.
