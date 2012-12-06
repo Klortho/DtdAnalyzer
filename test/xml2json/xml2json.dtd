@@ -1,0 +1,51 @@
+<!--    
+  This is an example/test DTD for the XML-to-JSON features of the DtdAnalyzer.
+-->
+<!-- ================================================================= -->
+
+<!--~~ <Result>
+
+~~ tags
+  root
+~~-->
+
+<!ELEMENT Result ( 
+                   ( 
+                     ( Count,
+                       ( RetMax,
+                         RetStart,
+                         IdList,
+                         TranslationSet,
+                         TranslationStack?
+                       )?
+                     ) 
+                     | ERROR
+                   ),
+                   ErrorList?
+                 )>
+
+<!ELEMENT Count           (#PCDATA)>	<!-- \d+ -->
+<!ELEMENT RetMax          (#PCDATA)>	<!-- \d+ -->
+<!ELEMENT RetStart        (#PCDATA)>	<!-- \d+ -->
+
+<!ELEMENT IdList          (Id*)>
+<!ELEMENT Id              (#PCDATA)>	<!-- \d+ -->
+
+<!ELEMENT TranslationSet  (Translation*)>
+<!ELEMENT Translation     (From, To)>
+<!ELEMENT From            (#PCDATA)>	<!-- .+ -->
+<!ELEMENT To              (#PCDATA)>	<!-- .+ -->
+
+<!ELEMENT TranslationStack        ((TermSet|OP)*)>
+<!ELEMENT TermSet (Term, Field, Count, Explode)>
+<!ELEMENT Term            (#PCDATA)>	<!-- .+ -->
+<!ELEMENT Field           (#PCDATA)>	<!-- .+ -->
+<!ELEMENT Explode         (#PCDATA)>	<!-- (Y|N) -->
+<!ELEMENT OP              (#PCDATA)>	<!-- (AND|OR|NOT|RANGE|GROUP) -->
+
+<!ELEMENT ERROR                  (#PCDATA)>	<!-- .+ -->
+
+<!ELEMENT ErrorList      (PhraseNotFound*,FieldNotFound*)>
+<!ELEMENT FieldNotFound          (#PCDATA)>	<!-- .+ -->
+<!ELEMENT PhraseNotFound         (#PCDATA)>	<!-- .+ -->
+

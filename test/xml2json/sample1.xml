@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<!DOCTYPE Result SYSTEM "xml2json.dtd">
+<Result>
+  <Count>5163</Count>
+  <RetMax>20</RetMax>
+  <RetStart>0</RetStart>
+  <IdList>
+    <Id>101595451</Id>
+    <Id>101594756</Id>
+    <Id>101592162</Id>
+  </IdList>
+  <TranslationSet>
+    <Translation>
+      <From>obstetrics[MeSH Terms]</From>
+      <To>"obstetrics"[MeSH Terms]</To>
+    </Translation>
+  </TranslationSet>
+  <TranslationStack>
+    <TermSet>
+      <Term>"obstetrics"[MeSH Terms]</Term>
+      <Field>MeSH Terms</Field>
+      <Count>5163</Count>
+      <Explode>Y</Explode>
+    </TermSet>
+    <OP>GROUP</OP>
+  </TranslationStack>
+  <ErrorList>
+    <PhraseNotFound>fleegle[MeSH Terms]</PhraseNotFound>
+    <PhraseNotFound>bingo[MeSH Terms]</PhraseNotFound>
+  </ErrorList>
+</Result>
