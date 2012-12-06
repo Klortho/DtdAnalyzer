@@ -55,13 +55,11 @@ public class DtdDocumentor {
             app.usageError("At least one of -d, -s, or -p must be specified!");
         }
 
-
         // There should be nothing left on the line.
         String[] rest = line.getArgs();
         if (rest.length > 0) {
             app.usageError("Too many arguments!");
         }
-
 
         // Perform set-up and parsing here.  The output of this step is a fully chopped up
         // and recorded representation of the DTD, stored in the DtdEventHandler object.
@@ -117,7 +115,7 @@ public class DtdDocumentor {
         XMLWriter writer = new XMLWriter(model);
 
 
-        // Now run the XSLT transformation.  This will be the dtddocumentor.xslt
+        // Now run the XSLT transformation.  This will be the dtddocumentor.xsl
         // stylesheet
 
         try {
