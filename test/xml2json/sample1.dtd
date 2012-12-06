@@ -1,0 +1,24 @@
+<!--
+  This is a sample DTD for testing basic features of the XML-to-JSON
+  funcionality of the DtdAnalyzer.
+  
+  This example is very simple
+-->
+
+<!-- ================================================================= -->
+
+<!--~~ <Result>
+This is the root element for a response.
+~~ tags
+root
+~~-->
+<!ELEMENT Result      (DbList,DbInfo?)>
+
+<!ELEMENT DbList      (DbName+)>
+<!ELEMENT DbName      (#PCDATA)>      <!-- \S+ -->
+
+<!ELEMENT DbInfo      (DbName, MenuName, Description)>
+
+<!ELEMENT MenuName    (#PCDATA)>      <!-- .+ -->
+<!ELEMENT Description (#PCDATA)>      <!-- .+ -->
+
