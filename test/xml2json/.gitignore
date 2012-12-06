@@ -1,0 +1,6 @@
+# Files that are generated from dtd with dtdanalyzer:
+*.daz.xml
+
+# Ignore the XML-to-JSON product files:
+*2json.xsl
+
