@@ -138,7 +138,8 @@ public class DtdDocumentor {
             xslt.setParameter("dir", dir);
             
             // We set the defaults for css and js here, which should match the default in the 
-            // stylesheet, so that we can copy it into the destination directory
+            // stylesheet.  The reason is that the Java code needs to know what the filename is, so
+            // that it can copy it into the destination directory
             String css = app.getCss();
             if (css == null) css = "dtddoc.css";
             xslt.setParameter("css", css);

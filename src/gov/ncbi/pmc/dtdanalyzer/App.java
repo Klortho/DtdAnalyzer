@@ -127,6 +127,7 @@ public class App {
     private boolean suffixes = true;
     private String excludeElems = null;
     private String excludeExcept = null;
+    private String basexslt = null;
 
 
     /**
@@ -318,6 +319,9 @@ public class App {
             if (line.hasOption("exclude-except")) {
                 excludeExcept = line.getOptionValue("exclude-except");
             }
+            if (line.hasOption("basexslt")) {
+                basexslt = line.getOptionValue("basexslt");
+            }
 
         }
         catch( ParseException exp ) {
@@ -448,7 +452,12 @@ public class App {
         return excludeExcept;
     }
 
-
+    /**
+     * If --basexslt was given, this returns the value, otherwise null.
+     */
+    public String getBaseXslt() {
+        return basexslt;
+    }
 
 
 
@@ -626,6 +635,15 @@ public class App {
                 .hasArg()
                 .withArgName("elems")
                 .create()
+        );
+        allOpts.put("basexslt",
+            OptionBuilder
+                .withLongOpt("basexslt")
+                .withDescription("Path to the XSLT which will be imported by the output XSLT. " +
+                    "Defaults to \"../../xslt/xml2json.xsl\".")
+                .hasArg()
+                .withArgName("basexslt")
+                .create("b")
         );
 
 

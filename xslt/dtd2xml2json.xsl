@@ -16,12 +16,13 @@
   <x:output encoding="UTF-8" method="xml" indent="yes" />
   
   <x:variable name='nl' select='"&#10;"'/>
+  <x:param name='basexslt' select='"../../xslt/xml2json.xsl"'/>
   
   <x:template match="/">
     <!-- Generate the structure of the XSL stylesheet -->
     <xsl:stylesheet version="1.0" xmlns:np="http://ncbi.gov/portal/XSLT/namespace">
 
-      <xsl:import href='../XML2JSON.xsl'/>
+      <xsl:import href='{$basexslt}'/>
       <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
 
       <x:apply-templates select='declarations/elements/element'>

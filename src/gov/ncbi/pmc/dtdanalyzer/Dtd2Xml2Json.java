@@ -33,7 +33,7 @@ public class Dtd2Xml2Json {
     public static void main (String[] args) {
 
         String[] optList = {
-            "help", "version", "doc", "system", "public", 
+            "help", "version", "doc", "system", "public", "basexslt", 
             "catalog", "title", "roots", "docproc", "markdown", "param"
         };
         app = new App(args, optList, 
@@ -137,7 +137,11 @@ public class Dtd2Xml2Json {
                     xslt.setParameter(xsltParams[2*i], xsltParams[2*i+1]);
                 }
             }
-            
+
+            // Get the basexslt option, if given, and pass those it in as a param
+            String basexslt = app.getBaseXslt();
+            if (basexslt != null) xslt.setParameter("basexslt", basexslt);
+
             // Use this constructor because Saxon always 
             // looks for a system id even when a reader is used as the source  
             // If no string is provided for the sysId, we get a null pointer exception
