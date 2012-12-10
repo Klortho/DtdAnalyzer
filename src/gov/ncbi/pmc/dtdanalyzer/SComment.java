@@ -73,6 +73,11 @@ public class SComment {
     private HashMap sections = new HashMap();
 
     /**
+     * This is set to true if this scomment has a tag "root"
+     */
+    private boolean root = false;
+
+    /**
      * Here is an XML parser that we use to check the validity of structured 
      * comments as we see them.
      */
@@ -162,8 +167,11 @@ public class SComment {
             String[] tags = text.split("\\s+");
             String tagElems = "";
             for (int i = 0; i < tags.length; ++i) {
-                if (tags[i].equals("")) continue;
-                sectionString += "<tag>" + tags[i] + "</tag>";
+                String tag = tags[i];
+                if (tag.equals("")) continue;
+                sectionString += "<tag>" + tag + "</tag>";
+                // Record any "root" tag:
+                if (tag.equals("root")) root = true;
             }
         }
         else if (name.equals("schematron")) {
@@ -275,5 +283,12 @@ public class SComment {
      */
     public static void setCommentProcessor(String p) {
         commentProcessor = p;
+    }
+    
+    /**
+     * Returns true if this structured comment includes a tag "root"
+     */
+    public boolean isRoot() {
+        return root;
     }
 }

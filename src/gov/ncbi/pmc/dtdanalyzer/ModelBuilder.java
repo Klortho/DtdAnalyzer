@@ -27,6 +27,10 @@ public class ModelBuilder {
     private Map contexts = new HashMap(1024);  // Collection used to hold context info
     private SComments scomments;               // All structured comments
 
+    private HashSet _roots;                    // A list of all the root Elements
+
+
+
     /**
      * Creates a new instance of ModelBuilder.  
      *
@@ -42,6 +46,11 @@ public class ModelBuilder {
         entities = _dtdInfo.getAllEntities();
         scomments = _dtdInfo.getAllSComments();
 
+        _roots = new HashSet();
+        _reachable = new HashSet();
+        _toCheck = new LinkedList();
+
+
         // The DTD title will either come from the parsed content (from _dtdInfo) or else 
         // from the command-line param (from _dtdTitle).
         if (_dtdTitle != null) {
@@ -54,6 +63,18 @@ public class ModelBuilder {
             }
         }
         
+        // Initialize the set of _roots from the annotation tags.  This might
+        // be supplemented later with values from command-line argument
+        ElementIterator elit = elements.getElementIterator();        
+        while ( elit.hasNext() ){
+            Element el = elit.next();
+            SComment sc = scomments.getSComment(SComment.ELEMENT, el.getName());
+            if (sc != null && sc.isRoot()) {
+                el.setIsRoot();
+                _putRoot(el);
+            }
+        }
+
         processContext();
     }
 
@@ -152,23 +173,23 @@ public class ModelBuilder {
                   // Check if this element already exists in context collection
                   if ( contexts.containsKey(elName)){
                      parents = (Map)contexts.get(elName);
-                  }//if
+                  }
                   //Doesn't exist yet, so create a collection for it
                   else{
                      parents = new HashMap(256);
                      contexts.put(elName, parents);
-                  }//else
+                  }
                   
                   // Now update the context for this element
                   if ( parents.containsKey( name )) {
                       // do nothing since we already know about it
-                  } //if
+                  }
                   else {
                       parents.put(name, name);
-                  } // else
-               } // if
-            } // while            
-        } //else
+                  }
+               }
+            }       
+        } 
     }
     
     /**
@@ -180,9 +201,35 @@ public class ModelBuilder {
         while ( elit.hasNext() ){
             Element el = elit.next();
             parseModel(el.getName(), el.getMinifiedModel());
-        } // while        
+        } 
     }
     
+    
+    /**
+     * Add a list of root elements.  This is used by the main routine in response to
+     * the "--roots" command-line argument.
+     */
+    public void addRoots(String[] roots) throws Exception {
+        String name;
+        
+        for (int i = 0; i < roots.length; ++i) {
+            name = roots[i];
+            //System.err.println("root: " + roots[i]);
+            Element r = elements.getElement(name);
+            if (r == null) throw new Exception("Specified root \"" + name + "\" not found");
+            r.setIsRoot();
+
+            // Add each of these to the list of roots (and of reachable elements)
+            _putRoot(r);
+        }
+    }
+    
+    /**
+     * Returns true if there are any elements known to be specified as root elements
+     */
+    public boolean hasRoots() {
+        return !_roots.isEmpty();
+    }
     
     /**
      * Finds all the reachable elements, given a list of roots.  This then will flag the
@@ -190,22 +237,8 @@ public class ModelBuilder {
      * 'reachable=false' attribute.
      */
 
-    public void findReachable(String[] roots) throws Exception {
-        _reachable = new HashSet();
-        _toCheck = new LinkedList();
-        String name;
+    public void findReachable() throws Exception {
         Element r;
-
-        for (int i = 0; i < roots.length; ++i) {
-            name = roots[i];
-            //System.err.println("root: " + roots[i]);
-            r = elements.getElement(name);
-            if (r == null) throw new Exception("Specified root \"" + name + "\" not found");
-            r.setIsRoot();
-
-            // Add each of these to the list of reachable elements
-            _putReachable(r);
-        }
         
         // Pop a new reachable element off the queue, and check each of its kids, until done.
         while ((r = (Element) _toCheck.poll()) != null) {
@@ -243,7 +276,7 @@ public class ModelBuilder {
 
     // Here are the reachable elements whose kids we still need to check.
     private Queue _toCheck;
-    
+
     // This helper function checks a given element that has just been determined to be
     // reachable.  If it has not been seen before, then it adds it to the queue of those
     // that still need to be checked.
@@ -251,6 +284,16 @@ public class ModelBuilder {
         if (!_reachable.contains(r)) {
             _reachable.add(r);
             _toCheck.add(r);
+        }
+    }
+    
+    // This helper function adds a given element to the list of root elements.  
+    // While doing that, it also adds it to _reachable, since every root is of course
+    // reachable.
+    private void _putRoot(Element r) {
+        if (!_roots.contains(r)) {
+            _roots.add(r);
+            _putReachable(r);
         }
     }
     

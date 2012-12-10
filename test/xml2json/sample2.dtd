@@ -1,10 +1,48 @@
 <!--    
   This is an example/test DTD for the XML-to-JSON features of the DtdAnalyzer.
+  This DTD tests some of the more complex features.
+  
+  The elements are here in alphabetical order for convenience.
 -->
 <!-- ================================================================= -->
 
-<!--~~ <Result>
 
+<!ELEMENT Count            (#PCDATA)>	<!-- \d+ -->
+
+<!--~~ <ERROR>
+
+~~json
+<json name='ERROR'/>
+~~-->
+<!ELEMENT ERROR            (#PCDATA)>	<!-- .+ -->
+
+<!--~~ <ErrorList>
+This one is special because it can take any number of TermSet and/or OP
+children.  So it doesn't fit cleanly into either a JSON array or object.
+~~json
+<object>
+  <array name='phrasesnotfound' content='PhraseNotFound'/>
+  <array name='fieldsnotfound' content='FieldNotFound'/>
+</object>
+~~-->
+<!ELEMENT ErrorList        (PhraseNotFound*,FieldNotFound*)>
+
+<!ELEMENT Explode          (#PCDATA)>	<!-- (Y|N) -->
+
+<!ELEMENT Field            (#PCDATA)>	<!-- .+ -->
+
+<!ELEMENT FieldNotFound    (#PCDATA)>	<!-- .+ -->
+
+<!ELEMENT From             (#PCDATA)>	<!-- .+ -->
+
+<!ELEMENT Id               (#PCDATA)>	<!-- \d+ -->
+
+<!ELEMENT IdList           (Id*)>
+
+<!ELEMENT OP               (#PCDATA)>	<!-- (AND|OR|NOT|RANGE|GROUP) -->
+
+<!--~~ <Result>
+This is the root element for a response.
 ~~ tags
   root
 ~~-->
@@ -24,28 +62,30 @@
                    ErrorList?
                  )>
 
-<!ELEMENT Count           (#PCDATA)>	<!-- \d+ -->
-<!ELEMENT RetMax          (#PCDATA)>	<!-- \d+ -->
-<!ELEMENT RetStart        (#PCDATA)>	<!-- \d+ -->
+<!ELEMENT RetMax           (#PCDATA)>	<!-- \d+ -->
 
-<!ELEMENT IdList          (Id*)>
-<!ELEMENT Id              (#PCDATA)>	<!-- \d+ -->
+<!ELEMENT RetStart         (#PCDATA)>	<!-- \d+ -->
 
-<!ELEMENT TranslationSet  (Translation*)>
-<!ELEMENT Translation     (From, To)>
-<!ELEMENT From            (#PCDATA)>	<!-- .+ -->
-<!ELEMENT To              (#PCDATA)>	<!-- .+ -->
+<!ELEMENT PhraseNotFound   (#PCDATA)>	<!-- .+ -->
 
-<!ELEMENT TranslationStack        ((TermSet|OP)*)>
-<!ELEMENT TermSet (Term, Field, Count, Explode)>
-<!ELEMENT Term            (#PCDATA)>	<!-- .+ -->
-<!ELEMENT Field           (#PCDATA)>	<!-- .+ -->
-<!ELEMENT Explode         (#PCDATA)>	<!-- (Y|N) -->
-<!ELEMENT OP              (#PCDATA)>	<!-- (AND|OR|NOT|RANGE|GROUP) -->
+<!ELEMENT Term             (#PCDATA)>	<!-- .+ -->
 
-<!ELEMENT ERROR                  (#PCDATA)>	<!-- .+ -->
+<!ELEMENT TermSet          (Term, Field, Count, Explode)>
 
-<!ELEMENT ErrorList      (PhraseNotFound*,FieldNotFound*)>
-<!ELEMENT FieldNotFound          (#PCDATA)>	<!-- .+ -->
-<!ELEMENT PhraseNotFound         (#PCDATA)>	<!-- .+ -->
+<!ELEMENT To               (#PCDATA)>	<!-- .+ -->
+
+<!ELEMENT Translation      (From, To)>
+
+<!--~~ <TranslationStack>
+This one is special because it can take any number of TermSet and/or OP
+children, in any order.  So it doesn't fit cleanly into either a JSON array or object.
+Since we know that TermSet's will get converted to objects, and OP's will get
+converted to strings, we can just turn this into an array, without any loss of
+information.
+~~json
+<array/>
+~~-->
+<!ELEMENT TranslationStack ((TermSet|OP)*)>
+
+<!ELEMENT TranslationSet   (Translation*)>
 

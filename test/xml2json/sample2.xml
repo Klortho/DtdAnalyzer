@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE Result SYSTEM "xml2json.dtd">
+<!DOCTYPE Result SYSTEM "sample2.dtd">
 <Result>
   <Count>5163</Count>
   <RetMax>20</RetMax>

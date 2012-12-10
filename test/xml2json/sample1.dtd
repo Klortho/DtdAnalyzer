@@ -2,7 +2,9 @@
   This is a sample DTD for testing basic features of the XML-to-JSON
   funcionality of the DtdAnalyzer.
   
-  This example is very simple
+  This example is very simple, and relies solely on the default behavior of the
+  dtd2xml2json transformation.  That means that there are no json-annotations
+  used to override the default behavior.
 -->
 
 <!-- ================================================================= -->
@@ -14,11 +16,29 @@ root
 ~~-->
 <!ELEMENT Result      (DbList,DbInfo?)>
 
+<!--~~ <DbList>
+Converted into a JSON array.
+~~-->
 <!ELEMENT DbList      (DbName+)>
+
+<!--~~ <DbName>
+Converted into a JSON string.
+~~-->
 <!ELEMENT DbName      (#PCDATA)>      <!-- \S+ -->
 
+
+<!--~~ <DbInfo>
+Converted into a JSON object.
+~~-->
 <!ELEMENT DbInfo      (DbName, MenuName, Description)>
 
+<!--~~ <MenuName>
+Converted into a JSON string.
+~~-->
 <!ELEMENT MenuName    (#PCDATA)>      <!-- .+ -->
+
+<!--~~ <Description>
+Converted into a JSON string.
+~~-->
 <!ELEMENT Description (#PCDATA)>      <!-- .+ -->
 

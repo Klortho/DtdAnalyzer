@@ -37,20 +37,33 @@
     <!-- The variable 'json-name', if not empty, will be passed to the 'key' param of the
       XML2JSON template.  -->
     <x:variable name='json-name' select='$json-annotation/@name'/>
+    <!--<x:message>json-name is <x:value-of select='$json-name'/></x:message>-->
 
-    <!-- The variable 'type-override' is from the DTD json annotations.
-      If not empty, it will override the default type that is
-      derived from this node's content model.
+    <!-- 
+      $type-override is from the DTD json annotation top-level
+      element name, and overrides the default type that we compute for a
+      particular element in the DTD.  For example, if the json annotation 
+      contains
+          <object/>
+      then $type-override will be "object".  But note that the element
+      <json> acts as a placeholder, and does not override the type.  So
+      if the json annotation is
+          <json name='FOO'/>
+      then $type-override will be the empty string.
     -->
-    <x:variable name='type-override' select='name($json-annotation)'/>
+    <x:variable name='type-override'>
+      <x:if test='name($json-annotation) != "json"'>
+        <x:value-of select='name($json-annotation)'/>
+      </x:if>
+    </x:variable>
     
     <!-- 
       Compute the type for this node.
       Valid values:  'root', 'simple', 'object', or 'array'.
       
       FIXME:  Need to change 'simple' to 'string', and add 'number' and 'boolean'.
-        All three of those are simple types, but 'number' and 'boolean' should not
-        be quoted.
+      All three of those are simple types, but 'number' and 'boolean' should not
+      be quoted.
     -->
     <x:variable name='type'>
       <x:choose>
@@ -64,6 +77,7 @@
             </x:otherwise>
           </x:choose>
         </x:when>
+
         <x:when test='@root="true"'>
           <x:value-of select='"root"'/>
         </x:when>
@@ -196,7 +210,7 @@
       
       <x:otherwise>
         <x:message>
-          <x:text>Need to implement a template for </x:text> 
+          <x:text>Need to tell me what to do with </x:text> 
           <x:value-of select='@name'/>
         </x:message>
       </x:otherwise>
