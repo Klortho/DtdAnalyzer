@@ -143,7 +143,10 @@
     <x:choose>
       <x:when test='$type = "root"'>
         <xsl:template match='{@name}'>
-          <xsl:call-template name='result-start'/>
+          <xsl:call-template name='result-start'>
+            <xsl:with-param name='resulttype' select='"{$json-annotation/@resulttype}"'/>
+            <xsl:with-param name='version' select='"{$json-annotation/@version}"'/>
+          </xsl:call-template>
           <xsl:apply-templates select='*'>
             <xsl:with-param name='indent' select='$iu'/>
             <xsl:with-param name='context' select='"object"'/>

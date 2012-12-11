@@ -1,0 +1,39 @@
+<!--    
+  This is an example/test DTD for the XML-to-JSON features of the DtdAnalyzer.
+  This DTD tests the ability to implement some of the templates in
+  an external custom stylesheet.
+  
+  The elements are here in alphabetical order for convenience.
+-->
+<!-- ================================================================= -->
+
+
+<!ELEMENT Field            (#PCDATA)>	<!-- .+ -->
+
+<!ELEMENT OP               (#PCDATA)>	<!-- (AND|OR|NOT|RANGE|GROUP) -->
+
+<!--~~ <Result>
+This is the root element for a response.
+~~ tags
+  root
+~~ json
+<json resulttype='sample3' version='0.2' />
+~~-->
+<!ELEMENT Result ( TranslationStack? )>
+
+<!ELEMENT Term             (#PCDATA)>	<!-- .+ -->
+
+<!ELEMENT TermSet          (Term, Field)>
+
+
+<!--~~ <TranslationStack>
+This one is special because it can take any number of TermSet and/or OP
+children, in any order.  In sample2, we converted this into an array.
+This time, we'll convert it into a fancy tree structure, in custom templates
+implemented in a custom stylesheet.
+~~json
+<ignore/>
+~~-->
+<!ELEMENT TranslationStack ((TermSet|OP)*)>
+
+

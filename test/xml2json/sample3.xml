@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<!DOCTYPE Result SYSTEM "sample3.dtd">
+<Result>
+  <TranslationStack>
+    <TermSet>
+      <Term>"neoplasms"[MeSH Terms]</Term>
+      <Field>MeSH Terms</Field>
+    </TermSet>
+    <TermSet>
+      <Term>"neoplasms"[All Fields]</Term>
+      <Field>All Fields</Field>
+    </TermSet>
+    <OP>OR</OP>
+    <TermSet>
+      <Term>"cancer"[All Fields]</Term>
+      <Field>All Fields</Field>
+    </TermSet>
+    <OP>OR</OP>
+    <OP>GROUP</OP>
+    <TermSet>
+      <Term>2012/09/25[EDAT]</Term>
+      <Field>EDAT</Field>
+    </TermSet>
+    <TermSet>
+      <Term>2012/11/24[EDAT]</Term>
+      <Field>EDAT</Field>
+    </TermSet>
+    <OP>RANGE</OP>
+    <OP>AND</OP>
+  </TranslationStack>
+</Result>

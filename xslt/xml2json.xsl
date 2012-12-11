@@ -6,13 +6,6 @@
                 xmlns:f="http://exslt.org/functions"
                 extension-element-prefixes="np str f">
   
-  <!--
-    FIXME:  The VERSION variable, currently hard-coded here, should come from the
-    DTD annotation, or from a stylesheet that's imported via the DTD annotation.
-    It refers to the version of the JSON format, so should not depend on these
-    underlying resources.   
-  -->
-  <xsl:variable name='VERSION' select='"0.1"'/>
   
   <!-- Turn off pretty-printing by setting this to false() -->
   <xsl:param name='pretty' select='true()'/>
@@ -46,6 +39,8 @@
   <xsl:variable name='iu2' select='concat($iu, $iu)'/>
   <xsl:variable name='iu3' select='concat($iu2, $iu)'/>
   <xsl:variable name='iu4' select='concat($iu3, $iu)'/>
+  <xsl:variable name='iu5' select='concat($iu4, $iu)'/>
+  <xsl:variable name='iu6' select='concat($iu5, $iu)'/>
   
   
   <!--================================================
@@ -111,12 +106,18 @@
     be made more generic, which allowing us to still have it for eutils.
   -->
   <xsl:template name='result-start'>
-    <xsl:value-of select='concat(
-      "{", $nl, 
-      $iu, np:dq("version"), ": ", np:dq($VERSION), ",", $nl,
-      $iu, np:dq("resulttype"), ": ",
-      np:dq(substring-before(np:to-lower(name(.)), "result")), ",", $nl
-      )'/>
+    <xsl:param name='resulttype' select='""'/>
+    <xsl:param name='version' select='""'/>
+    
+    <xsl:value-of select='concat("{", $nl)'/>
+    <xsl:if test='$resulttype != ""'>
+      <xsl:value-of select='concat(
+          $iu, np:dq("resulttype"), ": ", np:dq($resulttype), ",", $nl)'/>
+    </xsl:if>
+    <xsl:if test='$version != ""'>
+      <xsl:value-of select='concat(
+        $iu, np:dq("version"), ": ", np:dq($version), ",", $nl)'/>
+    </xsl:if>
   </xsl:template>
 
   <!--

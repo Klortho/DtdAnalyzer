@@ -13,6 +13,8 @@
 This is the root element for a response.
 ~~ tags
 root
+~~ json
+<json resulttype='sample1' version='0.2' />
 ~~-->
 <!ELEMENT Result      (DbList,DbInfo?)>
 

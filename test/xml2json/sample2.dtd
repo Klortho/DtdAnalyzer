@@ -48,6 +48,8 @@ children.  So it doesn't fit cleanly into either a JSON array or object.
 This is the root element for a response.
 ~~ tags
   root
+~~ json
+<json resulttype='sample2' version='0.2' />
 ~~-->
 
 <!ELEMENT Result ( 
