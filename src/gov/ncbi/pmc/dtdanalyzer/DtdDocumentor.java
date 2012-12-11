@@ -103,9 +103,25 @@ public class DtdDocumentor {
         // data structures.  The output of this step is stored in the ModelBuilder object.
 
         ModelBuilder model = new ModelBuilder(dtdEvents, app.getDtdTitle());
+
+        // If the --roots switch was given, then add those to our list of root elements:
         String[] roots = app.getRoots();
         try {
-            if (roots != null) model.findReachable(roots);
+            if (roots != null) model.addRoots(roots);
+        }
+        catch (Exception e) {
+            // This is not fatal
+            System.err.println("Error trying to add specified root elements: " + 
+                e.getMessage());
+        }
+        
+        // If there are any known root elements (specified either as annotation tags or with
+        // the --roots switch, then find reachable elements.
+        try {
+            if (model.hasRoots()) {
+                System.err.println("Finding reachable");
+                model.findReachable();
+            }
         }
         catch (Exception e) {
             // This is not fatal.
