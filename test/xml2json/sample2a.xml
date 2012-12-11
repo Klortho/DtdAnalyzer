@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!--
+  Sample instance document.
+-->
+
+<!DOCTYPE Result SYSTEM "sample2.dtd">
+
+<Result>
+  <ERROR>Invalid db name specified: fleegle</ERROR>
+  <ErrorList>
+    <PhraseNotFound>fleegle[MeSH Terms]</PhraseNotFound>
+    <PhraseNotFound>bingo[MeSH Terms]</PhraseNotFound>
+  </ErrorList>
+</Result>
