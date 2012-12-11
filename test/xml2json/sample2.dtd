@@ -10,9 +10,12 @@
 <!ELEMENT Count            (#PCDATA)>	<!-- \d+ -->
 
 <!--~~ <ERROR>
-
+This element (tested in sample2a.xml) becomes a key-value pair, and the key is
+specified by the name attribute here.  By default, the key would be "error", but
+we want to preserve the all-uppercase "ERROR".  Note that the value of the name 
+attribute is an XPath expression, so it is enclosed in quotes.
 ~~json
-<json name='ERROR'/>
+<json name='"ERROR"'/>
 ~~-->
 <!ELEMENT ERROR            (#PCDATA)>	<!-- .+ -->
 

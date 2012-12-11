@@ -121,7 +121,7 @@
       Write a comment into the destination stylesheet for help to see where
       the type came from. 
     -->
-    <x:value-of select='concat($nl, $nl, "  ")'/>
+    <x:value-of select='concat($nl, $nl, "   ")'/>
     <x:comment> 
       <x:text> Element </x:text>
       <x:value-of select='@name'/>
@@ -137,7 +137,7 @@
       </x:choose>
       <x:text> </x:text>
     </x:comment>
-    <x:value-of select='$nl'/>
+    <x:value-of select='concat($nl, "   ")'/>
     
     
     <x:choose>
@@ -236,6 +236,7 @@
         <x:value-of select='$currentmeta'/>
       <x:text>'</x:text>
     </x:comment>
+    <x:value-of select='concat($nl, "      ")'/>
     
     <!-- Output the indent for this level -->
     <xsl:value-of select='$indent'/>

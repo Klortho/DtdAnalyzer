@@ -8,7 +8,9 @@
 <Result>
   <ERROR>Invalid db name specified: fleegle</ERROR>
   <ErrorList>
-    <PhraseNotFound>fleegle[MeSH Terms]</PhraseNotFound>
-    <PhraseNotFound>bingo[MeSH Terms]</PhraseNotFound>
+    <PhraseNotFound>not found phrase #1</PhraseNotFound>
+    <PhraseNotFound>not found phrase #2</PhraseNotFound>
+    <FieldNotFound>not found field #1</FieldNotFound>
+    <FieldNotFound>not found field #2</FieldNotFound>
   </ErrorList>
 </Result>
