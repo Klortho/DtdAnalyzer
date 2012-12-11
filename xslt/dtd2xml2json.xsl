@@ -218,15 +218,25 @@
   </x:template>
   
   <!--
+    FIXME:  Split this into two templates, one of which matches if we are at
+    the top level of the JSON annotation, and the other that matches for kids.
+    For example, if the JSON annotation is 
+        <object><array name='...'/></object>
+    then <object> should match one template, and <array> the other.  As it is now,
+    it is too confusing keeping track of where we are.
+    
+    
     This is the template that gets matched for each element within the json-annotation
     of the DTD.  It gives the author a way to override specific defaults of the automatic
     generation of JSON from the XML.
   -->
   <x:template match='object|array|simple|string|number|boolean'>
-    <x:param name='metaindent' select='0'/>
+    <x:param name='metaindentlevel' select='1'/>
     <!-- If we are here from recursing within the json annotation, then this
       will be the name of our parent, either object or array.  -->
     <x:param name='metacontext' select='""'/>
+    
+    <x:variable name='metaindent' select='concat("$iu", $metaindentlevel)'/>
 
     <x:variable name='currentmeta' select='name(.)'/>
     <x:value-of select='$nl'/>
@@ -239,54 +249,85 @@
     <x:value-of select='concat($nl, "      ")'/>
     
     <!-- Output the indent for this level -->
-    <xsl:value-of select='$indent'/>
-    <x:if test='$metaindent > 0'>
-      <xsl:value-of select='$iu{$metaindent}'/>
-    </x:if>
+    <xsl:value-of select='{$metaindent}'/>
     
-    <xsl:if test='$context = "object"'>
-      <xsl:variable name='key'>
-        <x:attribute name='select'>
-          <x:choose>
-            <x:when test='@name'>
-              <x:value-of select='@name'/>
-            </x:when>
-            <x:otherwise>
-              <x:text>np:to-lower(name(.))</x:text>
-            </x:otherwise>
-          </x:choose>
-        </x:attribute>
-      </xsl:variable>
-      <xsl:value-of select='concat(np:dq($key), ": ")'/>
-    </xsl:if>
+    <!-- Now output the key and a colon if we are inside a JSON object.
+      If $metacontext is "object", then definitely output them.  Otherwise,
+      if $metacontext is blank, then we have to use $context. -->
+    <x:choose>
+      <x:when test='$metacontext = "object"'>
+        <xsl:value-of select='concat(np:dq({@name}), ": ")'/>
+      </x:when>
+      <x:when test='$metacontext = ""'>
+        <xsl:if test='$context = "object"'>
+          <xsl:variable name='key'>
+            <x:attribute name='select'>
+              <x:choose>
+                <x:when test='@name'>
+                  <x:value-of select='@name'/>
+                </x:when>
+                <x:otherwise>
+                  <x:text>np:to-lower(name(.))</x:text>
+                </x:otherwise>
+              </x:choose>
+            </x:attribute>
+          </xsl:variable>
+          <xsl:value-of select='concat(np:dq($key), ": ")'/>
+        </xsl:if>
+      </x:when>
+    </x:choose>
     
     <x:choose>
       <x:when test='$currentmeta = "object"'>
         <xsl:value-of select='concat("{{", $nl)'/>
-        <x:apply-templates select='*'>
-          <x:with-param name='metaindent' select='$metaindent + 1'/>
-          <x:with-param name='metacontext' select='$currentmeta'/>
-        </x:apply-templates>
-        <xsl:value-of select='concat($indent, "}}")'/>
-        <xsl:if test='position() != last()'>,</xsl:if>
+        <x:choose>
+          <x:when test='*'>
+            <x:apply-templates select='*'>
+              <x:with-param name='metaindentlevel' select='$metaindentlevel + 1'/>
+              <x:with-param name='metacontext' select='$currentmeta'/>
+            </x:apply-templates>
+          </x:when>
+          <x:otherwise>
+            <xsl:apply-templates select='{@content}'>
+              <xsl:with-param name='indent' select='concat({$metaindent}, $iu)'/>
+              <xsl:with-param name='context' select='"object"'/>
+            </xsl:apply-templates>
+          </x:otherwise>
+        </x:choose>
+        <xsl:value-of select='concat({$metaindent}, "}}")'/>
+        <x:if test='position() != last()'>
+          <xsl:text>,</xsl:text>
+        </x:if>
       </x:when>
       <x:when test='$currentmeta = "array"'>
         <xsl:value-of select='concat("[", $nl )'/>
-        <x:apply-templates select='*'>
-          <x:with-param name='metaindent' select='$metaindent + 1'/>
-          <x:with-param name='metacontext' select='$currentmeta'/>
-        </x:apply-templates>
-        <xsl:value-of select='concat($indent, "]")'/>
-        <xsl:if test='position() != last()'>,</xsl:if>
+        <x:choose>
+          <x:when test='*'>
+            <x:apply-templates select='*'>
+              <x:with-param name='metaindentlevel' select='$metaindentlevel + 1'/>
+              <x:with-param name='metacontext' select='$currentmeta'/>
+            </x:apply-templates>
+          </x:when>
+          <x:otherwise>
+            <xsl:apply-templates select='{@content}'>
+              <xsl:with-param name='indent' select='concat({$metaindent}, $iu)'/>
+              <xsl:with-param name='context' select='"array"'/>
+            </xsl:apply-templates>
+          </x:otherwise>
+        </x:choose>
+        <xsl:value-of select='concat({$metaindent}, "]")'/>
+        <x:if test='position() != last()'>
+          <xsl:text>,</xsl:text>
+        </x:if>
       </x:when>
     </x:choose>
     <xsl:value-of select='$nl'/>
     
     <x:value-of select='$nl'/>
     <x:comment> 
-      <x:text>done: '</x:text> 
+      <x:text> done: '</x:text> 
       <x:value-of select='name(.)'/>
-      <x:text>'</x:text>
+      <x:text>' </x:text>
     </x:comment>
   </x:template>
 </x:stylesheet>

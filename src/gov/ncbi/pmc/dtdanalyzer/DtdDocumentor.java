@@ -119,7 +119,6 @@ public class DtdDocumentor {
         // the --roots switch, then find reachable elements.
         try {
             if (model.hasRoots()) {
-                System.err.println("Finding reachable");
                 model.findReachable();
             }
         }

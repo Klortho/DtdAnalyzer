@@ -126,7 +126,6 @@ public class DtdAnalyzer {
         // the --roots switch, then find reachable elements.
         try {
             if (model.hasRoots()) {
-                System.err.println("Finding reachable");
                 model.findReachable();
             }
         }

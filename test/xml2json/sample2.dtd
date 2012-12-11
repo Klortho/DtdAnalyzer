@@ -24,8 +24,8 @@ This one is special because it can take any number of TermSet and/or OP
 children.  So it doesn't fit cleanly into either a JSON array or object.
 ~~json
 <object>
-  <array name='phrasesnotfound' content='PhraseNotFound'/>
-  <array name='fieldsnotfound' content='FieldNotFound'/>
+  <array name='"phrasesnotfound"' content='PhraseNotFound'/>
+  <array name='"fieldsnotfound"' content='FieldNotFound'/>
 </object>
 ~~-->
 <!ELEMENT ErrorList        (PhraseNotFound*,FieldNotFound*)>
