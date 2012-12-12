@@ -35,6 +35,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
+  <xsl:variable name='iu0' select='""'/>
   <xsl:variable name='iu1' select='$iu'/>
   <xsl:variable name='iu2' select='concat($iu, $iu)'/>
   <xsl:variable name='iu3' select='concat($iu2, $iu)'/>
@@ -95,34 +96,164 @@
     </f:result>
   </f:function>
   
+  <!--
+    mkey = member key - this produces a string which is the key in double-quotes, 
+    followed by a colon, space.  It is used whenever outputting a member of a JSON 
+    object.
+  -->
+  <f:function name='np:mkey'>
+    <xsl:param name='k'/>
+    <f:result>
+      <xsl:value-of select='concat(np:dq($k), ": ")'/>
+    </f:result>
+  </f:function>
+  
+  <!-- 
+    This function takes a boolean indicating whether or not we want a trailing
+    comma.  If false, it returns the empty string; if true, a comma.
+  -->
+  <f:function name='np:tc'>
+    <xsl:param name='trailing-comma'/>
+    <f:result>
+      <xsl:if test='$trailing-comma'>
+        <xsl:text>,</xsl:text>
+      </xsl:if>
+    </f:result>
+  </f:function>
+  
+  <!-- 
+    There are five main utility functions for output stuff, as illustrated here.
+    Trailing commas are included only when the trailing-comma parameter is true.
+    Each of these is designed to be invoked at the start of a new line, so each
+    first outputs an indent, if that's given.
+
+      Function name      Output
+      =============      ======
+      simple             value,\n
+      key-simple         "key": value,\n
+      start-object       {\n
+      key-start-object   "key": {\n
+      end-object         },\n
+      start-array        [\n
+      key-start-array    "key": [\n
+      end-array          ],\n
+  -->
+  <f:function name='np:simple'>
+    <xsl:param name='indent'/>
+    <xsl:param name='value'/>
+    <xsl:param name='trailing-comma'/>
+    <f:result>
+      <xsl:value-of select='concat($indent, $value, np:tc($trailing-comma), $nl)'/>
+    </f:result>
+  </f:function>
+  
+  <f:function name='np:key-simple'>
+    <xsl:param name='indent'/>
+    <xsl:param name='key'/>
+    <xsl:param name='value'/>
+    <xsl:param name='trailing-comma'/>
+    <f:result>
+      <xsl:value-of select='concat($indent, np:mkey($key), $value, np:tc($trailing-comma), $nl)'/>
+    </f:result>
+  </f:function>
+  
+  <f:function name='np:start-object'>
+    <xsl:param name='indent'/>
+    <f:result>
+      <xsl:value-of select='concat($indent, "{", $nl)'/>
+    </f:result>
+  </f:function>
+
+  <f:function name='np:key-start-object'>
+    <xsl:param name='indent'/>
+    <xsl:param name='key'/>
+    <f:result>
+      <xsl:value-of select='concat($indent, np:mkey($key), "{", $nl)'/>
+    </f:result>
+  </f:function>
+
+  <f:function name='np:end-object'>
+    <xsl:param name='indent'/>
+    <xsl:param name='trailing-comma'/>
+    <f:result>
+      <xsl:value-of select='concat($indent, "}", np:tc($trailing-comma), $nl)'/>
+    </f:result>
+  </f:function>
+  
+  <f:function name='np:start-array'>
+    <xsl:param name='indent'/>
+    <f:result>
+      <xsl:value-of select='concat($indent, "[", $nl)'/>
+    </f:result>
+  </f:function>
+  
+  <f:function name='np:key-start-array'>
+    <xsl:param name='indent'/>
+    <xsl:param name='key'/>
+    <f:result>
+      <xsl:value-of select='concat($indent, np:mkey($key), "[", $nl)'/>
+    </f:result>
+  </f:function>
+  
+  <f:function name='np:end-array'>
+    <xsl:param name='indent'/>
+    <xsl:param name='trailing-comma'/>
+    <f:result>
+      <xsl:value-of select='concat($indent, "]", np:tc($trailing-comma), $nl)'/>
+    </f:result>
+  </f:function>
+  
+  <!-- 
+    The following three return the json-escaped values for simple types 
+  -->
+  <f:function name='np:string-value'>
+    <xsl:param name='v'/>
+    <f:result>
+      <xsl:value-of select='np:dq(normalize-space(np:q($v)))'/>
+    </f:result>
+  </f:function>
+
+  <f:function name='np:number-value'>
+    <xsl:param name='v'/>
+    <f:result>
+      <xsl:value-of select='normalize-space($v)'/>
+    </f:result>
+  </f:function>
+
+  <!-- 
+    FIXME:  for booleans, we should do a little processing on the value to see
+    if it is "falsy" or not.
+  -->
+  <f:function name='np:boolean-value'>
+    <xsl:param name='v'/>
+    <f:result>
+      <xsl:value-of select='normalize-space($v)'/>
+    </f:result>
+  </f:function>
+  
   <!--============================================================
     Generic templates
   -->
   
   <!-- Start-of-output boilerplate -->
-  <!-- 
-    FIXME:  the "resulttype" here is Eutils specific.  If the root element is named
-    eSearchResult, for example, then this computes resulttype: esearch.  This should
-    be made more generic, which allowing us to still have it for eutils.
-  -->
   <xsl:template name='result-start'>
     <xsl:param name='resulttype' select='""'/>
     <xsl:param name='version' select='""'/>
     
     <xsl:value-of select='concat("{", $nl)'/>
     <xsl:if test='$resulttype != ""'>
-      <xsl:value-of select='concat(
-          $iu, np:dq("resulttype"), ": ", np:dq($resulttype), ",", $nl)'/>
+      <xsl:value-of select='np:key-simple($iu, "resulttype", np:dq($resulttype), true())'/>
     </xsl:if>
     <xsl:if test='$version != ""'>
-      <xsl:value-of select='concat(
-        $iu, np:dq("version"), ": ", np:dq($version), ",", $nl)'/>
+      <xsl:value-of select='np:key-simple($iu, "version", np:dq($version), true())'/>
     </xsl:if>
   </xsl:template>
 
   <!--
     simple
     Delegates either to simple-in-object or simple-in-array.
+    
+    FIXME:  This should change to "string".
   -->
   <xsl:template name='simple'>
     <xsl:param name='indent' select='""'/>
@@ -154,6 +285,42 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <!--
+    number
+    Delegates either to number-in-object or number-in-array.
+  -->
+  <xsl:template name='number'>
+    <xsl:param name='indent' select='""'/>
+    <xsl:param name='context' select='"unknown"'/>
+    <xsl:param name='key' select='""'/>
+    
+    <xsl:choose>
+      <xsl:when test='$context = "object" and $key = ""'>
+        <xsl:call-template name='number-in-object'>
+          <xsl:with-param name='indent' select='$indent'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test='$context = "object" and $key != ""'>
+        <xsl:call-template name='number-in-object'>
+          <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='key' select='$key'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test='$context = "array"'>
+        <xsl:call-template name="number-in-array">
+          <xsl:with-param name='indent' select='$indent'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:message>
+          <xsl:text>Error:  context is not defined for element </xsl:text>
+          <xsl:value-of select='name(.)'/>
+        </xsl:message>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   
   <!--
     array 
@@ -250,10 +417,8 @@
       </xsl:choose>
     </xsl:param>
     
-    <xsl:value-of select='concat(
-      $indent, np:dq($key), ": ", np:dq(normalize-space(np:q(.))) )'/>
-    <xsl:if test='position() != last()'>,</xsl:if>
-    <xsl:value-of select='$nl'/>
+    <xsl:value-of 
+      select='np:key-simple($indent, $key, np:string-value(.), position() != last())'/>
   </xsl:template>
   
   <!-- 
@@ -266,11 +431,46 @@
   -->
   <xsl:template name='simple-in-array'>
     <xsl:param name='indent' select='""'/>
-    
-    <xsl:value-of select="concat( $indent, np:dq(normalize-space(np:q(.))) )"/>
-    <xsl:if test='position() != last()'>,</xsl:if>
-    <xsl:value-of select='$nl'/>
+
+    <xsl:value-of 
+      select='np:simple($indent, np:string-value(.), position() != last())'/>
   </xsl:template>
+
+  <!--
+    number-in-object
+    For text nodes, attributes, or elements that have simple 
+    content, when in the context of a JSON object.  
+  -->
+  <xsl:template name='number-in-object'>
+    <xsl:param name='indent' select='""'/>
+    <xsl:param name='key'>
+      <xsl:choose>
+        <xsl:when test='self::text()'>
+          <xsl:text>value</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>  <!-- This is an attribute or element node -->
+          <xsl:value-of select='np:to-lower(name(.))'/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
+    
+    <xsl:value-of 
+      select='np:key-simple($indent, $key, np:number-value(.), position() != last())'/>
+  </xsl:template>
+  
+  <!-- 
+    number-in-array
+    For text nodes, attributes, or elements that have simple content, when
+    in the context of a JSON array.  This discards the attribute or element name,
+    and produces a quoted string from the content.
+  -->
+  <xsl:template name='number-in-array'>
+    <xsl:param name='indent' select='""'/>
+    
+    <xsl:value-of 
+      select='np:simple($indent, np:number-value(.), position() != last())'/>
+  </xsl:template>
+  
   
   <!--
     array-in-object
@@ -279,20 +479,31 @@
     By default, the key will be the name converted to lowercase.
     This produces a JSON array.  The "kids" are the set of child elements only,
     so attributes and text node children are discarded.
+    
+    FIXME [here and in all the templates below]:  
+    Can't I use
+      <xsl:param name='trailing-comma' select='position() != last()'/>
+    instead of the kludgy force-comma that I have here now?  If not, won't I also
+    need a no-comma param?
+    
+    
+    FIXME:  Do we still need kids-param?
   -->
   <xsl:template name='array-in-object'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
-    <!-- kids-param says whether or not kids is given.  It is needed (unless I don't 
+    <!-- 
+      kids-param says whether or not kids is given.  It is needed (unless I don't 
       know something) because we might be calling this with a kids parameter that
       evaluates to an empty node-set.  It seems that XSLT 1.0 uses the default 
-      in that case, which is no good. -->      
+      in that case (which would be "*"), which is no good:  we want it to mean "no kids". 
+    -->      
     <xsl:param name='kids-param' select='false()'/>
     <xsl:param name='kids'/>
     <xsl:param name='force-comma' select='false()'/>
+    <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
     
-    
-    <xsl:value-of select='concat( $indent, np:dq($key), ": [", $nl )'/>
+    <xsl:value-of select='np:key-start-array($indent, $key)'/>
 
     <xsl:choose>
       <xsl:when test='$kids-param'>
@@ -309,9 +520,7 @@
       </xsl:otherwise>
     </xsl:choose>
     
-    <xsl:value-of select='concat($indent, "]")'/>
-    <xsl:if test='$force-comma or position() != last()'>,</xsl:if>
-    <xsl:value-of select='$nl'/>
+    <xsl:value-of select='np:end-array($indent, $trailing-comma)'/>
   </xsl:template>
   
   <!--
@@ -321,15 +530,17 @@
   <xsl:template name='array-in-array'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
-      
-    <xsl:value-of select='concat( $indent, "[", $nl )'/>
+    <xsl:param name='force-comma' select='false()'/>
+    <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
+    
+    <xsl:value-of select='np:start-array($indent)'/>
+
     <xsl:apply-templates select='*'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
       <xsl:with-param name='context' select='"array"'/>
     </xsl:apply-templates>
-    <xsl:value-of select='concat($indent, "]")'/>
-    <xsl:if test='position() != last()'>,</xsl:if>
-    <xsl:value-of select='$nl'/>
+    
+    <xsl:value-of select='np:end-array($indent, $trailing-comma)'/>
   </xsl:template>
   
   <!-- 
@@ -346,15 +557,16 @@
     <xsl:param name='key' select='np:to-lower(name(.))'/>
     <xsl:param name='kids' select='@*|*'/>
     <xsl:param name='force-comma' select='false()'/>
+    <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
     
-    <xsl:value-of select='concat( $indent, np:dq($key), ": {", $nl )'/>
+    <xsl:value-of select='np:key-start-object($indent, $key)'/>
+    
     <xsl:apply-templates select='$kids'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
       <xsl:with-param name='context' select='"object"'/>
     </xsl:apply-templates>
-    <xsl:value-of select='concat($indent, "}")'/>
-    <xsl:if test='$force-comma or position() != last()'>,</xsl:if>
-    <xsl:value-of select='$nl'/>
+
+    <xsl:value-of select='np:end-object($indent, $trailing-comma)'/>
   </xsl:template>
 
   <!-- 
@@ -366,15 +578,16 @@
     <xsl:param name='indent' select='""'/>
     <xsl:param name='kids' select='@*|*'/>
     <xsl:param name='force-comma' select='false()'/>
+    <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
     
-    <xsl:value-of select='concat($indent, "{", $nl )'/>
+    <xsl:value-of select='np:start-object($indent)'/>
+    
     <xsl:apply-templates select='$kids'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
       <xsl:with-param name='context' select='"object"'/>
     </xsl:apply-templates>
-    <xsl:value-of select='concat($indent, "}")'/>
-    <xsl:if test='$force-comma or position() != last()'>,</xsl:if>
-    <xsl:value-of select='$nl'/>
+
+    <xsl:value-of select='np:end-object($indent, $trailing-comma)'/>
   </xsl:template>
   
   <!-- 
@@ -391,11 +604,11 @@
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
 
-    <xsl:value-of select='concat( 
-      $indent, "{ ", np:dq($key), ": ", np:dq(normalize-space(np:q(.))), " }" 
+    <xsl:value-of select='np:start-object($indent)'/>
+    <xsl:value-of select='np:key-simple(
+      concat($indent, $iu), $key, np:string-value(.), false()
     )'/>
-    <xsl:if test='position() != last()'>,</xsl:if>
-    <xsl:value-of select='$nl'/>
+    <xsl:value-of select='np:end-object($indent, position() != last())'/>
   </xsl:template>
   
   <!-- 
