@@ -252,28 +252,26 @@
   <!--
     simple
     Delegates either to simple-in-object or simple-in-array.
-    
-    FIXME:  This should change to "string".
   -->
-  <xsl:template name='simple'>
+  <xsl:template name='string'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='key' select='""'/>
     
     <xsl:choose>
       <xsl:when test='$context = "object" and $key = ""'>
-        <xsl:call-template name='simple-in-object'>
+        <xsl:call-template name='string-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "object" and $key != ""'>
-        <xsl:call-template name='simple-in-object'>
+        <xsl:call-template name='string-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='key' select='$key'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "array"'>
-        <xsl:call-template name="simple-in-array">
+        <xsl:call-template name="string-in-array">
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
       </xsl:when>
@@ -281,6 +279,11 @@
         <xsl:message>
           <xsl:text>Error:  context is not defined for element </xsl:text>
           <xsl:value-of select='name(.)'/>
+          <xsl:text> ($context = "</xsl:text>
+          <xsl:value-of select='$context'/>
+          <xsl:text>", $key = "</xsl:text>
+          <xsl:value-of select='$key'/>
+          <xsl:text>")</xsl:text>
         </xsl:message>
       </xsl:otherwise>
     </xsl:choose>
@@ -316,6 +319,11 @@
         <xsl:message>
           <xsl:text>Error:  context is not defined for element </xsl:text>
           <xsl:value-of select='name(.)'/>
+          <xsl:text> ($context = "</xsl:text>
+          <xsl:value-of select='$context'/>
+          <xsl:text>", $key = "</xsl:text>
+          <xsl:value-of select='$key'/>
+          <xsl:text>")</xsl:text>
         </xsl:message>
       </xsl:otherwise>
     </xsl:choose>
@@ -351,6 +359,11 @@
         <xsl:message>
           <xsl:text>Error:  context is not defined for element </xsl:text>
           <xsl:value-of select='name(.)'/>
+          <xsl:text> ($context = "</xsl:text>
+          <xsl:value-of select='$context'/>
+          <xsl:text>", $key = "</xsl:text>
+          <xsl:value-of select='$key'/>
+          <xsl:text>")</xsl:text>
         </xsl:message>
       </xsl:otherwise>
     </xsl:choose>
@@ -387,6 +400,11 @@
         <xsl:message>
           <xsl:text>Error:  context is not defined for element </xsl:text>
           <xsl:value-of select='name(.)'/>
+          <xsl:text> ($context = "</xsl:text>
+          <xsl:value-of select='$context'/>
+          <xsl:text>", $key = "</xsl:text>
+          <xsl:value-of select='$key'/>
+          <xsl:text>")</xsl:text>
         </xsl:message>
       </xsl:otherwise>
     </xsl:choose>
@@ -422,6 +440,11 @@
         <xsl:message>
           <xsl:text>Error:  context is not defined for element </xsl:text>
           <xsl:value-of select='name(.)'/>
+          <xsl:text> ($context = "</xsl:text>
+          <xsl:value-of select='$context'/>
+          <xsl:text>", $key = "</xsl:text>
+          <xsl:value-of select='$key'/>
+          <xsl:text>")</xsl:text>
         </xsl:message>
       </xsl:otherwise>
     </xsl:choose>
@@ -429,7 +452,7 @@
   
   
   <!--
-    simple-in-object
+    string-in-object
     For text nodes, attributes, or elements that have simple 
     content, when in the context of a JSON object.  
     This translates the node into a key:value pair.  If it's a text node, then, by 
@@ -439,7 +462,7 @@
     
     FIXME:  I don't think we always want to normalize-space on the content.
   -->
-  <xsl:template name='simple-in-object'>
+  <xsl:template name='string-in-object'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key'>
       <xsl:choose>
@@ -457,14 +480,14 @@
   </xsl:template>
   
   <!-- 
-    simple-in-array
+    string-in-array
     For text nodes, attributes, or elements that have simple content, when
     in the context of a JSON array.  This discards the attribute or element name,
     and produces a quoted string from the content.
     
     FIXME:  I don't think we always want to normalize-space on the content.
   -->
-  <xsl:template name='simple-in-array'>
+  <xsl:template name='string-in-array'>
     <xsl:param name='indent' select='""'/>
 
     <xsl:value-of 
@@ -627,7 +650,7 @@
   <xsl:template name='object-in-object'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
-    <xsl:param name='kids' select='@*|*'/>
+    <xsl:param name='kids' select='@*|node()'/>
     <xsl:param name='force-comma' select='false()'/>
     <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
     
@@ -707,12 +730,12 @@
     
     <xsl:choose>
       <xsl:when test='$context = "array"'>
-        <xsl:call-template name='simple-in-array'>
+        <xsl:call-template name='string-in-array'>
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name='simple-in-object'>
+        <xsl:call-template name='string-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
       </xsl:otherwise>
@@ -732,12 +755,12 @@
       </xsl:message>
       <xsl:choose>
         <xsl:when test='$context = "array"'>
-          <xsl:call-template name='simple-in-array'>
+          <xsl:call-template name='string-in-array'>
             <xsl:with-param name='indent' select='$indent'/>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name='simple-in-object'>
+          <xsl:call-template name='string-in-object'>
             <xsl:with-param name='indent' select='$indent'/>
           </xsl:call-template>
         </xsl:otherwise>

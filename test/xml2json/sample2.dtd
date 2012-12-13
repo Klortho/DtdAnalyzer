@@ -78,8 +78,18 @@ This is the root element for a response.
                    ErrorList?
                  )>
 
+<!--~~ <RetMax>
+
+~~json
+<number/>
+~~-->
 <!ELEMENT RetMax           (#PCDATA)>	<!-- \d+ -->
 
+<!--~~ <RetStart>
+
+~~json
+<number/>
+~~-->
 <!ELEMENT RetStart         (#PCDATA)>	<!-- \d+ -->
 
 <!ELEMENT PhraseNotFound   (#PCDATA)>	<!-- .+ -->
