@@ -6,6 +6,15 @@
               xmlns:c="http://exslt.org/common"
               exclude-result-prefixes="xsl xd c"
               version="2.0">
+  <!-- 
+    FIXME:  
+    * Converting elements and attribute names to lowercase when using them as
+      member names should be optional.  In fact, I think the default should be off.
+    * For the default operation of converting to an object, need to check that 
+      there are no name clashes between attributes and element kids, and also
+      none when names are converted to lowercase (case-insensitive compare).
+  -->
+  
   <xd:doc scope="stylesheet">
     <xd:desc>
       <xd:p><xd:b>Created on:</xd:b> Dec 6, 2012</xd:p>
@@ -186,6 +195,21 @@
         </xsl:template>
       </x:when>
 
+      <!-- boolean -->
+      <x:when test='$type = "boolean"'>
+        <xsl:template match='{@name}'>
+          <xsl:param name='indent' select='""'/>
+          <xsl:param name='context' select='"unknown"'/>
+          <xsl:call-template name='boolean'>
+            <xsl:with-param name='indent' select='$indent'/>
+            <xsl:with-param name='context' select='$context'/>
+            <x:if test='$json-name != ""'>
+              <xsl:with-param name='key' select='{$json-name}'/>
+            </x:if>
+          </xsl:call-template>
+        </xsl:template>
+      </x:when>
+      
       <!-- array -->
       <x:when test='$type = "array"'>
         <xsl:template match='{@name}'>
@@ -227,12 +251,15 @@
         </xsl:template>
       </x:when>
       
-      <x:otherwise>
+      <!-- 
+        If type is 'ignore', ignore it; otherwise print out a message.
+      -->
+      <x:when test='$type != "ignore"'>
         <x:message>
           <x:text>Need to tell me what to do with </x:text> 
           <x:value-of select='@name'/>
         </x:message>
-      </x:otherwise>
+      </x:when>
     </x:choose>
   </x:template>
   

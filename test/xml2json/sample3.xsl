@@ -10,18 +10,11 @@
     into a JSON tree structure.  The stack is a sequence of TermSet objects and 
     binary operators, in reverse-polish notation.  It is tricky to convert this into
     a tree structure, using recursion within XSLT.
-    
-    This is experimental, not thoroughly tested, and optional.  Just set the 
-    $parse-translation-stack parameter (at the top) to
-    false() to turn this off, in which case it will be treated as a run-of-the-mill
-    array.
   -->
   <xsl:template match='TranslationStack'>
     <xsl:param name='indent' select='""'/>
-    
-    <xsl:value-of select='$indent'/>
-    <xsl:text>"translationstack": </xsl:text>
-    <xsl:value-of select='$nl'/>
+
+    <xsl:value-of select='concat($indent, np:mkey("translationstack"), $nl)'/>
     <xsl:call-template name='term-tree'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
       <xsl:with-param name='elems' select='*'/>
@@ -66,10 +59,9 @@
       <!-- If the last thing on the stack is a binary operator, then put out
         an array. -->
       <xsl:when test='$lastelem[self::OP]'>
-        <xsl:value-of select='$indent'/>
-        <xsl:value-of select='concat(
-          "[", $nl, $indent, $iu, np:dq($lastelem), ",", $nl
-          )'/>
+        <xsl:value-of select='np:start-array($indent)'/>
+        <xsl:value-of 
+          select='np:simple(concat($indent, $iu), np:dq($lastelem), true())'/>
         
         <!-- Count how many elements compose the second of my operands -->
         <xsl:variable name='num-top-elems'>
@@ -93,9 +85,8 @@
           <xsl:with-param name='elems'
             select='$elems[position() >= $numelems - $num-top-elems and position() &lt; last()]'/>
         </xsl:call-template>
-        <xsl:value-of select='concat($indent, "]")'/>
-        <xsl:if test='$trailing-comma'>,</xsl:if>
-        <xsl:value-of select='$nl'/>
+        
+        <xsl:value-of select='np:end-array($indent, $trailing-comma)'/>
       </xsl:when>
     </xsl:choose>
   </xsl:template>

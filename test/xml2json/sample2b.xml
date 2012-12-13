@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE Result SYSTEM "sample2.dtd">
 <Result>
+  <ProblemFound>false</ProblemFound>
   <Count>5163</Count>
   <RetMax>20</RetMax>
   <RetStart>0</RetStart>

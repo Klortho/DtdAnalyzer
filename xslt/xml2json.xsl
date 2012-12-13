@@ -222,7 +222,7 @@
 
   <!-- 
     FIXME:  for booleans, we should do a little processing on the value to see
-    if it is "falsy" or not.
+    if it is "falsy" or not, then convert it into either "true" or "false".
   -->
   <f:function name='np:boolean-value'>
     <xsl:param name='v'/>
@@ -309,6 +309,41 @@
       </xsl:when>
       <xsl:when test='$context = "array"'>
         <xsl:call-template name="number-in-array">
+          <xsl:with-param name='indent' select='$indent'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:message>
+          <xsl:text>Error:  context is not defined for element </xsl:text>
+          <xsl:value-of select='name(.)'/>
+        </xsl:message>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!--
+    boolean
+    Delegates either to boolean-in-object or boolean-in-array.
+  -->
+  <xsl:template name='boolean'>
+    <xsl:param name='indent' select='""'/>
+    <xsl:param name='context' select='"unknown"'/>
+    <xsl:param name='key' select='""'/>
+    
+    <xsl:choose>
+      <xsl:when test='$context = "object" and $key = ""'>
+        <xsl:call-template name='boolean-in-object'>
+          <xsl:with-param name='indent' select='$indent'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test='$context = "object" and $key != ""'>
+        <xsl:call-template name='boolean-in-object'>
+          <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='key' select='$key'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test='$context = "array"'>
+        <xsl:call-template name="boolean-in-array">
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
       </xsl:when>
@@ -470,6 +505,43 @@
     <xsl:value-of 
       select='np:simple($indent, np:number-value(.), position() != last())'/>
   </xsl:template>
+
+
+  <!--
+    boolean-in-object
+    For text nodes, attributes, or elements that have simple 
+    content, when in the context of a JSON object.  
+  -->
+  <xsl:template name='boolean-in-object'>
+    <xsl:param name='indent' select='""'/>
+    <xsl:param name='key'>
+      <xsl:choose>
+        <xsl:when test='self::text()'>
+          <xsl:text>value</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>  <!-- This is an attribute or element node -->
+          <xsl:value-of select='np:to-lower(name(.))'/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
+    
+    <xsl:value-of 
+      select='np:key-simple($indent, $key, np:boolean-value(.), position() != last())'/>
+  </xsl:template>
+  
+  <!-- 
+    boolean-in-array
+    For text nodes, attributes, or elements that have simple content, when
+    in the context of a JSON array.  This discards the attribute or element name,
+    and produces a quoted string from the content.
+  -->
+  <xsl:template name='boolean-in-array'>
+    <xsl:param name='indent' select='""'/>
+    
+    <xsl:value-of 
+      select='np:simple($indent, np:boolean-value(.), position() != last())'/>
+  </xsl:template>
+  
   
   
   <!--

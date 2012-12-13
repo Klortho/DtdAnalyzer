@@ -1,0 +1,236 @@
+<!-- DocSum DTD for all sequence databases -->
+
+<!ENTITY % T_int "(#PCDATA)">
+
+<!-- Members definition of Structure type: T_DocSum -->
+<!ELEMENT error   (#PCDATA)>
+<!ELEMENT Caption (#PCDATA)>
+<!ELEMENT Title   (#PCDATA)>
+<!ELEMENT Extra   (#PCDATA)>
+
+<!--~~ <Gi>
+
+~~json
+<number/>
+~~-->
+<!ELEMENT Gi         %T_int;>
+<!ELEMENT CreateDate (#PCDATA)>
+<!ELEMENT UpdateDate (#PCDATA)>
+
+<!--~~ <Flags>
+
+~~json
+<number/>
+~~-->
+<!ELEMENT Flags   %T_int;>
+
+<!--~~ <TaxId>
+
+~~json
+<number/>
+~~-->
+<!ELEMENT TaxId   %T_int;>
+
+<!--~~ <Slen>
+
+~~json
+<number/>
+~~-->
+<!ELEMENT Slen    %T_int;>
+
+<!ELEMENT   Statistics  (Stat)+>
+
+<!ELEMENT   Stat   EMPTY>
+<!ATTLIST   Stat
+  count     CDATA  #IMPLIED
+  subtype   CDATA  #IMPLIED
+  value     CDATA  #IMPLIED
+  source    CDATA  #IMPLIED
+  type      CDATA  #IMPLIED>
+
+<!ELEMENT Biomol    (#PCDATA)>
+<!-- Until docsuminfo with fixed Biomol field is propagated, we'll need this spelling as well: -->
+<!ELEMENT BioMol    (#PCDATA)>
+<!ELEMENT MolType   (#PCDATA)>
+<!ELEMENT Topology  (#PCDATA)>
+<!ELEMENT SourceDb  (#PCDATA)>
+
+<!--~~ <SegSetSize>
+
+~~json
+<number/>
+~~-->
+<!ELEMENT SegSetSize  %T_int;>
+
+<!--~~ <ProjectId>
+
+~~json
+<number/>
+~~-->
+<!ELEMENT ProjectId %T_int;>
+
+<!ELEMENT Genome    (#PCDATA)>
+<!ELEMENT SubType   (#PCDATA)>
+<!ELEMENT SubName   (#PCDATA)>
+
+<!--~~ <AssemblyGi>
+
+~~json
+<number/>
+~~-->
+<!ELEMENT AssemblyGi    %T_int;>
+<!ELEMENT AssemblyAcc   (#PCDATA)>
+<!ELEMENT Tech          (#PCDATA)>
+<!ELEMENT Completeness  (#PCDATA)>
+<!ELEMENT GeneticCode   (#PCDATA)>
+<!ELEMENT Strand        (#PCDATA)>
+<!ELEMENT Organism      (#PCDATA)>
+<!ELEMENT AccessionVersion (#PCDATA)>
+
+<!ELEMENT Properties (#PCDATA)>
+<!ATTLIST Properties
+  na        CDATA       #IMPLIED
+  aa        CDATA       #IMPLIED
+  est       CDATA       #IMPLIED
+  gss       CDATA       #IMPLIED
+  trace     CDATA       #IMPLIED
+  qual      CDATA       #IMPLIED
+  genome    CDATA       #IMPLIED
+  popset    CDATA       #IMPLIED>
+<!ELEMENT   Comment     (#PCDATA)>
+<!ELEMENT   Status      (#PCDATA)>
+<!ELEMENT   OSLT        (#PCDATA)>
+<!ATTLIST   OSLT
+  indexed   CDATA       #IMPLIED>
+<!ELEMENT   ReplacedBy  (#PCDATA)>
+<!ELEMENT   IdGiClass   EMPTY>
+<!ATTLIST IdGiClass
+  defdiv    CDATA       #IMPLIED
+  extfeatmask CDATA     #IMPLIED
+  gi_state  CDATA       #IMPLIED
+  length    CDATA       #IMPLIED
+  mol       CDATA       #IMPLIED
+  owner     CDATA       #IMPLIED
+  owner_name CDATA      #IMPLIED
+  repr      CDATA       #IMPLIED
+  sat       CDATA       #IMPLIED
+  sat_key   CDATA       #IMPLIED
+  sat_name  CDATA       #IMPLIED>
+<!-- PopSet fields -->
+<!ELEMENT   SetType     (#PCDATA)>
+<!-- Genome fields -->
+<!ELEMENT   Meta        (#PCDATA)>
+<!ELEMENT   Refseq_accession    (#PCDATA)>
+<!ELEMENT   GenBank_accession   (#PCDATA)>
+<!ELEMENT   PubMedIds           (#PCDATA)>
+<!ELEMENT   Sequencing_centers  (#PCDATA)>
+<!ELEMENT   Reviewed_status     (#PCDATA)>
+<!ELEMENT   Subtype             (#PCDATA)>
+<!ELEMENT   GenomeExtra         (#PCDATA)>
+<!ELEMENT   MoleculeType        (#PCDATA)>
+<!ELEMENT   DNA_length          (#PCDATA)>
+<!ELEMENT   Protein_count       (#PCDATA)>
+<!ELEMENT   RNA_count           (#PCDATA)>
+<!ELEMENT   Gene_count          (#PCDATA)>
+<!ELEMENT   Total_count         (#PCDATA)>
+<!ELEMENT   GC_content          (#PCDATA)>
+<!ELEMENT   ProjectID           (#PCDATA)>
+<!ELEMENT   ViewerIdx           (#PCDATA)>
+<!ELEMENT   TraceGi             (#PCDATA)>
+<!ELEMENT   ContigNum           (#PCDATA)>
+<!ELEMENT   NeighborNum         (#PCDATA)>
+<!ELEMENT   Replicon_type       (#PCDATA)>
+<!ELEMENT   Replicon_name       (#PCDATA)>
+<!ELEMENT   Organelle           (#PCDATA)>
+<!ELEMENT   OtherReplicons      (#PCDATA)>
+
+
+<!-- Definition of Structure type: T_DocSum -->
+<!--~~ <DocumentSummary>
+
+~~json
+<object name='\@uid'/>
+~~--><!ENTITY  % T_DocSum "(
+      error
+      | Caption
+      | Title
+      | Extra
+      | Gi
+      | CreateDate
+      | UpdateDate
+      | Flags
+      | TaxId
+      | Slen
+      | Statistics
+      | Biomol
+      | BioMol
+      | MolType
+      | Topology
+      | SourceDb
+      | SegSetSize
+      | ProjectId
+      | Genome
+      | SubType
+      | SubName
+      | AssemblyGi
+      | AssemblyAcc
+      | Tech
+      | Completeness
+      | GeneticCode
+      | Strand
+      | Organism
+      | AccessionVersion
+      | Properties
+      | Comment
+      | Status
+      | OSLT
+      | ReplacedBy
+      | IdGiClass
+      | SetType
+      | Meta
+      | Refseq_accession
+      | GenBank_accession
+      | PubMedIds
+      | Sequencing_centers
+      | Reviewed_status
+      | Subtype
+      | GenomeExtra
+      | MoleculeType
+      | DNA_length
+      | Protein_count
+      | RNA_count
+      | Gene_count
+      | Total_count
+      | GC_content
+      | ProjectID
+      | ViewerIdx
+      | TraceGi
+      | ContigNum
+      | NeighborNum
+      | Replicon_type
+      | Replicon_name
+      | Organelle
+      | OtherReplicons
+      )*">
+
+<!ELEMENT DocumentSummary %T_DocSum;>
+<!ATTLIST DocumentSummary uid CDATA #IMPLIED>
+
+<!ELEMENT Warning (Otherdb)+>
+<!ELEMENT Otherdb   EMPTY>
+<!ATTLIST Otherdb
+  db    CDATA #IMPLIED
+  term  CDATA #IMPLIED
+  uid   CDATA #IMPLIED>
+
+
+<!--~~ <DocumentSummarySet>
+
+~~json
+<object/>
+~~-->
+<!ELEMENT DocumentSummarySet (DocumentSummary | Warning)*>
+
+<!ATTLIST DocumentSummarySet status CDATA #IMPLIED>
+
+<!ELEMENT eSummaryResult (DocumentSummarySet?)>

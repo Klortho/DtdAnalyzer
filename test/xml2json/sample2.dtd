@@ -6,7 +6,11 @@
 -->
 <!-- ================================================================= -->
 
-
+<!--~~ <Count>
+Here we override the default type, indicating that this is a JSON number.
+~~json
+<number/>
+~~-->
 <!ELEMENT Count            (#PCDATA)>	<!-- \d+ -->
 
 <!--~~ <ERROR>
@@ -60,7 +64,8 @@ This is the root element for a response.
 
 <!ELEMENT Result ( 
                    ( 
-                     ( Count,
+                     ( ProblemFound,
+                       Count,
                        ( RetMax,
                          RetStart,
                          IdList,
@@ -78,6 +83,13 @@ This is the root element for a response.
 <!ELEMENT RetStart         (#PCDATA)>	<!-- \d+ -->
 
 <!ELEMENT PhraseNotFound   (#PCDATA)>	<!-- .+ -->
+
+<!--~~ <ProblemFound>
+This should be converted into a JSON boolean.
+~~json
+<boolean/>
+~~-->
+<!ELEMENT ProblemFound     (#PCDATA)> <!-- (TRUE|FALSE)  -->
 
 <!ELEMENT Term             (#PCDATA)>	<!-- .+ -->
 
