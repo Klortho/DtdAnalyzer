@@ -8,7 +8,7 @@
 <!-- ================================================================= -->
 
 <!--~~ !dtd
-~~json <json type='sample3' version='0.3' />
+~~json <json lcnames='true' type='sample3' version='0.3' />
 ~~-->
 
 <!ELEMENT Field            (#PCDATA)>	<!-- .+ -->

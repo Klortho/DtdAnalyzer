@@ -11,6 +11,9 @@
   <!-- Turn off pretty-printing by setting this to false() -->
   <xsl:param name='pretty' select='true()'/>
   
+  <!-- By default, do not convert all names to lowercase -->
+  <xsl:param name='lcnames' select='false()'/>
+  
 
   <!-- $nl == newline when pretty-printing; otherwise empty string  -->
   <xsl:variable name='nl'>
@@ -49,14 +52,23 @@
     Utility templates and functions
   -->
   
-  <!-- Convert a string to lowercase. -->
+  <!-- 
+    Convert a string to lowercase, only if the lcnames param is true.
+  -->
   
   <xsl:variable name="lo" select="'abcdefghijklmnopqrstuvwxyz'"/>
   <xsl:variable name="hi" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
   
   <xsl:template name="np:to-lower">
     <xsl:param name="s"/>
-    <xsl:value-of select="translate($s, $hi, $lo)"/>
+    <xsl:choose>
+      <xsl:when test='$lcnames'>
+        <xsl:value-of select="translate($s, $hi, $lo)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select='$s'/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <f:function name="np:to-lower">

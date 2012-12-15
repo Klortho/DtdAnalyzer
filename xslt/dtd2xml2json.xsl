@@ -31,7 +31,6 @@
   
   
   <x:param name='basexslt' select='"../../xslt/xml2json.xsl"'/>
-  <x:param name='lowercase-names' select='false()'/>
   
   <x:variable name='nl' select='"&#10;"'/>
   <x:variable name='debug' select='false()'/>
@@ -45,6 +44,21 @@
     The dtd-level json annotation, if it exists
   -->
   <x:variable name='dtdJA' select='/declarations/dtd/annotations/annotation[@type="json"]/*'/>
+
+  <!-- 
+    This tells us whether or not to convert all names into lowercase.  By default, this 
+    is false.
+  -->
+  <x:variable name='lcnames' as="xs:boolean">
+    <x:choose>
+      <x:when test='$dtdJA/@lcnames = "true"'>
+        <x:value-of select='true()'/>
+      </x:when>
+      <x:otherwise>
+        <x:value-of select='false()'/>
+      </x:otherwise>
+    </x:choose>
+  </x:variable>
   
   <!-- 
     First we make a pass through all the element declarations in the DTD, and determine
@@ -228,7 +242,7 @@
             <x:variable name='kidCNames' as='xs:string*'>
               <x:for-each select="$kidNames">
                 <x:choose>
-                  <x:when test='$lowercase-names'>
+                  <x:when test='$lcnames'>
                     <x:value-of select='lower-case(.)'/>
                   </x:when>
                   <x:otherwise>
@@ -288,7 +302,10 @@
       <xsl:import href='{$basexslt}'/>
       <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
 
-      <!--<x:copy-of select='$elemSpecs'/>-->
+      <!-- 
+        Pass the same value of lcnames that we're using down into the generated stylesheet.
+      -->
+      <xsl:param name='lcnames' select='{$lcnames}()'/>
 
       <x:apply-templates select='declarations/elements/element'/>
       <x:apply-templates select='declarations/attributes/attribute'/>

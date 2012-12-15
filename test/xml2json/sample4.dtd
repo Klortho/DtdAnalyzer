@@ -1,7 +1,7 @@
 <!-- DocSum DTD for all sequence databases -->
 
 <!--~~ !dtd
-~~json <json type='sample4' version='0.3' />
+~~json <json lcnames='true' type='sample4' version='0.3' />
 ~~-->
 
 <!--~~ <Result>
@@ -83,6 +83,15 @@
 ~~-->
 <!ELEMENT Customized (splits+|split+)>
  
+<!-- 
+  This one should report a problem when lcnames is in effect, but not
+  otherwise.
+-->
+<!ELEMENT TestLCNames EMPTY>
+ <!ATTLIST   TestLCNames
+  attr CDATA  #IMPLIED
+  Attr CDATA  #IMPLIED>
+
  
  
  

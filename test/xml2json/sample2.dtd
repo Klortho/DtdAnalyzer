@@ -7,7 +7,7 @@
 <!-- ================================================================= -->
 
 <!--~~ !dtd
-~~json <json type='sample2' version='0.3' />
+~~json <json lcnames='true' type='sample2' version='0.3' />
 ~~-->
 
 <!--~~ <Count>
