@@ -157,7 +157,8 @@ public class SComment {
      * Special handling:
      *   tags - convert into a list of <tag> elements
      *   schematron - pass-thru
-     *   anything else - eitehr pass-thru or process as Markdown
+     *   json - pass-thru
+     *   anything else - either pass-thru or process as Markdown
      */
     public void addSection(String name, String text) throws Exception
     {
@@ -174,7 +175,7 @@ public class SComment {
                 if (tag.equals("root")) root = true;
             }
         }
-        else if (name.equals("schematron")) {
+        else if (name.equals("schematron") || name.equals("json")) {
             sectionString = text;
         }
         else {

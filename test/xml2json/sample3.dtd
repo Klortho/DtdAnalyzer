@@ -14,10 +14,8 @@
 
 <!--~~ <Result>
 This is the root element for a response.
-~~ tags
-  root
-~~ json
-<json resulttype='sample3' version='0.2' />
+~~ tags root
+~~ json <json resulttype='sample3' version='0.2' />
 ~~-->
 <!ELEMENT Result ( TranslationStack? )>
 
@@ -31,8 +29,7 @@ This one is special because it can take any number of TermSet and/or OP
 children, in any order.  In sample2, we converted this into an array.
 This time, we'll convert it into a fancy tree structure, in custom templates
 implemented in a custom stylesheet.
-~~json
-<ignore/>
+~~json <custom/>
 ~~-->
 <!ELEMENT TranslationStack ((TermSet|OP)*)>
 

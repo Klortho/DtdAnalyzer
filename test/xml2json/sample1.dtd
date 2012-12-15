@@ -11,36 +11,23 @@
 
 <!--~~ <Result>
 This is the root element for a response.
-~~ tags
-root
-~~ json
-<json resulttype='sample1' version='0.2' />
+~~ tags root
+~~ json <json resulttype='sample1' version='0.2' />
 ~~-->
 <!ELEMENT Result      (DbList,DbInfo?)>
 
-<!--~~ <DbList>
-Converted into a JSON array.
-~~-->
+<!-- <DbList> will be converted into a JSON array. -->
 <!ELEMENT DbList      (DbName+)>
 
-<!--~~ <DbName>
-Converted into a JSON string.
-~~-->
+<!-- <DbName> will be converted into a JSON string. -->
 <!ELEMENT DbName      (#PCDATA)>      <!-- \S+ -->
 
-
-<!--~~ <DbInfo>
-Converted into a JSON object.
-~~-->
+<!-- <DbInfo> will be converted into a JSON object. -->
 <!ELEMENT DbInfo      (DbName, MenuName, Description)>
 
-<!--~~ <MenuName>
-Converted into a JSON string.
-~~-->
+<!-- <MenuName> will be converted into a JSON string. -->
 <!ELEMENT MenuName    (#PCDATA)>      <!-- .+ -->
 
-<!--~~ <Description>
-Converted into a JSON string.
-~~-->
+<!-- <Description> will be converted into a JSON string. -->
 <!ELEMENT Description (#PCDATA)>      <!-- .+ -->
 

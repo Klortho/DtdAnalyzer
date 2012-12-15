@@ -81,14 +81,14 @@
         </x:message>
       </x:if>
       
-      <!-- $typeOverride - one of the valid types, or "ignore", or "".  
-        If the json-annotation has a valid type name (or "ignore"), then we'll use
+      <!-- $typeOverride - one of the valid types, or "custom", or "".  
+        If the json-annotation has a valid type name (or "custom"), then we'll use
         that for the new type.  Here we'll also check for valid json annotation
         values. -->
       <x:variable name='typeOverride'>
         <x:choose>
           <x:when test='$jaName = "string" or $jaName = "number" or $jaName = "boolean" or
-                        $jaName = "object" or $jaName = "array" or $jaName = "ignore"'>
+                        $jaName = "object" or $jaName = "array" or $jaName = "custom"'>
             <x:value-of select='$jaName'/>
           </x:when>
           <x:when test='$jaName != "" and $jaName != "json"'>
@@ -425,9 +425,9 @@
       </x:when>
       
       <!-- 
-        If type is 'ignore', ignore it; otherwise print out a message.
+        If type is 'custom', ignore it; otherwise print out a message.
       -->
-      <x:when test='$type != "ignore"'>
+      <x:when test='$type != "custom"'>
         <x:message>
           <x:text>Need to tell me what to do with element </x:text> 
           <x:value-of select='$elemName'/>
@@ -461,12 +461,12 @@
     <x:variable name='ja' select='annotations/annotation[@type="json"]/*'/>
     <x:variable name='jaName' select='name($ja)'/>
     <!-- 
-      Compute the type. This will be one of "ignore", "number", "boolean", "string".
+      Compute the type. This will be one of "custom", "number", "boolean", "string".
     -->
     <x:variable name='type'>
       <x:choose>
         <x:when test='$jaName = "string" or $jaName = "number" or $jaName = "boolean" or
-                      $jaName = "ignore"'>
+                      $jaName = "custom"'>
           <x:value-of select='$jaName'/>
         </x:when>
         <x:when test='$jaName != "" and $jaName != "json"'>
@@ -548,9 +548,9 @@
       </x:when>
       
       <!-- 
-        If type is 'ignore', ignore it; otherwise print out a message.
+        If type is 'custom', ignore it; otherwise print out a message.
       -->
-      <x:when test='$type != "ignore"'>
+      <x:when test='$type != "custom"'>
         <x:message>
           <x:text>Need to tell me what to do with attribute </x:text> 
           <x:value-of select='$attrName'/>

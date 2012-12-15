@@ -320,7 +320,7 @@ public class DTDEventHandler
             if (!fullComment.startsWith("~~")) return;
     
             // Match the beginning and ending "~~", and the identifier line.       
-            Pattern p = Pattern.compile("\\A~~[ \\t]*(.*?)[ \\t]*\\n(.*)~~", Pattern.DOTALL);
+            Pattern p = Pattern.compile("\\A~~[ \\t]*(.*?)[ \\t]*(\\n.*)~~", Pattern.DOTALL);
             Matcher m = p.matcher(fullComment);
             if (!m.find()) {
                 throw new Exception("Malformed structured comment");
@@ -339,15 +339,15 @@ public class DTDEventHandler
                 sc.setName(relSysId);
             }
     
-            // comment will hold everything after the first line, and up to but not including
-            // the final ~~.
+            // comment will hold everything from the newline at the end of identifier line, 
+            // and up to but not including the final ~~.
             String comment = m.group(2);
             
             // Next we'll parse the rest of the comment
             
-            // This pattern matches the current text section, plus the intro line of the next
-            // section, if there is one; or the end-of-input, if not.
-            p = Pattern.compile("(.*?)((\\n~~[ \\t]*(\\S+)[ \\t]*\\n)|\\z)", Pattern.DOTALL);
+            // This pattern matches the current section, if there is one, plus the intro 
+            // of the next section, if there is one.
+            p = Pattern.compile("(.*?)((\\n[ \\t]*~~[ \\t]*(\\S+))|\\z)", Pattern.DOTALL);
             
             // sectionName stores the name of the next annotation section.  The first section is 
             // implicitly defined to be "notes".
@@ -363,8 +363,11 @@ public class DTDEventHandler
                     String sectionText = m.group(1);
                     sp += m.end();
                     
-                    // Add this section to the SComment
-                    sc.addSection(sectionName, sectionText);
+                    // Unless we're looking at an empty "notes", add this section 
+                    // to the SComment
+                    if (!sectionName.equals("notes") || !sectionText.trim().equals("")) {
+                        sc.addSection(sectionName, sectionText);
+                    }
                     
                     // If there's no next intro line, then we're done.
                     if (m.group(2).equals("")) {

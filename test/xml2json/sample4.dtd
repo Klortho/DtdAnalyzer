@@ -1,26 +1,19 @@
 <!-- DocSum DTD for all sequence databases -->
 
 <!--~~ <Result>
-
-~~tags
-root
-~~json
-<json resulttype='summary' version='0.2' />
+~~tags root
+~~json <json resulttype='summary' version='0.2' />
 ~~-->
 <!ELEMENT Result (DocumentSummarySet?)>
 
 <!--~~ <DocumentSummarySet>
-
-~~json
-<object/>
+~~json <object/>
 ~~-->
 <!ELEMENT DocumentSummarySet (DocumentSummary)*>
 <!ATTLIST DocumentSummarySet status CDATA #IMPLIED>
 
 <!--~~ <DocumentSummary>
-
-~~json
-<object name='\@uid'/>
+~~json <object name='@uid'/>
 ~~-->
 <!ELEMENT DocumentSummary 
     (   Title
@@ -35,9 +28,7 @@ root
 <!ELEMENT Title   (#PCDATA)>
 
 <!--~~ <Gi>
-
-~~json
-<number/>
+~~json <number/>
 ~~-->
 <!ELEMENT Gi         (#PCDATA)>
 
@@ -46,9 +37,7 @@ root
 <!ELEMENT   Stat   EMPTY>
 
 <!--~~ @count
-
-~~json
-<number/>
+~~json <number/>
 ~~-->
 <!ATTLIST   Stat
   type      CDATA  #IMPLIED
@@ -57,14 +46,11 @@ root
 <!ELEMENT Properties (#PCDATA)>
 
 <!--~~ @aa
-
-~~json
-<number/>
+~~json <number/>
 ~~-->
-<!--~~ @qual
 
-~~json
-<number/>
+<!--~~ @qual
+~~json <number/>
 ~~-->
 <!ATTLIST Properties
   aa        CDATA       #IMPLIED
@@ -73,9 +59,7 @@ root
 <!ELEMENT   OSLT        (#PCDATA)>
 
 <!--~~ @indexed
-
-~~json
-<boolean/>
+~~json <boolean/>
 ~~-->
 <!ATTLIST   OSLT
   indexed   CDATA       #IMPLIED>
@@ -90,13 +74,11 @@ root
 <!-- Test "unknown"  -->
 <!ELEMENT Unknowable (splits+|split+)>
 
-<!-- Test "ignore"  -->
-<!--~~ <Ignoreable>
-
-~~json
-<ignore/>
+<!-- Test "custom"  -->
+<!--~~ <Customized>
+~~json <custom/>
 ~~-->
-<!ELEMENT Ignoreable (splits+|split+)>
+<!ELEMENT Customized (splits+|split+)>
  
  
  

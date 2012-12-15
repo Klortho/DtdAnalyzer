@@ -8,8 +8,7 @@
 
 <!--~~ <Count>
 Here we override the default type, indicating that this is a JSON number.
-~~json
-<number/>
+~~json <number/>
 ~~-->
 <!ELEMENT Count            (#PCDATA)>	<!-- \d+ -->
 
@@ -18,8 +17,7 @@ This element (tested in sample2a.xml) becomes a key-value pair, and the key is
 specified by the name attribute here.  By default, the key would be "error", but
 we want to preserve the all-uppercase "ERROR".  Note that the value of the name 
 attribute is an XPath expression, so it is enclosed in quotes.
-~~json
-<json name='"ERROR"'/>
+~~json <json name='"ERROR"'/>
 ~~-->
 <!ELEMENT ERROR            (#PCDATA)>	<!-- .+ -->
 
@@ -27,11 +25,11 @@ attribute is an XPath expression, so it is enclosed in quotes.
 This one is special because it can take any number of TermSet and/or OP
 children.  So it doesn't fit cleanly into either a JSON array or object.
 ~~json
-<object>
-  <number name='count' value='count(*)'/>
-  <array name='"phrasesnotfound"' content='PhraseNotFound'/>
-  <array name='"fieldsnotfound"' content='FieldNotFound'/>
-</object>
+  <object>
+    <number name='count' value='count(*)'/>
+    <array name='"phrasesnotfound"' content='PhraseNotFound'/>
+    <array name='"fieldsnotfound"' content='FieldNotFound'/>
+  </object>
 ~~-->
 <!ELEMENT ErrorList        (PhraseNotFound*,FieldNotFound*)>
 
@@ -44,9 +42,7 @@ children.  So it doesn't fit cleanly into either a JSON array or object.
 <!ELEMENT From             (#PCDATA)>	<!-- .+ -->
 
 <!--~~ <Id>
-
-~~json
-<number/>
+~~json <number/>
 ~~-->
 <!ELEMENT Id               (#PCDATA)>	<!-- \d+ -->
 
@@ -56,10 +52,8 @@ children.  So it doesn't fit cleanly into either a JSON array or object.
 
 <!--~~ <Result>
 This is the root element for a response.
-~~ tags
-  root
-~~ json
-<json resulttype='sample2' version='0.2' />
+~~ tags root
+~~ json <json resulttype='sample2' version='0.2' />
 ~~-->
 
 <!ELEMENT Result ( 
@@ -79,16 +73,12 @@ This is the root element for a response.
                  )>
 
 <!--~~ <RetMax>
-
-~~json
-<number/>
+~~json <number/>
 ~~-->
 <!ELEMENT RetMax           (#PCDATA)>	<!-- \d+ -->
 
 <!--~~ <RetStart>
-
-~~json
-<number/>
+~~json <number/>
 ~~-->
 <!ELEMENT RetStart         (#PCDATA)>	<!-- \d+ -->
 
@@ -96,8 +86,7 @@ This is the root element for a response.
 
 <!--~~ <ProblemFound>
 This should be converted into a JSON boolean.
-~~json
-<boolean/>
+~~json <boolean/>
 ~~-->
 <!ELEMENT ProblemFound     (#PCDATA)> <!-- (TRUE|FALSE)  -->
 
@@ -115,8 +104,7 @@ children, in any order.  So it doesn't fit cleanly into either a JSON array or o
 Since we know that TermSet's will get converted to objects, and OP's will get
 converted to strings, we can just turn this into an array, without any loss of
 information.
-~~json
-<array/>
+~~json <array/>
 ~~-->
 <!ELEMENT TranslationStack ((TermSet|OP)*)>
 
