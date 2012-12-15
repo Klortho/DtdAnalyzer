@@ -41,6 +41,11 @@
     Preliminaries - set a bunch of variables
   -->
   
+  <!--
+    The dtd-level json annotation, if it exists
+  -->
+  <x:variable name='dtdJA' select='/declarations/dtd/annotations/annotation[@type="json"]/*'/>
+  
   <!-- 
     First we make a pass through all the element declarations in the DTD, and determine
     their type.  This will merge the annotations provided by the user with the default
@@ -327,8 +332,11 @@
       <x:when test='$type = "root"'>
         <xsl:template match='{$elemName}'>
           <xsl:call-template name='result-start'>
-            <xsl:with-param name='resulttype' select='"{$elemSpec/@resulttype}"'/>
-            <xsl:with-param name='version' select='"{$elemSpec/@version}"'/>
+            <x:if test='$dtdJA'>
+              <xsl:with-param name='dtd-annotation'>
+                <x:copy-of select='$dtdJA'/>
+              </xsl:with-param>
+            </x:if>
           </xsl:call-template>
           <xsl:apply-templates select='@*|*'>
             <xsl:with-param name='indent' select='$iu'/>

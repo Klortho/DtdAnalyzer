@@ -4,6 +4,7 @@
                 xmlns:np="http://ncbi.gov/portal/XSLT/namespace"
                 xmlns:str="http://exslt.org/strings"
                 xmlns:f="http://exslt.org/functions"
+                xmlns:c="http://exslt.org/common"
                 extension-element-prefixes="np str f">
   
   
@@ -239,14 +240,15 @@
   <xsl:template name='result-start'>
     <xsl:param name='resulttype' select='""'/>
     <xsl:param name='version' select='""'/>
+    <xsl:param name='dtd-annotation'/>
+    <xsl:variable name='dans' 
+      select='c:node-set($dtd-annotation)/json'/>
     
     <xsl:value-of select='concat("{", $nl)'/>
-    <xsl:if test='$resulttype != ""'>
-      <xsl:value-of select='np:key-simple($iu, "resulttype", np:dq($resulttype), true())'/>
-    </xsl:if>
-    <xsl:if test='$version != ""'>
-      <xsl:value-of select='np:key-simple($iu, "version", np:dq($version), true())'/>
-    </xsl:if>
+    <xsl:for-each select='$dans/@*'>
+      <xsl:value-of 
+        select='np:key-simple($iu, name(.), np:dq(.), true())'/>
+    </xsl:for-each>
   </xsl:template>
 
   <!--

@@ -7,12 +7,13 @@
   used to override the default behavior.
 -->
 
-<!-- ================================================================= -->
+<!--~~ !dtd
+~~json <json type='sample1' version='0.3' />
+~~-->
 
 <!--~~ <Result>
 This is the root element for a response.
 ~~ tags root
-~~ json <json resulttype='sample1' version='0.2' />
 ~~-->
 <!ELEMENT Result      (DbList,DbInfo?)>
 

@@ -1,8 +1,11 @@
 <!-- DocSum DTD for all sequence databases -->
 
+<!--~~ !dtd
+~~json <json type='sample4' version='0.3' />
+~~-->
+
 <!--~~ <Result>
 ~~tags root
-~~json <json resulttype='summary' version='0.2' />
 ~~-->
 <!ELEMENT Result (DocumentSummarySet?)>
 

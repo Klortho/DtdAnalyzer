@@ -6,6 +6,10 @@
 -->
 <!-- ================================================================= -->
 
+<!--~~ !dtd
+~~json <json type='sample2' version='0.3' />
+~~-->
+
 <!--~~ <Count>
 Here we override the default type, indicating that this is a JSON number.
 ~~json <number/>
@@ -53,7 +57,6 @@ children.  So it doesn't fit cleanly into either a JSON array or object.
 <!--~~ <Result>
 This is the root element for a response.
 ~~ tags root
-~~ json <json resulttype='sample2' version='0.2' />
 ~~-->
 
 <!ELEMENT Result ( 

@@ -7,6 +7,9 @@
 -->
 <!-- ================================================================= -->
 
+<!--~~ !dtd
+~~json <json type='sample3' version='0.3' />
+~~-->
 
 <!ELEMENT Field            (#PCDATA)>	<!-- .+ -->
 
@@ -15,7 +18,6 @@
 <!--~~ <Result>
 This is the root element for a response.
 ~~ tags root
-~~ json <json resulttype='sample3' version='0.2' />
 ~~-->
 <!ELEMENT Result ( TranslationStack? )>
 
