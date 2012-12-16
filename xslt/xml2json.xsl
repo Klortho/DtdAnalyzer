@@ -258,8 +258,10 @@
     
     <xsl:value-of select='concat("{", $nl)'/>
     <xsl:for-each select='$dans/@*'>
-      <xsl:value-of 
-        select='np:key-simple($iu, name(.), np:dq(.), true())'/>
+      <xsl:if test='name(.) != "lcnames"'>
+        <xsl:value-of 
+          select='np:key-simple($iu, name(.), np:dq(.), true())'/>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
 
@@ -288,6 +290,13 @@
         <xsl:call-template name="string-in-array">
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
+      </xsl:when>
+
+      <xsl:when test='$context = "object"'>
+        <xsl:message>
+          <xsl:text>Error:  bad key passed in for element </xsl:text>
+          <xsl:value-of select='name(.)'/>
+        </xsl:message>
       </xsl:when>
       <xsl:otherwise>
         <xsl:message>
@@ -329,6 +338,13 @@
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
       </xsl:when>
+
+      <xsl:when test='$context = "object"'>
+        <xsl:message>
+          <xsl:text>Error:  bad key passed in for element </xsl:text>
+          <xsl:value-of select='name(.)'/>
+        </xsl:message>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:message>
           <xsl:text>Error:  context is not defined for element </xsl:text>
@@ -368,6 +384,13 @@
         <xsl:call-template name="boolean-in-array">
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
+      </xsl:when>
+
+      <xsl:when test='$context = "object"'>
+        <xsl:message>
+          <xsl:text>Error:  bad key passed in for element </xsl:text>
+          <xsl:value-of select='name(.)'/>
+        </xsl:message>
       </xsl:when>
       <xsl:otherwise>
         <xsl:message>
@@ -410,6 +433,13 @@
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
       </xsl:when>
+
+      <xsl:when test='$context = "object"'>
+        <xsl:message>
+          <xsl:text>Error:  bad key passed in for element </xsl:text>
+          <xsl:value-of select='name(.)'/>
+        </xsl:message>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:message>
           <xsl:text>Error:  context is not defined for element </xsl:text>
@@ -449,6 +479,13 @@
         <xsl:call-template name="object-in-array">
           <xsl:with-param name='indent' select='$indent'/>
         </xsl:call-template>
+      </xsl:when>
+
+      <xsl:when test='$context = "object"'>
+        <xsl:message>
+          <xsl:text>Error:  bad key passed in for element </xsl:text>
+          <xsl:value-of select='name(.)'/>
+        </xsl:message>
       </xsl:when>
       <xsl:otherwise>
         <xsl:message>

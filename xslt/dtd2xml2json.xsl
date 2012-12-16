@@ -35,6 +35,8 @@
   <x:variable name='nl' select='"&#10;"'/>
   <x:variable name='debug' select='false()'/>
 
+  <!-- Create a variable pointing to the root of the input document. -->
+  <x:variable name='daz' select='/'/>
 
   <!--=================================================================================
     Preliminaries - set a bunch of variables
@@ -61,12 +63,13 @@
   </x:variable>
   
   <!-- 
-    First we make a pass through all the element declarations in the DTD, and determine
-    their type.  This will merge the annotations provided by the user with the default
+    First we make a pass through all the element and attribute declarations in the DTD, 
+    and determine what we will do with them.
+    This will merge the annotations provided by the user with the default
     types computed here.
   -->
-  <x:variable name='elemSpecs'>
-    <x:for-each select='//element'>
+  <x:variable name='allItems'>
+    <x:for-each select='/declarations/elements/element'>
       <x:variable name='elemName' select='@name'/>
       <x:if test='$debug'>
         <x:message>============================================</x:message>
@@ -275,12 +278,10 @@
         </x:choose>
       </x:variable>
       
-      <!-- Finally, create the elemSpec for this element.  For example, something like
-        <element name="DocumentSummary">
-          <object name="@uid"/>
-        </element>
+      <!-- 
+        The "spec" for this element; like <object name='@uid'/>
       -->
-      <element name='{$elemName}'>
+      <x:variable name='spec'>
         <x:element name='{$type}'>
           <x:if test='$ja/@name'>
             <x:attribute name='name' select='$ja/@name'/>
@@ -288,14 +289,164 @@
           <x:copy-of select='$ja/@*[name(.) != "name"]'/>
           <x:copy-of select='$ja/*'/>
         </x:element>
-      </element>
+      </x:variable>
+      
+      <!-- 
+        groupByKey.  This is a string that controls how the elements and 
+        attributes are grouped together in the end.  Anything out of the ordinary is
+        "special", and those elements and attributes will have their own private
+        template.
+      -->
+      <x:variable name="groupByKey">
+        <x:choose>
+          <x:when test='$spec/*/@* or $spec/*/*'>
+            <x:text>special</x:text>
+          </x:when>
+          <x:otherwise>
+            <x:value-of select='$type'/>
+          </x:otherwise>
+        </x:choose>
+      </x:variable>
+      
+      <!-- 
+        This will be true if an element can have a text node child
+      -->
+      <x:variable name='textKid' as='xs:boolean'>
+        <x:value-of select='($type = "object" or $type = "array") and
+                            content-model/@spec = "text"'/>
+      </x:variable>
+      
+      <!-- Finally, create the itemSpec for this element.  For example, something like
+        <item type='element' name="DocumentSummary">
+          <object name="@uid"/>
+        </item>
+      -->
+      <item type='element' name='{$elemName}' groupByKey='{$groupByKey}'
+            textKid='{$textKid}'>
+        <x:copy-of select='$spec'/>
+      </item>
+    </x:for-each>
+
+    <x:for-each select='/declarations/attributes/attribute'>
+      <x:variable name='attrName' select='@name'/>
+      <x:if test='$debug'>
+        <x:message>============================================</x:message>
+        <x:message>
+          <x:value-of select='concat("Looking at attribute ", $attrName)'/>
+        </x:message>
+      </x:if>
+      
+      <!-- The json annotation -->
+      <x:variable name='ja' select='annotations/annotation[@type="json"]/*'/>
+      <x:if test='$debug'>
+        <x:message>
+          <x:text>ja is </x:text>
+          <x:copy-of select='$ja'/>
+        </x:message>
+      </x:if>
+      
+      <!-- The name of the top-level element in the json annotation, or "" if there isn't any -->
+      <x:variable name='jaName' select='name($ja)'/>
+      <x:if test='$debug'>
+        <x:message>
+          <x:value-of select='concat("$jaName is ", $jaName)'/>
+        </x:message>
+      </x:if>
+      
+      <!-- $typeOverride - one of the valid types, or "custom", or "".  
+        If the json-annotation has a valid type name (or "custom"), then we'll use
+        that for the new type.  Here we'll also check for valid json annotation
+        values. -->
+      <x:variable name='typeOverride'>
+        <x:choose>
+          <x:when test='$jaName = "string" or $jaName = "number" or $jaName = "boolean" or
+                        $jaName = "custom"'>
+            <x:value-of select='$jaName'/>
+          </x:when>
+          <x:when test='$jaName != "" and $jaName != "json"'>
+            <x:message>
+              <x:text>Error:  invalid json annotation for attribute </x:text>
+              <x:value-of select='$attrName'/>
+              <x:text>; don't understand "</x:text>
+              <x:value-of select='$jaName'/>
+              <x:text>".</x:text>
+            </x:message>
+          </x:when>
+        </x:choose>
+      </x:variable>
+      <x:if test='$debug'>
+        <x:message>
+          <x:value-of select='concat("$typeOverride is ", $typeOverride)'/>
+        </x:message>
+      </x:if>
+      
+      <!--
+        $type will be the name of the child element here.  If there is a type
+        override, then use that.  Otherwise, we'll have to compute it.
+        Valid values:  'string', 'number', 'boolean'.
+        If we can't figure out what to map it to, 'unknown'.
+      -->
+      <x:variable name='type'>
+        <x:choose>
+          <x:when test='$typeOverride != ""'>
+            <x:if test='$debug'><x:message>Setting type to typeOverride</x:message></x:if>
+            <x:value-of select='$typeOverride'/>
+          </x:when>
+          
+          <x:otherwise>
+            <x:text>string</x:text>
+          </x:otherwise>
+        </x:choose>
+      </x:variable>
+      
+      <!-- 
+        The "spec" for this attribute; like <number name='"fleegle"'/>
+      -->
+      <x:variable name="spec">
+        <x:element name='{$type}'>
+          <x:if test='$ja/@name'>
+            <x:attribute name='name' select='$ja/@name'/>
+          </x:if>
+          <x:copy-of select='$ja/@*[name(.) != "name"]'/>
+          <x:copy-of select='$ja/*'/>
+        </x:element>
+      </x:variable>
+      
+      <!-- 
+        groupByKey.  This is a string that controls how the elements and 
+        attributes are grouped together in the end.
+      -->
+      <x:variable name="groupByKey">
+        <x:choose>
+          <x:when test='$spec/*/@* or $spec/*/*'>
+            <x:text>special</x:text>
+          </x:when>
+          <x:otherwise>
+            <x:value-of select='$type'/>
+          </x:otherwise>
+        </x:choose>
+      </x:variable>
+      
+      <!-- Finally, create the itemSpec for this attribute.  -->
+      <item type='attribute' name='{$attrName}' groupByKey='{$groupByKey}'>
+        <x:copy-of select='$spec'/>
+      </item>
     </x:for-each>
   </x:variable>
+
 
   <!--=================================================================================
     Main template
   -->
   <x:template match="/">
+    <x:if test='$debug'>
+      <x:result-document href='debug.xml'>
+        <debug>
+          <x:copy-of select='$allItems'/>
+        </debug>
+      </x:result-document>
+    </x:if>
+
     <!-- Generate the structure of the XSL stylesheet -->
     <xsl:stylesheet version="1.0" xmlns:np="http://ncbi.gov/portal/XSLT/namespace">
 
@@ -306,9 +457,160 @@
         Pass the same value of lcnames that we're using down into the generated stylesheet.
       -->
       <xsl:param name='lcnames' select='{$lcnames}()'/>
+    
+      <x:for-each-group select="$allItems//item"
+                        group-by='@groupByKey'>
+        <x:variable name='matchStringSeq' as='xs:string*'>
+          <x:for-each select='current-group()'>
+            <x:choose>
+              <x:when test='@type = "attribute"'>
+                <x:value-of select='concat("@", @name)'/>
+              </x:when>
+              <x:otherwise>
+                <x:value-of select='@name'/>
+              </x:otherwise>
+            </x:choose>
+          </x:for-each>
+        </x:variable>
+        <x:variable name='matchString'
+                    select='string-join($matchStringSeq, " | ")'/>
 
-      <x:apply-templates select='declarations/elements/element'/>
-      <x:apply-templates select='declarations/attributes/attribute'/>
+        <x:choose>
+          <x:when test='current-grouping-key() = "root"'>
+            <xsl:template match='{$matchString}'>
+              <xsl:call-template name='result-start'>
+                <x:if test='$dtdJA'>
+                  <xsl:with-param name='dtd-annotation'>
+                    <x:copy-of select='$dtdJA'/>
+                  </xsl:with-param>
+                </x:if>
+              </xsl:call-template>
+              <xsl:apply-templates select='@*|*'>
+                <xsl:with-param name='indent' select='$iu'/>
+                <xsl:with-param name='context' select='"object"'/>
+              </xsl:apply-templates>
+              <xsl:value-of select='np:end-object("", false())'/>
+            </xsl:template>
+          </x:when>
+
+          <!-- string -->
+          <x:when test='current-grouping-key() = "string"'>
+            <xsl:template match='{$matchString}'>
+              <xsl:param name='indent' select='""'/>
+              <xsl:param name='context' select='"unknown"'/>
+              <xsl:call-template name='string'>
+                <xsl:with-param name='indent' select='$indent'/>
+                <xsl:with-param name='context' select='$context'/>
+              </xsl:call-template>
+            </xsl:template>
+          </x:when>
+          
+          <!-- number -->
+          <x:when test='current-grouping-key() = "number"'>
+            <xsl:template match='{$matchString}'>
+              <xsl:param name='indent' select='""'/>
+              <xsl:param name='context' select='"unknown"'/>
+              <xsl:call-template name='number'>
+                <xsl:with-param name='indent' select='$indent'/>
+                <xsl:with-param name='context' select='$context'/>
+              </xsl:call-template>
+            </xsl:template>
+          </x:when>
+          
+          <!-- boolean -->
+          <x:when test='current-grouping-key() = "boolean"'>
+            <xsl:template match='{$matchString}'>
+              <xsl:param name='indent' select='""'/>
+              <xsl:param name='context' select='"unknown"'/>
+              <xsl:call-template name='boolean'>
+                <xsl:with-param name='indent' select='$indent'/>
+                <xsl:with-param name='context' select='$context'/>
+              </xsl:call-template>
+            </xsl:template>
+          </x:when>
+          
+          <!-- array -->
+          <x:when test='current-grouping-key() = "array"'>
+            <xsl:template match='{$matchString}'>
+              <xsl:param name='indent' select='""'/>
+              <xsl:param name='context' select='"unknown"'/>
+              <xsl:call-template name='array'>
+                <xsl:with-param name='indent' select='$indent'/>
+                <xsl:with-param name='context' select='$context'/>
+              </xsl:call-template>
+            </xsl:template>
+          </x:when>
+          
+          <!-- object -->
+          <x:when test='current-grouping-key() = "object"'>
+            <xsl:template match='{$matchString}'>
+              <xsl:param name='indent' select='""'/>
+              <xsl:param name='context' select='"unknown"'/>
+              <xsl:call-template name='object'>
+                <xsl:with-param name='indent' select='$indent'/>
+                <xsl:with-param name='context' select='$context'/>
+              </xsl:call-template>
+            </xsl:template>
+          </x:when>
+          
+          <!-- special -->
+          <x:when test='current-grouping-key() = "special"'>
+            <x:for-each select='current-group()'>
+              <x:variable name='name' select='@name'/>
+              <x:choose>
+                <x:when test='@type = "attribute"'>
+                  <x:apply-templates select='$daz//attribute[@name = $name]'/>
+                </x:when>
+                <x:otherwise>  <!-- @type = "object" -->
+                  <x:apply-templates select='$daz//element[@name = $name]'/>
+                </x:otherwise>
+              </x:choose>
+            </x:for-each>
+          </x:when>
+
+          <!-- 
+            If type is 'custom', ignore it; otherwise print out a message.
+          -->
+          <x:when test='current-grouping-key() = "unknown"'>
+            <x:for-each select='current-group()'>
+              <x:message>
+                <x:text>Need to tell me what to do with element </x:text> 
+                <x:value-of select='@name'/>
+              </x:message>
+            </x:for-each>
+          </x:when>
+          
+          <x:when test='current-grouping-key() = "custom"'>
+            <!-- do nothing. -->
+          </x:when>
+          
+          <x:otherwise>  <!-- This should never happen; sanity check.  -->
+            <x:message>
+              <x:text>Error:  unknown item group; this should never happen.</x:text>
+            </x:message>
+          </x:otherwise>
+        </x:choose>
+
+        <!-- 
+          If the type of this element is array or object, and it has text content, then
+          also generate a template to match that text.
+        -->
+        <x:for-each select='current-group()'>
+          <x:if test='@textKid = "true"'>
+            <xsl:template match="{@name}/text()">
+              <xsl:param name="indent" select='""'/>
+              <xsl:param name="context" select='"unknown"'/>
+              <xsl:call-template name="string">
+                <xsl:with-param name="indent" select="$indent"/>
+                <xsl:with-param name="context" select="$context"/>
+              </xsl:call-template>
+            </xsl:template>
+          </x:if>
+        </x:for-each>
+        
+
+      </x:for-each-group>
+
     </xsl:stylesheet>
   </x:template>
 
@@ -318,19 +620,19 @@
   -->
   <x:template match='element'>
     <x:variable name='elemName' select='@name'/>
-    <x:variable name='elemSpec' select='$elemSpecs/element[@name=$elemName]/*'/>
+    <x:variable name='item' select='$allItems/item[@type="element" and @name=$elemName]'/>
+    <x:variable name='itemSpec' select='$item/*'/>
 
-    <!-- The variable 'json-name', if not empty, will be passed to the 'key' param of the
+    <!-- The variable 'jsonName', if not empty, will be passed to the 'key' param of the
       xml2json template.  -->
-    <x:variable name='jsonName' select='$elemSpec/@name'/>
+    <x:variable name='jsonName' select='$itemSpec/@name'/>
     <!--<x:message>json-name is <x:value-of select='$json-name'/></x:message>-->
 
     <!-- 
       The type for this element, will be either 
       'unknown', 'root', 'string', 'number', 'boolean', 'object', or 'array'.
     -->
-    <x:variable name='type' select='name($elemSpec)'/>
-<!--    <x:message>type is '<x:value-of select='$type'/>'.</x:message> -->
+    <x:variable name='type' select='name($itemSpec)'/>
 
     <!-- 
       Write a comment into the destination stylesheet.
@@ -346,6 +648,7 @@
     
     
     <x:choose>
+      <!-- special root - probably don't need this. --> 
       <x:when test='$type = "root"'>
         <xsl:template match='{$elemName}'>
           <xsl:call-template name='result-start'>
@@ -362,8 +665,8 @@
           <xsl:value-of select='np:end-object("", false())'/>
         </xsl:template>
       </x:when>
-
-      <!-- string -->
+      
+      <!-- special string -->
       <x:when test='$type = "string"'>
         <xsl:template match='{$elemName}'>
           <xsl:param name='indent' select='""'/>
@@ -411,11 +714,11 @@
 
       <!-- Special: an array or object that has specified kids -->
       <x:when test='($type = "array" or $type = "object") and
-                    $elemSpec/*'>
+                    $itemSpec/*'>
         <xsl:template match='{$elemName}'>
           <xsl:param name='indent' select='""'/>
           <xsl:param name='context' select='"unknown"'/>
-          <x:apply-templates select='$elemSpec'/>
+          <x:apply-templates select='$itemSpec'/>
         </xsl:template>
       </x:when>
       
@@ -449,32 +752,8 @@
         </xsl:template>
       </x:when>
       
-      <!-- 
-        If type is 'custom', ignore it; otherwise print out a message.
-      -->
-      <x:when test='$type != "custom"'>
-        <x:message>
-          <x:text>Need to tell me what to do with element </x:text> 
-          <x:value-of select='$elemName'/>
-        </x:message>
-      </x:when>
     </x:choose>
     
-    <!-- 
-      If the type of this element is array or object, and it has text content, then
-      also generate a template to match that text.
-    -->
-    <x:if test='($type = "object" or $type = "array") and
-                content-model/@spec = "text"'>
-      <xsl:template match="{$elemName}/text()">
-        <xsl:param name="indent" select='""'/>
-        <xsl:param name="context" select='"unknown"'/>
-        <xsl:call-template name="string">
-          <xsl:with-param name="indent" select="$indent"/>
-          <xsl:with-param name="context" select="$context"/>
-        </xsl:call-template>
-      </xsl:template>
-    </x:if>
   </x:template>
   
 
@@ -483,36 +762,18 @@
   -->
   <x:template match='attribute'>
     <x:variable name='attrName' select='@name'/>
-    <x:variable name='ja' select='annotations/annotation[@type="json"]/*'/>
-    <x:variable name='jaName' select='name($ja)'/>
+    <x:variable name='item' select='$allItems/item[@type="attribute" and @name=$attrName]'/>
+    <x:variable name='itemSpec' select='$item/*'/>
+
+    <!-- The variable 'jsonName', if not empty, will be passed to the 'key' param of the
+      xml2json template.  -->
+    <x:variable name='jsonName' select='$itemSpec/@name'/>
+
     <!-- 
       Compute the type. This will be one of "custom", "number", "boolean", "string".
     -->
-    <x:variable name='type'>
-      <x:choose>
-        <x:when test='$jaName = "string" or $jaName = "number" or $jaName = "boolean" or
-                      $jaName = "custom"'>
-          <x:value-of select='$jaName'/>
-        </x:when>
-        <x:when test='$jaName != "" and $jaName != "json"'>
-          <x:message>
-            <x:text>Error:  invalid json annotation for attribute </x:text>
-            <x:value-of select='$attrName'/>
-            <x:text>; don't understand "</x:text>
-            <x:value-of select='$jaName'/>
-            <x:text>".</x:text>
-          </x:message>
-        </x:when>
-        <x:otherwise>
-          <x:text>string</x:text>
-        </x:otherwise>
-      </x:choose>
-    </x:variable>
+    <x:variable name='type' select='name($itemSpec)'/>
     
-    <!-- The variable 'jsonName', if not empty, will be passed to the 'key' param of the
-      xml2json template.  -->
-    <x:variable name='jsonName' select='$ja/@name'/>
-    <!--<x:message>json-name is <x:value-of select='$json-name'/></x:message>-->
     
     <!-- 
       Write a comment into the destination stylesheet.
