@@ -284,6 +284,14 @@
       </x:variable>
       
       <!-- 
+        This will be true if an element can have a text node child
+      -->
+      <x:variable name='textKid' as='xs:boolean'>
+        <x:value-of select='($type = "object" or $type = "array") and
+          content-model/@spec = "text"'/>
+      </x:variable>
+      
+      <!-- 
         groupByKey.  This is a string that controls how the elements and 
         attributes are grouped together in the end.  Anything out of the ordinary is
         "special", and those elements and attributes will have their own private
@@ -291,21 +299,13 @@
       -->
       <x:variable name="groupByKey">
         <x:choose>
-          <x:when test='$spec/*/@* or $spec/*/*'>
+          <x:when test='$spec/*/@* or $spec/*/* or $textKid'>
             <x:text>special</x:text>
           </x:when>
           <x:otherwise>
             <x:value-of select='$type'/>
           </x:otherwise>
         </x:choose>
-      </x:variable>
-      
-      <!-- 
-        This will be true if an element can have a text node child
-      -->
-      <x:variable name='textKid' as='xs:boolean'>
-        <x:value-of select='($type = "object" or $type = "array") and
-                            content-model/@spec = "text"'/>
       </x:variable>
       
       <!-- Finally, create the itemSpec for this element.  For example, something like
@@ -452,6 +452,10 @@
     
       <x:for-each-group select="$allItems//item"
                         group-by='@groupByKey'>
+        
+        <!-- Compute the string that will be used for the "match" attribute of the
+          xsl:template that we are generating.  This will be a concatenation of all
+          of the names of items in this group. -->
         <x:variable name='matchStringSeq' as='xs:string*'>
           <x:for-each select='current-group()'>
             <x:choose>
@@ -739,6 +743,10 @@
             <xsl:with-param name='context' select='$context'/>
             <x:if test='$jsonName != ""'>
               <xsl:with-param name='key' select='{$jsonName}'/>
+            </x:if>
+            <x:if test='$item/@textKid = "true"'>
+              <xsl:with-param name='kids-param' select='true()'/>
+              <xsl:with-param name='kids' select='@*|node()'/>
             </x:if>
           </xsl:call-template>
         </xsl:template>
