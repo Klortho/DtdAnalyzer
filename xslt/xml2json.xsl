@@ -85,14 +85,20 @@
     Right now this backslash-escapes double quotes and backslashes.  Probably
     needs to be made more robust.
   -->
-  <f:function name="np:q">
-    <xsl:param name="_" select="/.."/>
+  <f:function name="np:json-escape">
+    <xsl:param name="s"/>
     <xsl:variable name="quot">"</xsl:variable>
     <xsl:variable name="bs">\</xsl:variable>
     <xsl:variable name="result" 
       select="str:replace(
-                  str:replace( str:decode-uri($_), $bs, concat($bs, $bs) ), 
-                  $quot, concat($bs, $quot) )"/>
+                str:replace( 
+                  str:replace($s, 
+                    $bs, concat($bs, $bs) 
+                  ),
+                  $quot, concat($bs, $quot) 
+                ),
+                $nl, concat($bs, 'n')
+              )"/>
     <f:result>
       <xsl:value-of select="$result"/>
     </f:result>
@@ -222,7 +228,7 @@
   <f:function name='np:string-value'>
     <xsl:param name='v'/>
     <f:result>
-      <xsl:value-of select='np:dq(normalize-space(np:q($v)))'/>
+      <xsl:value-of select='np:dq(np:json-escape($v))'/>
     </f:result>
   </f:function>
 
@@ -233,10 +239,6 @@
     </f:result>
   </f:function>
 
-  <!-- 
-    FIXME:  for booleans, we should do a little processing on the value to see
-    if it is "falsy" or not, then convert it into either "true" or "false".
-  -->
   <f:function name='np:boolean-value'>
     <xsl:param name='v'/>
     <xsl:variable name='nv' select='np:to-lower(normalize-space($v))'/>
