@@ -22,7 +22,7 @@
   <x:output encoding="UTF-8" method="xml" indent="yes" />
   
   
-  <x:param name='basexslt' select='"../../xslt/xml2json.xsl"'/>
+  <x:param name='basexslt' select='"xml2json.xsl"'/>
   
   <x:variable name='nl' select='"&#10;"'/>
   <x:variable name='debug' select='false()'/>

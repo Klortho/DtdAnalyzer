@@ -29,6 +29,15 @@
           <instrument>keyboards</instrument>
         </split>
       </splits>
+      <Booleans>
+        <Boolean></Boolean>  <!-- empty string is false -->
+        <Boolean> no </Boolean>
+        <Boolean> 0</Boolean>
+        <Boolean>false  </Boolean>
+        <Boolean>bingo</Boolean>  <!-- true -->
+        <Boolean>yes</Boolean>
+        <Boolean>true</Boolean>
+      </Booleans>
     </DocumentSummary>
   </DocumentSummarySet>
 </Result>

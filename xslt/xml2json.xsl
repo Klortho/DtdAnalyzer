@@ -239,8 +239,16 @@
   -->
   <f:function name='np:boolean-value'>
     <xsl:param name='v'/>
+    <xsl:variable name='nv' select='np:to-lower(normalize-space($v))'/>
     <f:result>
-      <xsl:value-of select='normalize-space($v)'/>
+      <xsl:choose>
+        <xsl:when test='$nv = "0" or $nv = "no" or $nv = "false" or $nv = ""'>
+          <xsl:text>false</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>true</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </f:result>
   </f:function>
   

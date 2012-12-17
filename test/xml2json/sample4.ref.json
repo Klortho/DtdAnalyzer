@@ -1,0 +1,74 @@
+{
+    "type": "sample4",
+    "version": "0.3",
+    "documentsummaryset": {
+        "status": "OK",
+        "284822047": {
+            "uid": "284822047",
+            "title": "Cat [Donor vector pTKIP-cat]",
+            "gi": 284822047,
+            "statistics": [
+                {
+                    "type": "all",
+                    "count": 4
+                },
+                {
+                    "type": "blob_size",
+                    "count": 5964
+                },
+                {
+                    "type": "cdregion",
+                    "count": 1
+                },
+                {
+                    "type": "cdregion",
+                    "count": 1
+                },
+                {
+                    "type": "gene",
+                    "count": 1
+                }
+            ],
+            "properties": {
+                "aa": 2,
+                "qual": 32,
+                "value": "34"
+            },
+            "oslt": {
+                "indexed": true,
+                "value": "ADB98021.1"
+            },
+            "splits": [
+                {
+                    "name": "fleegle",
+                    "hobby": "fun",
+                    "instrument": "guitar"
+                },
+                {
+                    "name": "bingo",
+                    "hobby": "fun",
+                    "instrument": "drums"
+                },
+                {
+                    "name": "drooper",
+                    "hobby": "fun",
+                    "instrument": "bass"
+                },
+                {
+                    "name": "snorky",
+                    "hobby": "fun",
+                    "instrument": "keyboards"
+                }
+            ],
+            "booleans": [
+                false,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true
+            ]
+        }
+    }
+}

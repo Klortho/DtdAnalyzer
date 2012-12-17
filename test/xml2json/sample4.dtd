@@ -25,6 +25,7 @@
       | Properties
       | OSLT
       | splits
+      | Booleans
     )*>
 <!ATTLIST DocumentSummary uid CDATA #IMPLIED>
 
@@ -67,6 +68,8 @@
 <!ATTLIST   OSLT
   indexed   CDATA       #IMPLIED>
 
+
+<!-- Test an array of objects. -->
 <!ELEMENT splits (split)+>
 <!ELEMENT split (instrument)>
 <!ATTLIST split
@@ -92,6 +95,9 @@
   attr CDATA  #IMPLIED
   Attr CDATA  #IMPLIED>
 
- 
- 
- 
+<!-- Test various boolean values  -->
+<!ELEMENT Booleans (Boolean)+>
+<!--~~ <Boolean>
+~~json <boolean/>
+~~-->
+<!ELEMENT Boolean (#PCDATA)>
