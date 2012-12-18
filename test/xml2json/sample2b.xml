@@ -27,9 +27,6 @@
   </TranslationStack>
   <ErrorList>
     <PhraseNotFound>fleegle[MeSH Terms]</PhraseNotFound>
-    <!-- Test newlines embedded in a value -->
-    <PhraseNotFound>
-      bingo[MeSH Terms]
-    </PhraseNotFound>
+    <PhraseNotFound>bingo[MeSH Terms]</PhraseNotFound>
   </ErrorList>
 </Result>

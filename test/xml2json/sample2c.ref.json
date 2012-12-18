@@ -1,0 +1,17 @@
+{
+    "type": "sample2",
+    "version": "0.3",
+    "ERROR": "Test",
+    "errorlist": {
+        "count": 5,
+        "phrasesnotfound": [
+            "  Leading and trailing whitespace  ",
+            "\n      Some newlines\n    ",
+            "  Newlines and carriage returns, too!  \n  \n\r  \r\n ",
+            " A \t tab. ",
+            "\n      Some \"quote\" characters, a backslash: \\, and a unicode snowman:  ☃\n    "
+        ],
+        "fieldsnotfound": [
+        ]
+    }
+}

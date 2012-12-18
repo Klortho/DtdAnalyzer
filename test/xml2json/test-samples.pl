@@ -12,9 +12,13 @@ use strict;
 use File::Compare;
 
 my @samples = qw(
-    sample1 sample2a sample2b sample3 sample4
+    sample1 sample2a sample2b sample2c sample3 sample4
 );
+# Set this to true if you have jsonlint installed.
+my $test_jsonlint = 0;
+
 my $failpref = "****** Failed: ";
+
 
 print "Generating outputs for each of the samples.\n";
 system "./make-samples.sh";
@@ -36,13 +40,14 @@ foreach my $s (@samples) {
     }
 }
 
-print "Testing that each new output is valid JSON.\n";
-foreach my $s (@samples) {
-    my $sjson = $s . ".json";
-    my $jsonlint_cmd = "jsonlint $sjson";
-    system($jsonlint_cmd . " > /dev/null 2>\&1");
-    if ($? != 0) {
-        die "$failpref $sjson does not appear to be valid JSON.\nTry '$jsonlint_cmd'.\n";
+if ($test_jsonlint) {
+    print "Testing that each new output is valid JSON.\n";
+    foreach my $s (@samples) {
+        my $sjson = $s . ".json";
+        my $jsonlint_cmd = "jsonlint $sjson";
+        system($jsonlint_cmd . " > /dev/null 2>\&1");
+        if ($? != 0) {
+            die "$failpref $sjson does not appear to be valid JSON.\nTry '$jsonlint_cmd'.\n";
+        }
     }
 }
-

@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!--
+  This sample exists to test various unusual and difficult characters inside 
+  text, to make sure JSON escaping is working properly.
+-->
+
+<!DOCTYPE Result SYSTEM "sample2.dtd">
+
+<Result>
+  <ERROR>Test</ERROR>
+  <ErrorList>
+    <PhraseNotFound>  Leading and trailing whitespace  </PhraseNotFound>
+    <PhraseNotFound>
+      Some newlines
+    </PhraseNotFound>
+    <PhraseNotFound>  Newlines and carriage returns, too!  &#10;  &#10;&#13;  &#13;&#10; </PhraseNotFound>
+    <PhraseNotFound> A &#9; tab. </PhraseNotFound>
+    <PhraseNotFound>
+      Some "quote" characters, a backslash: \, and a unicode snowman:  ☃
+    </PhraseNotFound>
+  </ErrorList>
+</Result>

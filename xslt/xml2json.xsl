@@ -82,23 +82,30 @@
   
   <!--
     Quote a string to prepare it for insertion into a JSON literal value.
-    Right now this backslash-escapes double quotes and backslashes.  Probably
-    needs to be made more robust.
+    Right now this backslash-escapes double quotes and backslashes. 
   -->
   <f:function name="np:json-escape">
     <xsl:param name="s"/>
     <xsl:variable name="quot">"</xsl:variable>
     <xsl:variable name="bs">\</xsl:variable>
+    <xsl:variable name='cr' select='"&#13;"'/>
+    <xsl:variable name='tab' select='"&#9;"'/>
     <xsl:variable name="result" 
       select="str:replace(
-                str:replace( 
-                  str:replace($s, 
-                    $bs, concat($bs, $bs) 
+                str:replace(
+                  str:replace(
+                    str:replace(
+                      str:replace($s, 
+                        $bs, concat($bs, $bs) 
+                      ),
+                      $quot, concat($bs, $quot) 
+                    ),
+                    $nl, concat($bs, 'n')
                   ),
-                  $quot, concat($bs, $quot) 
+                  $cr, concat($bs, 'r')
                 ),
-                $nl, concat($bs, 'n')
-              )"/>
+                $tab, concat($bs, 't')
+              )"/> 
     <f:result>
       <xsl:value-of select="$result"/>
     </f:result>
@@ -536,8 +543,6 @@
     default, the key will be "value".  If it's an attribute or element node, then, 
     by default, the key will be the name converted to lowercase (it's up to you
     to make sure they are unique within the object).
-    
-    FIXME:  I don't think we always want to normalize-space on the content.
   -->
   <xsl:template name='string-in-object'>
     <xsl:param name='indent' select='""'/>
@@ -560,8 +565,6 @@
     For text nodes, attributes, or elements that have simple content, when
     in the context of a JSON array.  This discards the attribute or element name,
     and produces a quoted string from the content.
-    
-    FIXME:  I don't think we always want to normalize-space on the content.
   -->
   <xsl:template name='string-in-array'>
     <xsl:param name='indent' select='""'/>
