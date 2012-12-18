@@ -8,6 +8,9 @@ package gov.ncbi.pmc.dtdanalyzer;
 
 import java.util.*;
 import java.io.*;
+import org.apache.xml.resolver.tools.CatalogResolver;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Processes the declarations for Elements, Attributes and Entities to provide 
@@ -30,6 +33,78 @@ public class ModelBuilder {
     private HashSet _roots;                    // A list of all the root Elements
 
 
+    /**
+     * New version of constructor.  Does a lot more.
+     */
+    public ModelBuilder(DtdSpecifier _dtdSpec, String[] _roots, CatalogResolver _resolver) {
+    
+        // Perform set-up and parsing here.  The output of this step is a fully chopped up
+        // and recorded representation of the DTD, stored in the DtdEventHandler object.
+        
+        DTDEventHandler dtdEvents = new DTDEventHandler();
+        try {
+            XMLReader parser = XMLReaderFactory.createXMLReader();
+            parser.setContentHandler(dtdEvents);
+            parser.setErrorHandler(dtdEvents);
+            parser.setProperty( "http://xml.org/sax/properties/lexical-handler", dtdEvents); 
+            parser.setProperty( "http://xml.org/sax/properties/declaration-handler", dtdEvents);
+            parser.setFeature("http://xml.org/sax/features/validation", true);
+            
+            // Resolve entities if we have a catalog
+            if ( _resolver != null ) parser.setEntityResolver(_resolver); 
+            
+            // Run the parse to capture all events and create an XML representation of the DTD.
+            // XMLReader's parse method either takes a system id as a string, or an InputSource
+            if (_dtdSpec.idType == 'd') {
+                parser.parse(_dtdSpec.idValue);
+            }
+            else {
+                parser.parse(_dtdSpec.dummyXml);
+            }
+            
+            // After parsing, all of the data has been collected into dtdEvents.
+        }
+
+        catch (EndOfDTDException ede) {
+            // ignore: this is a normal exception raised to signal the end of processing
+        }
+        
+        catch (Exception e) {
+            System.err.println( "Could not process the DTD.  Message from the parser:");
+            System.err.println(e.getMessage());
+            //e.printStackTrace();
+            System.exit(1);
+        }
+
+
+        // The next step is to mung the data from the parsed DTD a bit, building derived
+        // data structures.  The output of this step is stored in the ModelBuilder object.
+        _initialize(dtdEvents, _dtdSpec.title);
+
+        // If the --roots switch was given, then add those to our list of root elements:
+        try {
+            if (_roots != null) addRoots(_roots);
+        }
+        catch (Exception e) {
+            // This is not fatal
+            System.err.println("Error trying to add specified root elements: " + 
+                e.getMessage());
+        }
+        
+        // If there are any known root elements (specified either as annotation tags or with
+        // the --roots switch, then find reachable elements.
+        try {
+            if (hasRoots()) {
+                findReachable();
+            }
+        }
+        catch (Exception e) {
+            // This is not fatal.
+            System.err.println("Error trying to find reachable nodes from set of roots: " +
+                e.getMessage());
+        }
+
+    }
 
     /**
      * Creates a new instance of ModelBuilder.  
@@ -40,6 +115,10 @@ public class ModelBuilder {
      * top-level DTD structured comment.
      */
     public ModelBuilder(DTDEventHandler _dtdInfo, String _dtdTitle) {
+        _initialize(_dtdInfo, _dtdTitle); 
+    }
+    
+    private void _initialize(DTDEventHandler _dtdInfo, String _dtdTitle) {
         dtdInfo = _dtdInfo;
         elements = _dtdInfo.getAllElements();
         attributes = _dtdInfo.getAllAttributes();

@@ -18,23 +18,9 @@ import org.apache.xml.resolver.tools.*;
 import gov.ncbi.pmc.xml.PMCBootStrapper;
 import org.apache.xml.resolver.*;
 
-/*
-import java.io.*;
-import java.net.*;
-import javax.xml.transform.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
-import gov.ncbi.pmc.xml.PMCBootStrapper;
-import org.apache.xml.resolver.*;
-import org.apache.xml.resolver.tools.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.XMLReaderFactory;
-*/
-
 /**
- * Creates XML representation of an XML DTD and then transforms it using
- * a provided stylesheet. This is a bare-bones application intended for
- * demonstration and debugging.
+ * The App class consolidates command-line options, configuration information, and other
+ * things that are shared across all of the dtdanalyzer tools.
  */
 public class App {
 
@@ -73,7 +59,6 @@ public class App {
     // Value of the DTDANALYZER_HOME system property
     private File home;
 
-
     // This is the Options object that gives the list of all of the command-line options
     // that are in effect for this particular invokation.  (The list will differ depending on the
     // driver class; i.e. DtdAnalyzer, DtdDocumentor, etc.)
@@ -84,31 +69,29 @@ public class App {
     // key of this hash.
     private HashMap allOpts = new HashMap();
 
-    // This is used to sort the options
+    // This is used to sort the options, when outputting the usage message.
     private OptionComparator oc;
 
-    // Usage into, passed to the HelpFormatter
+    // Usage info, these are passed to the HelpFormatter
     private String cmdLineSyntax;
     private String usageHeader;
 
     // Parsed command line
     private CommandLine line;
 
-    // If -s or -p was given, this is the dummy input XML file:
-    private InputSource dummyXmlFile = null;
+    // List of DTD specifiers.  This list is constructed from the -d/-s/-p options, plus
+    // the other options that are DTD-specific.  Usually, there is only one, but at least
+    // one tool (dtdcompare) requires two DTDs.
+    private DtdSpecifier[] dtdSpecifiers;
 
-    // If two options -s or -p were given (for comparison), this is the 
-    // second dummy XML file
-    private InputSource dummyXmlFile2 = null;
-    
+    // Number of DTDs that we are expecting from the command-line arguments.
+    private int numDtds;
+
     // If --catalog was given, this will be the CatalogResolver
     private CatalogResolver resolver = null;
 
     // If --xslt was given, this will be the transformer
     private Transformer xslt = null;
-
-    // If --title was given, this holds the value
-    private String dtdTitle = null;
 
     // If --roots was given, this holds the values as an array.
     private String[] roots = null;
@@ -118,7 +101,15 @@ public class App {
     private String[] xsltParams = new String[0];
 
 
-    // DtdDocumentor options, to be passed in as XSLT params
+
+
+
+    // FIXME:
+    // If --title was given, this holds the value
+    //private String dtdTitle = null;
+
+
+    // DtdDocumentor options, to be passed in as XSLT params.
 
     private String dir = null;
     private String css = null;
@@ -136,6 +127,18 @@ public class App {
      * to be output in the usage message.
      */
     public App(String[] args, String[] optList, String _cmdLineSyntax, String _usageHeader) {
+        _initialize(args, optList, _cmdLineSyntax, _usageHeader, 1);
+    }
+    
+    public App(String[] args, String[] optList, String _cmdLineSyntax, String _usageHeader,
+               int _numDtds) {
+        _initialize(args, optList, _cmdLineSyntax, _usageHeader, _numDtds);
+    }
+    
+    
+    private void _initialize(String[] args, String[] optList, String _cmdLineSyntax, 
+                             String _usageHeader, int _numDtds) 
+    {
         String homeStr = System.getProperty("DTDANALYZER_HOME");
         if (homeStr == null) homeStr = ".";
         home = new File(homeStr);
@@ -146,7 +149,8 @@ public class App {
             props.load(new FileInputStream( new File(homeStr, "app.properties") ));
             version = props.getProperty("version");
             buildtime = props.getProperty("buildtime");
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             System.err.println("Warning:  failed to read app.properties file.");
         }
         
@@ -179,7 +183,7 @@ public class App {
                 System.exit(0);
             }
             
-            // Hanlde --version:
+            // Handle --version:
             if ( line.hasOption("v") ) {
                 System.out.println(
                     "DtdAnalyzer utility, version " + version + "\n" +
@@ -189,43 +193,56 @@ public class App {
                 System.exit(0);
             }
 
-            // Validate options
-
-            // Only one of -s, -d, or -p can be given
-            if ( (line.hasOption("d") ? 1:0) + (line.hasOption("s") ? 1:0) +
-                 (line.hasOption("p") ? 1:0) > 1) {
-                 usageError("Only one of -d, -s, or -p is allowed!");
+            // Initialize all of the dtd specifiers
+            numDtds = _numDtds;
+            dtdSpecifiers = new DtdSpecifier[numDtds];
+            for (int i = 0; i < numDtds; ++i) {
+                dtdSpecifiers[i] = new DtdSpecifier();
             }
 
-            // Check that, if given, the argument to -d is a valid file
-            if (line.hasOption("d")) {
-                File xml = new File(line.getOptionValue("d"));
-                if ( ! xml.exists() || ! xml.isFile() ) {
-                    System.err.println("Error: " + xml.toString() + " is not a file" );
-                    System.exit(1);
+            // Loop through the dtd-specific options -d/-s/-p, and store the info in the
+            // DtdSpecifer objects.
+            Option[] lineOpts = line.getOptions();
+            int n = 0;
+            for (int i = 0; i < lineOpts.length; ++i) {
+                Option opt = lineOpts[i];
+                //System.out.println("Option " + i + ": " + opt.getArgName() + ", " + (char) opt.getId());
+                int optId = opt.getId();
+                if (optId == 'd' || optId == 's' || optId == 'p') {
+                    if (n + 1 > numDtds) {
+                        usageError("Expected at most " + numDtds + " DTD specifier" +
+                                   (numDtds > 1 ? "s" : "") + "!");
+                    }
+                    dtdSpecifiers[n].idType = optId;
+                    dtdSpecifiers[n].idValue = opt.getValue();
+                    n++;
                 }
             }
-
-            // Otherwise, construct the dummy XML file
-            else {
-                String xmlFileStr = "<!DOCTYPE root ";
-                if (line.hasOption("s")) {
-                    xmlFileStr += "SYSTEM \"" + line.getOptionValue("s") + "\">";
-                }
-                else {
-                    xmlFileStr += "PUBLIC \"" + line.getOptionValue("p") + "\" \"\">";
-                }
-                String publicId = line.getOptionValue("p");
-                xmlFileStr += "\n\n<root/>\n";
-
-                if (dummyXmlFile == null) {
-                    dummyXmlFile = new InputSource(new StringReader(xmlFileStr));
-                }
-                else {
-                    dummyXmlFile2 = new InputSource(new StringReader(xmlFileStr));
+            // FIXME:  Now we want to loop through any left-over arguments, and if we still
+            // expect dtd specifiers, then use them up.  For now, complain
+            if (n < numDtds) {
+                usageError("Expected at least " + numDtds + " DTD specifier" + 
+                           (numDtds > 1 ? "s" : "") + "!");
+            }
+            
+            // Loop through again, and pick up any title options given
+            n = 0;
+            for (int i = 0; i < lineOpts.length; ++i) {
+                Option opt = lineOpts[i];
+                int optId = opt.getId();
+                if (optId == 't') {
+                    if (n + 1 > numDtds) {
+                        usageError("Too many titles!");
+                    }
+                    dtdSpecifiers[n++].title = opt.getValue();
                 }
             }
-
+            
+            // Validate each dtd specifier object.  This also causes dummy XML documents
+            // to be created for -s or -p specifiers.
+            for (int i = 0; i < numDtds; ++i) {
+                dtdSpecifiers[i].validate();
+            }
 
             // Check for, and handle, the --catalog option
             if (line.hasOption("c")) {
@@ -267,9 +284,6 @@ public class App {
                 System.err.println("Error configuring xslt transformer: " + e.getMessage());
                 System.exit(1);
             }
-
-            // Check for and store the --title option
-            if (line.hasOption("t")) dtdTitle = line.getOptionValue("t");
 
             // Check for and store --roots
             if (line.hasOption("r")) {
@@ -354,20 +368,87 @@ public class App {
         return activeOpts;
     }
 
+
     /**
-     * If -s or -p were used, this should hold the dummy XML file
+     * Get the DtdSpecifier.
      */
-    public InputSource getDummyXmlFile() {
-        return dummyXmlFile;
+    public DtdSpecifier getDtdSpec() {
+        return getDtdSpec(0);
+    }
+    /**
+     * Same, but use this when there are multiple dtds allowed.
+     * No range checking done here, use responsibly.
+     */
+    public DtdSpecifier getDtdSpec(int i) {
+        return dtdSpecifiers[i];
     }
 
     /**
-     * If two of -s and/or -p were used (for dtdcompare), this should hold the 
-     * second dummy XML file
+     * Gets the DTD specification type, either 'd', 's', or 'p'.
      */
-    public InputSource getDummyXmlFile2() {
-        return dummyXmlFile2;
+    public int getDtdSpecType() {
+        return getDtdSpecType(0);
     }
+    
+    /**
+     * Same, but use this one when there are multiple dtds allowed.
+     * No range checking done here, use responsibly.
+     */
+    public int getDtdSpecType(int i) {
+        return dtdSpecifiers[i].idType;
+    }
+
+    /**
+     * Gets the DTD specification value, either a filename ('d'), a
+     * system identifier, or a public identifier.
+     */
+    public String getDtdSpecValue() {
+        return getDtdSpecValue(0);
+    }
+    
+    /**
+     * Same, but use this one when there are multiple dtds allowed.
+     * No range checking done here, use responsibly.
+     */
+    public String getDtdSpecValue(int i) {
+        return dtdSpecifiers[i].idValue;
+    }
+
+    /**
+     * If -s or -p were used, this should hold the dummy XML file
+     */
+    public InputSource getDummyXml() {
+        return getDummyXml(0);
+    }
+    
+    /**
+     * Same, but use this one when there are multiple dtds allowed.
+     * No range checking done here, use responsibly.
+     */
+    public InputSource getDummyXml(int i) {
+        return dtdSpecifiers[i].dummyXml;
+    }
+
+    /**
+     * If --title was given, this returns the value, otherwise null.
+     */
+    public String getDtdTitle() {
+        return getDtdTitle(0);
+    }
+    
+    /**
+     * Same, but use this when there are multiple dtds allowed.
+     * No range checking done here, use responsibly.
+     */
+    public String getDtdTitle(int i) {
+        return dtdSpecifiers[i].title;
+    }
+
+
+
+
+
+
 
 
     /**
@@ -383,13 +464,6 @@ public class App {
      */
     public Transformer getXslt() {
         return xslt;
-    }
-
-    /**
-     * If --title was given, this returns the value, otherwise null.
-     */
-    public String getDtdTitle() {
-        return dtdTitle;
     }
 
     /**
@@ -692,4 +766,5 @@ public class App {
         printUsage(System.err);
         System.exit(1);
     }
+    
 }

@@ -39,7 +39,7 @@ public class XMLWriter {
      */
     public XMLWriter(ModelBuilder mb) {
         // Retrieve the internal DTD
-      /* cfm, removed this - I hate DTDs!
+      /* cfm, removed this - I hate DTDs!  ;-)
         try{
             InputStream is = this.getClass().getResourceAsStream(DTD_LOCATION);
             InputStreamReader isr = new InputStreamReader(is);
@@ -87,9 +87,6 @@ public class XMLWriter {
             scomments = model.getSComments();
             
             processDtdModule();
-            
-            // Process modules
-            //processModules();
             
             // Make elements
             processAllElements();
@@ -157,6 +154,13 @@ public class XMLWriter {
             //should never happen (hint)
         }      
         return isr;
+    }
+    
+    /**
+     * Because sometimes you just want the buffer.
+     */
+    public StringWriter getBuffer() {
+        return buffer;
     }
     
     /**

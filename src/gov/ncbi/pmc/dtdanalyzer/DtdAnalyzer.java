@@ -45,12 +45,6 @@ public class DtdAnalyzer {
 
         // Get the parsed command line arguments
         CommandLine line = app.getLine();
-    
-        // At least one of these must be given
-        if (!line.hasOption("d") && !line.hasOption("s") && !line.hasOption("p")) {
-            app.usageError("At least one of -d, -s, or -p must be specified!");
-        }
-
 
         // There should be at most one thing left on the line, which, if present, specifies the
         // output file.
@@ -66,74 +60,9 @@ public class DtdAnalyzer {
             app.usageError("Too many arguments!");
         }
 
-        
+        // This parses the DTD, and corrals the data into a model:
+        ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
 
-        // Perform set-up and parsing here.  The output of this step is a fully chopped up
-        // and recorded representation of the DTD, stored in the DtdEventHandler object.
-        
-        DTDEventHandler dtdEvents = new DTDEventHandler();
-        try {
-            XMLReader parser = XMLReaderFactory.createXMLReader();
-            parser.setContentHandler(dtdEvents);
-            parser.setErrorHandler(dtdEvents);
-            parser.setProperty( "http://xml.org/sax/properties/lexical-handler", dtdEvents); 
-            parser.setProperty( "http://xml.org/sax/properties/declaration-handler", dtdEvents);
-            parser.setFeature("http://xml.org/sax/features/validation", true);
-            
-            // Resolve entities if we have a catalog
-            CatalogResolver resolver = app.getResolver();
-            if ( resolver != null ) parser.setEntityResolver(resolver); 
-            
-            // Run the parse to capture all events and create an XML representation of the DTD.
-            // XMLReader's parse method either takes a system id as a string, or an InputSource
-            if (line.hasOption("d")) {
-                parser.parse(line.getOptionValue("d"));
-            }
-            else {
-                parser.parse(app.getDummyXmlFile());
-            }
-        }
-
-        catch (EndOfDTDException ede) {
-            // ignore: this is a normal exception raised to signal the end of processing
-        }
-        
-        catch (Exception e) {
-            System.err.println( "Could not process the DTD.  Message from the parser:");
-            System.err.println(e.getMessage());
-            //e.printStackTrace();
-            System.exit(1);
-        }
-
-
-        // The next step is to mung the data from the parsed DTD a bit, building derived
-        // data structures.  The output of this step is stored in the ModelBuilder object.
-
-        ModelBuilder model = new ModelBuilder(dtdEvents, app.getDtdTitle());
-        
-        // If the --roots switch was given, then add those to our list of root elements:
-        String[] roots = app.getRoots();
-        try {
-            if (roots != null) model.addRoots(roots);
-        }
-        catch (Exception e) {
-            // This is not fatal
-            System.err.println("Error trying to add specified root elements: " + 
-                e.getMessage());
-        }
-        
-        // If there are any known root elements (specified either as annotation tags or with
-        // the --roots switch, then find reachable elements.
-        try {
-            if (model.hasRoots()) {
-                model.findReachable();
-            }
-        }
-        catch (Exception e) {
-            // This is not fatal.
-            System.err.println("Error trying to find reachable nodes from set of roots: " +
-                e.getMessage());
-        }
         XMLWriter writer = new XMLWriter(model);
 
 
