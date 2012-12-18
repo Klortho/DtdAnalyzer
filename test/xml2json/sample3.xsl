@@ -42,7 +42,7 @@
         <xsl:for-each select='$elems[1]'>
           <xsl:call-template name='object-in-array'>
             <xsl:with-param name='indent' select='$indent'/>
-            <xsl:with-param name='force-comma' select='$trailing-comma'/>
+            <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
           </xsl:call-template>
         </xsl:for-each>
       </xsl:when>

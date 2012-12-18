@@ -645,19 +645,12 @@
     By default, the key will be the name converted to lowercase.
     This produces a JSON array.  The "kids" are the set of child elements only,
     so attributes and text node children are discarded.
-    
-    FIXME [here and in all the templates below]:  
-    Can't I use
-      <xsl:param name='trailing-comma' select='position() != last()'/>
-    instead of the kludgy force-comma that I have here now?  If not, won't I also
-    need a no-comma param?
   -->
   <xsl:template name='array-in-object'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
     <xsl:param name='kids' select='*'/>
-    <xsl:param name='force-comma' select='false()'/>
-    <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:value-of select='np:key-start-array($indent, $key)'/>
 
@@ -677,8 +670,7 @@
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
     <xsl:param name='kids' select='*'/>
-    <xsl:param name='force-comma' select='false()'/>
-    <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:value-of select='np:start-array($indent)'/>
 
@@ -703,8 +695,7 @@
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
     <xsl:param name='kids' select='@*|*'/>
-    <xsl:param name='force-comma' select='false()'/>
-    <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:value-of select='np:key-start-object($indent, $key)'/>
 
@@ -724,8 +715,7 @@
   <xsl:template name='object-in-array'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='kids' select='@*|*'/>
-    <xsl:param name='force-comma' select='false()'/>
-    <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:value-of select='np:start-object($indent)'/>
 
