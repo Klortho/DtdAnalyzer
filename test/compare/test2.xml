@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This sample is for testing the content-model generation of the DtdAnalyzer.
+-->
+<!DOCTYPE foo1 SYSTEM "test2.dtd">
+  
+<foo1>
+  <foo2/>
+  <foo3>Jackdaws love my big sphinx of quartz.</foo3>
+  <foo4><day/>Jackdaws love my big sphinx of <day/>quartz<month/>.</foo4>
+  <foo5><chapter/><appendix/><appendix/><chapter/></foo5>
+  <foo6><chapter/></foo6>
+  <foo7><intro/><section/></foo7>
+</foo1>

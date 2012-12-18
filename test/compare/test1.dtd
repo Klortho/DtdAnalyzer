@@ -1,0 +1,33 @@
+
+<!ELEMENT root ANY>
+<!ELEMENT empty EMPTY>
+
+<!-- 
+  According to the spec, both 'pcdata' and 'mixed' here have "mixed content", but
+  we'll use the term "pcdata" when only text nodes are allowed within an element.
+-->
+<!ELEMENT pcdata (#PCDATA)>
+<!ELEMENT mixed (#PCDATA|empty|pcdata|mixed)*>
+
+<!--
+  All of the following have "children" content.  The productions are (neglecting 
+  whitespace):
+    children ::= (choice | seq) ('?' | '*' | '+')
+    cp       ::= (Name | choice | seq) ('?' | '*' | '+')
+    choice   ::= '(' cp ( '|' cp )* ')'
+    seq      ::= '(' cp ( ',' cp )* ')'
+-->
+<!ELEMENT choice1 (chapter|appendix)+>
+<!ELEMENT choice2 (chapter|appendix)?>
+<!ELEMENT choice3 (chapter|appendix)*>
+<!-- Nested choice -->
+<!ELEMENT choice4 (chapter | (choice1 | choice2 | choice3)+)>
+
+<!ELEMENT seq1 (chapter+, appendix+, glossary*)+>
+<!ELEMENT seq2 (chapter+, (choice1 | choice2), (seq1, seq2?)+)?>
+
+<!ELEMENT  chapter (#PCDATA)>
+<!ELEMENT  appendix (#PCDATA)>
+<!ELEMENT  glossary (#PCDATA)>
+
+<!ELEMENT article (abstract?,(intro|preface),section+)?>
