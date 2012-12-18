@@ -432,14 +432,12 @@
     <xsl:param name='indent' select='""'/>
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='key' select='""'/>
-    <xsl:param name='kids-param' select='false()'/>
-    <xsl:param name='kids'/>
+    <xsl:param name='kids' select='*'/>
     
     <xsl:choose>
       <xsl:when test='$context = "object" and $key = ""'>
         <xsl:call-template name='array-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
-          <xsl:with-param name='kids-param' select='$kids-param'/>
           <xsl:with-param name='kids' select='$kids'/>
         </xsl:call-template>
       </xsl:when>
@@ -447,14 +445,12 @@
         <xsl:call-template name='array-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='key' select='$key'/>
-          <xsl:with-param name='kids-param' select='$kids-param'/>
           <xsl:with-param name='kids' select='$kids'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "array"'>
         <xsl:call-template name="array-in-array">
           <xsl:with-param name='indent' select='$indent'/>
-          <xsl:with-param name='kids-param' select='$kids-param'/>
           <xsl:with-param name='kids' select='$kids'/>
         </xsl:call-template>
       </xsl:when>
@@ -487,14 +483,12 @@
     <xsl:param name='indent' select='""'/>
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='key' select='""'/>
-    <xsl:param name='kids-param' select='false()'/>
-    <xsl:param name='kids'/>
+    <xsl:param name='kids' select='@*|*'/>
     
     <xsl:choose>
       <xsl:when test='$context = "object" and $key = ""'>
         <xsl:call-template name='object-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
-          <xsl:with-param name='kids-param' select='$kids-param'/>
           <xsl:with-param name='kids' select='$kids'/>
         </xsl:call-template>
       </xsl:when>
@@ -502,14 +496,12 @@
         <xsl:call-template name='object-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='key' select='$key'/>
-          <xsl:with-param name='kids-param' select='$kids-param'/>
           <xsl:with-param name='kids' select='$kids'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "array"'>
         <xsl:call-template name="object-in-array">
           <xsl:with-param name='indent' select='$indent'/>
-          <xsl:with-param name='kids-param' select='$kids-param'/>
           <xsl:with-param name='kids' select='$kids'/>
         </xsl:call-template>
       </xsl:when>
@@ -659,39 +651,20 @@
       <xsl:param name='trailing-comma' select='position() != last()'/>
     instead of the kludgy force-comma that I have here now?  If not, won't I also
     need a no-comma param?
-    
-    FIXME:  Do we still need kids-param?
   -->
   <xsl:template name='array-in-object'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
-    <!-- 
-      kids-param says whether or not kids is given.  It is needed (unless I don't 
-      know something) because we might be calling this with a kids parameter that
-      evaluates to an empty node-set.  It seems that XSLT 1.0 uses the default 
-      in that case (which would be "*"), which is no good:  we want it to mean "no kids". 
-    -->      
-    <xsl:param name='kids-param' select='false()'/>
-    <xsl:param name='kids'/>
+    <xsl:param name='kids' select='*'/>
     <xsl:param name='force-comma' select='false()'/>
     <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
     
     <xsl:value-of select='np:key-start-array($indent, $key)'/>
 
-    <xsl:choose>
-      <xsl:when test='$kids-param'>
-        <xsl:apply-templates select='$kids'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='context' select='"array"'/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select='*'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='context' select='"array"'/>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:apply-templates select='$kids'>
+      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
+      <xsl:with-param name='context' select='"array"'/>
+    </xsl:apply-templates>
     
     <xsl:value-of select='np:end-array($indent, $trailing-comma)'/>
   </xsl:template>
@@ -703,27 +676,16 @@
   <xsl:template name='array-in-array'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
-    <xsl:param name='kids-param' select='false()'/>
-    <xsl:param name='kids'/>
+    <xsl:param name='kids' select='*'/>
     <xsl:param name='force-comma' select='false()'/>
     <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
     
     <xsl:value-of select='np:start-array($indent)'/>
 
-    <xsl:choose>
-      <xsl:when test='$kids-param'>
-        <xsl:apply-templates select='$kids'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='context' select='"array"'/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select='*'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='context' select='"array"'/>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:apply-templates select='$kids'>
+      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
+      <xsl:with-param name='context' select='"array"'/>
+    </xsl:apply-templates>
     
     <xsl:value-of select='np:end-array($indent, $trailing-comma)'/>
   </xsl:template>
@@ -740,27 +702,16 @@
   <xsl:template name='object-in-object'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
-    <xsl:param name='kids-param' select='false()'/>
-    <xsl:param name='kids'/>
+    <xsl:param name='kids' select='@*|*'/>
     <xsl:param name='force-comma' select='false()'/>
     <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
     
     <xsl:value-of select='np:key-start-object($indent, $key)'/>
 
-    <xsl:choose>
-      <xsl:when test='$kids-param'>
-        <xsl:apply-templates select='$kids'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='context' select='"object"'/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select='@*|*'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='context' select='"object"'/>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:apply-templates select='$kids'>
+      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
+      <xsl:with-param name='context' select='"object"'/>
+    </xsl:apply-templates>
     
     <xsl:value-of select='np:end-object($indent, $trailing-comma)'/>
   </xsl:template>
@@ -772,27 +723,16 @@
   -->
   <xsl:template name='object-in-array'>
     <xsl:param name='indent' select='""'/>
-    <xsl:param name='kids-param' select='false()'/>
-    <xsl:param name='kids'/>
+    <xsl:param name='kids' select='@*|*'/>
     <xsl:param name='force-comma' select='false()'/>
     <xsl:variable name='trailing-comma' select='$force-comma or position() != last()'/>
     
     <xsl:value-of select='np:start-object($indent)'/>
 
-    <xsl:choose>
-      <xsl:when test='$kids-param'>
-        <xsl:apply-templates select='$kids'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='context' select='"object"'/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select='@*|*'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='context' select='"object"'/>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:apply-templates select='$kids'>
+      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
+      <xsl:with-param name='context' select='"object"'/>
+    </xsl:apply-templates>
     
     <xsl:value-of select='np:end-object($indent, $trailing-comma)'/>
   </xsl:template>

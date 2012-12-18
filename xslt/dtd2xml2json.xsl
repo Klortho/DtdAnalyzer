@@ -745,7 +745,6 @@
               <xsl:with-param name='key' select='{$jsonName}'/>
             </x:if>
             <x:if test='$item/@textKid = "true"'>
-              <xsl:with-param name='kids-param' select='true()'/>
               <xsl:with-param name='kids' select='@*|node()'/>
             </x:if>
           </xsl:call-template>
