@@ -6,11 +6,12 @@ DtdAnalyzer provides a set of tools:
   of an XML DTD
 * **dtddocumentor** - generates pretty HTML documentation, including annotations (if
   present) from specially-formatted comments of the DTD
-* **compare-dtds.xsl** - compares two DTDs and generate a report of differences
-* **scaffold.xsl** - generates XSLT scaffolding that can be used as a starting point
-  for writing a transform from one schema to another
+* **dtdcompare** - compares two DTDs and generate a report of differences
+* **dtd2xml2json** - generates XSLT to convert instance documents into JSON format.
 * **dtdschematron.xsl** - generates a schematron file from the DTD, including extra
   schematron rules (if present) from specially-formatted comments of the DTD
+* **scaffold.xsl** - generates XSLT scaffolding that can be used as a starting point
+  for writing a transform from one schema to another
 
 ## Home page and documentation
 
@@ -37,30 +38,39 @@ wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 
   On Windows:
 
-      set PATH=%PATH%;-path-to-dtdanalyzer-package-
+  ```
+  set PATH=%PATH%;-path-to-dtdanalyzer-package-
+  ```
 
   On Unix:
 
-      export PATH=$PATH:-path-to-dtdanalyzer-package-
+  ```
+  export PATH=$PATH:-path-to-dtdanalyzer-package-
+  ```
 
 * Try the following command (which analyzes the
   [Journal Archiving and Interchange](http://jats.nlm.nih.gov/archiving/1.0/dtd.html)
   flavor of the [NLM/NISO Journal Article Tag Suite](http://jats.nlm.nih.gov/), and
   writes the output to a file):
 
-      dtdanalyzer -s http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd JATS-archivearticle1.daz.xml
+  ```
+  dtdanalyzer http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd out.daz.xml
+  ```
 
-* Check that you have sensible results in the output file, `JATS-archivearticle1.daz.xml`.
+* Check that you have sensible results in the output file, `out.daz.xml`.
 
 * As another example, the next command produces HTML documentation for that DTD.  It should
   run for a little while and then announce that it's done, and that the documentation is in
-  the `doc` subdirectory.
+  the `doc` subdirectory. (Enter all on one line).
 
-      dtddocumentor -s http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd --exclude mml: --exclude-except mml:math
+  ```
+  dtddocumentor http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd
+    --exclude mml: --exclude-except mml:math
+  ```
 
 * Open the `doc/index.html` file there in a browser, and check that it looks correct.
 
-* Run `dtdanalyzer --help` or `dtddocumentor --help` for more complete usage information,
+* Run `--help` with any of the tools for more complete usage information,
   or continue by visiting the documentation pages on the [GitHub
   wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 

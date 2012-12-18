@@ -36,7 +36,7 @@ public class Dtd2Xml2Json {
             "help", "version", "doc", "system", "public", "basexslt", "default-minimized",
             "catalog", "title", "roots", "docproc", "markdown", "param"
         };
-        app = new App(args, optList, 
+        app = new App(args, optList, true,
             "dtd2xml2json [-d <xml-file> | -s <system-id> | -p <public-id>] " +
             "[-c <catalog>] [-x <xslt>] [-t <title>] [<out>]",
             "\nThis generates an XSLT stylesheet from a DTD.  The stylesheet transforms " +
@@ -47,20 +47,6 @@ public class Dtd2Xml2Json {
         // Get the parsed command line arguments
         CommandLine line = app.getLine();
     
-        // There should be at most one thing left on the line, which, if present, specifies the
-        // output file.
-        Result out = null;
-        String[] rest = line.getArgs();
-        if (rest.length == 0) {
-            out = new StreamResult(System.out);
-        }
-        else if (rest.length == 1) {
-            out = new StreamResult(new File(rest[0]));            
-        }
-        else {
-            app.usageError("Too many arguments!");
-        }
-
         // This parses the DTD, and corrals the data into a model:
         ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
         XMLWriter writer = new XMLWriter(model);
@@ -94,7 +80,7 @@ public class Dtd2Xml2Json {
             // looks for a system id even when a reader is used as the source  
             // If no string is provided for the sysId, we get a null pointer exception
             Source xmlSource = new StreamSource(reader, "");
-            xslt.transform(xmlSource, out);
+            xslt.transform(xmlSource, app.getOutput());
         }
 
         catch (Exception e){ 

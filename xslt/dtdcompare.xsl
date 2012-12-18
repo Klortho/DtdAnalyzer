@@ -15,8 +15,8 @@
    <!-- PARAMETERS  -->
    <!-- ============================================================================== -->
    <xsl:param name="dtd2-loc" select="'file://urn:UNKNOWN'"/> <!-- Location of second instance to compare -->
-   <xsl:param name="dtd1-name" select="'DTD 1'"/> <!-- Name of first DTD -->
-   <xsl:param name="dtd2-name" select="'DTD 2'"/> <!-- Name of second DTD -->
+   <xsl:param name="dtd1-name" select="'unknown'"/> <!-- Name of first DTD -->
+   <xsl:param name="dtd2-name" select="'unknown'"/> <!-- Name of second DTD -->
 
    <!-- ============================================================================== -->
    <!-- GLOBAL VARIABLES  -->
@@ -26,7 +26,34 @@
         templates to dtd2 -->
    <xsl:variable name="dtd1" select="/"/>
    <xsl:variable name="dtd2" select="document($dtd2-loc)"/>
-
+  
+   <xsl:variable name='dtd1-title'>
+     <xsl:choose>
+       <xsl:when test='$dtd1-name != "unknown"'>
+         <xsl:value-of select='$dtd1-name'/>
+       </xsl:when>
+       <xsl:when test='$dtd1/declarations/title'>
+         <xsl:value-of select='$dtd1/declarations/title'/>
+       </xsl:when>
+       <xsl:otherwise>
+         <xsl:value-of select='"DTD 1"'/>
+       </xsl:otherwise>
+     </xsl:choose>
+   </xsl:variable>
+  <xsl:variable name='dtd2-title'>
+    <xsl:choose>
+      <xsl:when test='$dtd2-name != "unknown"'>
+        <xsl:value-of select='$dtd2-name'/>
+      </xsl:when>
+      <xsl:when test='$dtd2/declarations/title'>
+        <xsl:value-of select='$dtd2/declarations/title'/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select='"DTD 2"'/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  
    <!-- ============================================================================== -->
    <!-- Start building HTML here   -->
    <!-- ============================================================================== -->
@@ -35,19 +62,19 @@
          <head>
             <title>
                <xsl:text>Comparison of </xsl:text>
-               <xsl:value-of select="$dtd1-name"/>
+               <xsl:value-of select="$dtd1-title"/>
                <xsl:text> to </xsl:text>
-               <xsl:value-of select="$dtd2-name"/>
+               <xsl:value-of select="$dtd2-title"/>
             </title>
          </head>
          <body>
             <table width="100%" border="1">
                <tr bgcolor="lightblue">
                   <th>
-                     <xsl:value-of select="$dtd1-name"/>
+                     <xsl:value-of select="$dtd1-title"/>
                   </th>
                   <th>
-                     <xsl:value-of select="$dtd2-name"/>
+                     <xsl:value-of select="$dtd2-title"/>
                   </th>
                </tr>
 
@@ -95,9 +122,9 @@
              <a name="removed"/>
                      <b>
                         <xsl:text>Elements present in </xsl:text>
-                        <xsl:value-of select="$dtd1-name"/>
+                        <xsl:value-of select="$dtd1-title"/>
                         <xsl:text> but not in </xsl:text>
-                        <xsl:value-of select="$dtd2-name"/>
+                        <xsl:value-of select="$dtd2-title"/>
                      </b>
                   </th>
                </tr>
@@ -111,9 +138,9 @@
              <a name="added"/>
                      <b>
                         <xsl:text>Elements present in </xsl:text>
-                        <xsl:value-of select="$dtd2-name"/>
+                        <xsl:value-of select="$dtd2-title"/>
                         <xsl:text> but not in </xsl:text>
-                        <xsl:value-of select="$dtd1-name"/>
+                        <xsl:value-of select="$dtd1-title"/>
                      </b>
                   </th>
                </tr>

@@ -36,7 +36,7 @@ public class DtdAnalyzer {
             "help", "version", "doc", "system", "public", "catalog", "xslt", "title", 
             "roots", "docproc", "markdown", "param"
         };
-        app = new App(args, optList, 
+        app = new App(args, optList, true,
             "dtdanalyzer [-d <xml-file> | -s <system-id> | -p <public-id>] " +
             "[-c <catalog>] [-x <xslt>] [-t <title>] [<out>]",
             "\nThis utility analyzes a DTD and writes an XML output file."
@@ -46,19 +46,6 @@ public class DtdAnalyzer {
         // Get the parsed command line arguments
         CommandLine line = app.getLine();
 
-        // There should be at most one thing left on the line, which, if present, specifies the
-        // output file.
-        Result out = null;
-        String[] rest = line.getArgs();
-        if (rest.length == 0) {
-            out = new StreamResult(System.out);
-        }
-        else if (rest.length == 1) {
-            out = new StreamResult(new File(rest[0]));            
-        }
-        else {
-            app.usageError("Too many arguments!");
-        }
 
         // This parses the DTD, and corrals the data into a model:
         ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
@@ -86,7 +73,7 @@ public class DtdAnalyzer {
             // looks for a system id even when a reader is used as the source  
             // If no string is provided for the sysId, we get a null pointer exception
             Source xmlSource = new StreamSource(reader, "");
-            xslt.transform(xmlSource, out);
+            xslt.transform(xmlSource, app.getOutput());
         }
 
         catch (Exception e){ 

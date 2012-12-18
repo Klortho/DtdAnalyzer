@@ -39,7 +39,7 @@ public class DtdDocumentor {
             "catalog", "title", "roots", "docproc", "markdown", "param",
             "css", "js", "include", "nosuffixes", "exclude", "exclude-except"
         };
-        app = new App(args, optList, 
+        app = new App(args, optList, false,
             "dtddocumentor [-h] [-d <xml-file> | -s <system-id> | -p <public-id>] " +
             "[-dir <dir>] [-c <catalog>] [-t <title>] [-r <roots>] [-m]",
             "\nThis utility generates HTML documentation from a DTD.  The above " +
@@ -50,12 +50,6 @@ public class DtdDocumentor {
         // Get the parsed command line arguments
         CommandLine line = app.getLine();
     
-        // There should be nothing left on the line.
-        String[] rest = line.getArgs();
-        if (rest.length > 0) {
-            app.usageError("Too many arguments!");
-        }
-
         // This parses the DTD, and corrals the data into a model:
         ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
 

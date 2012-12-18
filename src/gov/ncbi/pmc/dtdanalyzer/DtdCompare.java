@@ -30,32 +30,17 @@ public class DtdCompare {
             "help", "version", "doc", "system", "public", "catalog", "title", 
             "param"
         };
-        app = new App(args, optList, 
+        app = new App(args, optList, true, 2,  /* this "2" means we want two dtds */
             "dtdcompare [<options>]",
             "\nThis utility compares two DTDs and writes an HTML report. " +
             "Exactly two DTDs should be specified on the command line, with any " +
-            "combination of the --doc, --system, and --public options.\n\n",
-            2  /* this "2" means we want two dtds */
+            "combination of the --doc, --system, and --public options.\n\n"
         );
         Options options = app.getActiveOpts();
 
         // Get the parsed command line arguments
         CommandLine line = app.getLine();
         
-        // There should be at most one thing left on the line, which, if present, specifies the
-        // output file.
-        Result out = null;
-        String[] rest = line.getArgs();
-        if (rest.length == 0) {
-            out = new StreamResult(System.out);
-        }
-        else if (rest.length == 1) {
-            out = new StreamResult(new File(rest[0]));            
-        }
-        else {
-            app.usageError("Too many arguments!");
-        }
-
         // Parse DTD 2 and save the results in a temporary file.
         File f = null;
 
@@ -106,7 +91,7 @@ public class DtdCompare {
             // looks for a system id even when a reader is used as the source  
             // If no string is provided for the sysId, we get a null pointer exception
             Source xmlSource = new StreamSource(reader, "");
-            xslt.transform(xmlSource, out);
+            xslt.transform(xmlSource, app.getOutput());
         }
 
         catch (Exception e){ 

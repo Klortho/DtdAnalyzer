@@ -100,7 +100,7 @@ public class App {
     // indeces are keys, odd indeces are values.
     private String[] xsltParams = new String[0];
 
-
+    private StreamResult output = null;
 
 
 
@@ -125,19 +125,25 @@ public class App {
     /**
      * Constructor.  The list of options should be in the same order that you want them
      * to be output in the usage message.
+     *
+     * @param needOutput - if this is true, then if there's a final argument on the
+     *   line, then it will be considered to be a filename we should write the output to.
      */
-    public App(String[] args, String[] optList, String _cmdLineSyntax, String _usageHeader) {
-        _initialize(args, optList, _cmdLineSyntax, _usageHeader, 1);
+    public App(String[] args, String[] optList, boolean needOutput, 
+               String _cmdLineSyntax, String _usageHeader) 
+    {
+        _initialize(args, optList, needOutput, 1, _cmdLineSyntax, _usageHeader);
     }
     
-    public App(String[] args, String[] optList, String _cmdLineSyntax, String _usageHeader,
-               int _numDtds) {
-        _initialize(args, optList, _cmdLineSyntax, _usageHeader, _numDtds);
+    public App(String[] args, String[] optList, boolean needOutput, int _numDtds,
+               String _cmdLineSyntax, String _usageHeader) 
+    {
+        _initialize(args, optList, needOutput, _numDtds, _cmdLineSyntax, _usageHeader);
     }
     
     
-    private void _initialize(String[] args, String[] optList, String _cmdLineSyntax, 
-                             String _usageHeader, int _numDtds) 
+    private void _initialize(String[] args, String[] optList, boolean needOutput,
+                             int _numDtds, String _cmdLineSyntax, String _usageHeader) 
     {
         String homeStr = System.getProperty("DTDANALYZER_HOME");
         if (homeStr == null) homeStr = ".";
@@ -218,12 +224,38 @@ public class App {
                     n++;
                 }
             }
-            // FIXME:  Now we want to loop through any left-over arguments, and if we still
-            // expect dtd specifiers, then use them up.  For now, complain
+            
+            // Now loop through any left-over arguments, and if we still
+            // expect dtd specifiers, then use them up.  If there's one extra, and 
+            // needOutput is true, then we'll use that for the output filename.
+            String[] rest = line.getArgs();
+            for (int i = 0; i < rest.length; ++i) {
+                //System.out.println("looking at " + rest[i] + ", n is " + n +
+                //    ", numDtds is " + numDtds + ", needOutput is " + needOutput);
+                if (n < numDtds) {
+                    // Use this to initialize a dtd; assume it is a system id.
+                    dtdSpecifiers[n].idType = 's';
+                    dtdSpecifiers[n].idValue = rest[i];
+                    n++;
+                }
+                else if (needOutput && output == null) {
+                    // Use this to initialize the output
+                    output = new StreamResult(new File(rest[i]));
+                }
+                else {
+                    usageError("Too many arguments");
+                }
+            }
+            // If we still don't have all the input dtds specified, complain.
             if (n < numDtds) {
                 usageError("Expected at least " + numDtds + " DTD specifier" + 
                            (numDtds > 1 ? "s" : "") + "!");
             }
+            // Default output is to write to standard out
+            if (needOutput && output == null) {
+                output = new StreamResult(System.out);
+            }
+
             
             // Loop through again, and pick up any title options given
             n = 0;
@@ -543,6 +575,13 @@ public class App {
         return defaultMinimized;
     }
 
+    /**
+     * Get the output file/stream.  This will only be initialized if needOutput was
+     * true when you called the constructor.
+     */
+    public StreamResult getOutput() {
+        return output;
+    }
 
 
     /**
