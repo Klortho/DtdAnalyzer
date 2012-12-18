@@ -33,7 +33,7 @@ public class Dtd2Xml2Json {
     public static void main (String[] args) {
 
         String[] optList = {
-            "help", "version", "doc", "system", "public", "basexslt", 
+            "help", "version", "doc", "system", "public", "basexslt", "default-minimized",
             "catalog", "title", "roots", "docproc", "markdown", "param"
         };
         app = new App(args, optList, 
@@ -156,6 +156,11 @@ public class Dtd2Xml2Json {
             // Get the basexslt option, if given, and pass those it in as a param
             String basexslt = app.getBaseXslt();
             if (basexslt != null) xslt.setParameter("basexslt", basexslt);
+            
+            // Get the defaultpretty option, if given, and pass that in.
+            boolean defaultMinimized = app.getDefaultMinimized();
+            System.err.println("Setting default-minimized to " + defaultMinimized);
+            xslt.setParameter("default-minimized", defaultMinimized);
 
             // Use this constructor because Saxon always 
             // looks for a system id even when a reader is used as the source  

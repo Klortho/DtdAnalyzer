@@ -8,18 +8,23 @@
               xmlns:f="http://exslt.org/functions"
               exclude-result-prefixes="xsl xd c f"
               version="2.0">
- 
- 
+
   <x:namespace-alias stylesheet-prefix="xsl" result-prefix="x"/>
   <x:output encoding="UTF-8" method="xml" indent="yes" />
   
-  
+  <!-- The path to the base stylesheet.  This is used in the <xsl:import> of the
+    generated XSLT. -->
   <x:param name='basexslt' select='"xml2json.xsl"'/>
+  
+  <!-- This controls whether or not JSON pretty-printing is enabled by default in
+    the generated stylesheet. Note that you can always turn on or off pretty-printing;
+    this controls the default. The default default is to pretty-print. -->
+  <x:param name='default-minimized' select='false()'/>
   
   <x:variable name='nl' select='"&#10;"'/>
   
   <!-- Set this to true to write some interesting stuff to debug.xml.  -->
-  <x:variable name='debug' select='true()'/>
+  <x:variable name='debug' select='false()'/>
 
   <!-- Create a variable pointing to the root of the input document. -->
   <x:variable name='daz' select='/'/>
@@ -353,6 +358,8 @@
 
       <xsl:import href='{$basexslt}'/>
       <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
+      
+      <xsl:param name='pretty' select='{not($default-minimized)}()'/>
 
       <!-- 
         Pass the same value of lcnames that we're using down into the generated stylesheet.

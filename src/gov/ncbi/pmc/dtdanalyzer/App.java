@@ -128,6 +128,7 @@ public class App {
     private String excludeElems = null;
     private String excludeExcept = null;
     private String basexslt = null;
+    private boolean defaultMinimized = false;
 
 
     /**
@@ -322,7 +323,9 @@ public class App {
             if (line.hasOption("basexslt")) {
                 basexslt = line.getOptionValue("basexslt");
             }
-
+            if (line.hasOption("default-minimized")) {
+                defaultMinimized = true;
+            }
         }
         catch( ParseException exp ) {
             usageError(exp.getMessage());
@@ -457,6 +460,13 @@ public class App {
      */
     public String getBaseXslt() {
         return basexslt;
+    }
+
+    /**
+     * If --default-minimized was given, this returns true, otherwise false.
+     */
+    public boolean getDefaultMinimized() {
+        return defaultMinimized;
     }
 
 
@@ -644,6 +654,13 @@ public class App {
                 .hasArg()
                 .withArgName("basexslt")
                 .create("b")
+        );
+        allOpts.put("default-minimized",
+            OptionBuilder
+                .withLongOpt("default-minimized")
+                .withDescription("If this option is given, then the default output from " +
+                    "the generated stylesheet will minimized, and not pretty.")
+                .create("u")
         );
 
 

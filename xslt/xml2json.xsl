@@ -88,6 +88,7 @@
     <xsl:param name="s"/>
     <xsl:variable name="quot">"</xsl:variable>
     <xsl:variable name="bs">\</xsl:variable>
+    <xsl:variable name='nl' select='"&#10;"'/>
     <xsl:variable name='cr' select='"&#13;"'/>
     <xsl:variable name='tab' select='"&#9;"'/>
     <xsl:variable name="result" 
