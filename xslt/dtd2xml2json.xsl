@@ -1032,7 +1032,6 @@
     </x:comment>
   </x:template>
 
-  <!-- FIXME: Needs more testing. -->
   <x:template match='string|number|boolean'>
     <x:param name='metaindentlevel' select='0'/>
     <!-- If we are here from recursing within the json annotation, then this
