@@ -1,17 +1,17 @@
 # DtdAnalyzer Release Notes
 
-## Yet to be released changes
+## DtdAnalyzer v0.2 - 2012-12-18
 
 ### Features
 
+* Added auto-generating XML-to-JSON conversion XSLT
+
 ### Enhancements
 
-### Bug fixes
-
-### Performance
-
-### Other
-
+* Cleaned up the regular expressions that match the annotations, so now
+  annotations can be leaner.
+* Moved binaries into the gh-pages branch, since GitHub deprecated downloads
+  feature.
 
 ## DtdAnalyzer v0.1.2 - 2012-10-18
 

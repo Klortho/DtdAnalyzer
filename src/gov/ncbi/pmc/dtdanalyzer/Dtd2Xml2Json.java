@@ -159,7 +159,6 @@ public class Dtd2Xml2Json {
             
             // Get the defaultpretty option, if given, and pass that in.
             boolean defaultMinimized = app.getDefaultMinimized();
-            System.err.println("Setting default-minimized to " + defaultMinimized);
             xslt.setParameter("default-minimized", defaultMinimized);
 
             // Use this constructor because Saxon always 
