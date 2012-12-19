@@ -23,9 +23,9 @@ wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 ##Quick start
 
 * Download the latest release, either as a zip file:
-  [DtdAnalyzer-0.2.zip](https://raw.github.com/NCBITools/DtdAnalyzer/gh-pages/downloads/DtdAnalyzer-0.2.zip);
+  [DtdAnalyzer-0.2.1.zip](https://raw.github.com/NCBITools/DtdAnalyzer/gh-pages/downloads/DtdAnalyzer-0.2.1.zip);
   or as a gzipped tar:
-  [DtdAnalyzer-0.2.tar.gz](https://raw.github.com/NCBITools/DtdAnalyzer/gh-pages/downloads/DtdAnalyzer-0.2.tar.gz).
+  [DtdAnalyzer-0.2.1.tar.gz](https://raw.github.com/NCBITools/DtdAnalyzer/gh-pages/downloads/DtdAnalyzer-0.2.1.tar.gz).
 
   _**Note:**  Do not use the "Zip" download button on the main GitHub page!
   That button downloads the *source files*, not the pre-built packages.
