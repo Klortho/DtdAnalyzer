@@ -51,7 +51,10 @@
     <exclude name="velocity.log"/>
   </patternset>
 
-  <property name="execfiles" value="dtdanalyzer dtddocumentor dtdcompare"/>
+  <property name="execfiles" 
+    value="dtd2xml2json dtdanalyzer dtdcompare dtddocumentor dtdschematron
+           script/getlibs.sh script/setenv.sh 
+           test/xml2json/make-samples.sh test/xml2json/test-samples.pl"/>
 
   <target name="clean" description="Deletes all generated artifacts">
     <delete dir="${build}" failonerror="false"/>
