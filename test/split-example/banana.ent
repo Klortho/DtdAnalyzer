@@ -7,7 +7,7 @@ with it.
 This specifies one banana.  One banana doesn't make a bunch.
 
 ~~ schematron
-  <assert test="@instrument != 'drums' or . = 'Bingo'">
+  <assert test="@instrument != 'drums' or @name = 'Bingo'">
     If he plays the drums, he must be Bingo!
   </assert>
 ~~-->

@@ -1,5 +1,25 @@
 # DtdAnalyzer Release Notes
 
+## Yet to be released changes
+
+### Features
+
+* Integrated dtdcompare feature, creating new shell scripts, and some documentation
+  See GitHub issue #5.
+
+### Enhancements
+
+* Fixed up the command line options so they are simpler.  Now it's possible, for
+  example, to just type `dtddocumentor mydtd.dtd`, without having to remember
+  "-s".
+
+### Bug fixes
+
+### Performance
+
+### Other
+
+
 ## DtdAnalyzer v0.2 - 2012-12-18
 
 ### Features

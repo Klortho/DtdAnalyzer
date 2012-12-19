@@ -120,6 +120,7 @@ public class App {
     private String excludeExcept = null;
     private String basexslt = null;
     private boolean defaultMinimized = false;
+    private boolean full = false;
 
 
     /**
@@ -372,6 +373,9 @@ public class App {
             if (line.hasOption("default-minimized")) {
                 defaultMinimized = true;
             }
+            if (line.hasOption("full")) {
+                full = true;
+            }
         }
         catch( ParseException exp ) {
             usageError(exp.getMessage());
@@ -576,6 +580,13 @@ public class App {
     }
 
     /**
+     * If --full was given, this returns true, otherwise false.
+     */
+    public boolean getFull() {
+        return full;
+    }
+
+    /**
      * Get the output file/stream.  This will only be initialized if needOutput was
      * true when you called the constructor.
      */
@@ -774,6 +785,14 @@ public class App {
                 .withDescription("If this option is given, then the default output from " +
                     "the generated stylesheet will minimized, and not pretty.")
                 .create("u")
+        );
+        allOpts.put("full",
+            OptionBuilder
+                .withLongOpt("full")
+                .withDescription("If this option is given, then a complete schematron " +
+                    "will be generated from the DTD, as opposed to just extracting the " +
+                    "rules in the annotations.")
+                .create("f")
         );
 
 

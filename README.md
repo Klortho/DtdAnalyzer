@@ -8,7 +8,7 @@ DtdAnalyzer provides a set of tools:
   present) from specially-formatted comments of the DTD
 * **dtdcompare** - compares two DTDs and generate a report of differences
 * **dtd2xml2json** - generates XSLT to convert instance documents into JSON format.
-* **dtdschematron.xsl** - generates a schematron file from the DTD, including extra
+* **dtdschematron** - generates a schematron file from the DTD, including extra
   schematron rules (if present) from specially-formatted comments of the DTD
 * **scaffold.xsl** - generates XSLT scaffolding that can be used as a starting point
   for writing a transform from one schema to another
