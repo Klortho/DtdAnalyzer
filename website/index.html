@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Slate is a responsive theme for GitHub Pages" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>DtdAnalyzer by NCBITools: A tool for analyzing and manipulating DTDs</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+      <header class="inner">
+        <a id="forkme_banner" href="https://github.com/NCBITools/DtdAnalyzer">View on GitHub</a>
+
+        <h1 id="project_title">DtdAnalyzer</h1>
+        <h2 id="project_tagline">A tool for analyzing and manipulating
+          DTDs<br/><span style="font-size:.8em">Version 0.2.1</span></h2>
+
+        <section id="downloads">
+          <a class="zip_download_link"
+          href="http://www.ncbi.nlm.nih.gov/staff/maloneyc/DtdAnalyzer/DtdAnalyzer-0.2.1.zip">Download
+          this version as a .zip file</a>
+          <a class="tar_download_link"
+          href="http://www.ncbi.nlm.nih.gov/staff/maloneyc/DtdAnalyzer/DtdAnalyzer-0.2.1.tar.gz">Download
+          this version as a tar.gz file</a>
+        </section>
+      </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1><a name="dtdanalyzer" class="anchor" href="#dtdanalyzer"><span
+        class="mini-icon mini-icon-link"></span></a>DtdAnalyzer</h1>
+
+        <p>DtdAnalyzer provides a set of tools:</p>
+
+        <ul>
+          <li><strong>dtdanalyzer</strong>
+            - creates an XML representation (using elements and attributes)
+            of an XML DTD</li>
+          <li><strong>dtddocumentor</strong>
+            - generates pretty HTML documentation, including annotations (if
+            present) from specially-formatted comments of the DTD</li>
+          <li><strong>dtdcompare</strong>
+            - compares two DTDs and generate a report of differences</li>
+          <li><strong>dtd2xml2json</strong>
+            - generates XSLT to convert instance documents into JSON format.</li>
+          <li><strong>dtdschematron.xsl</strong>
+            - generates a schematron file from the DTD, including extra
+            schematron rules (if present) from specially-formatted comments of the DTD</li>
+          <li><strong>scaffold.xsl</strong>
+            - generates XSLT scaffolding that can be used as a starting point
+            for writing a transform from one schema to another</li>
+        </ul>
+
+        <h2><a name="quick-start" class="anchor" href="#quick-start"><span
+          class="mini-icon mini-icon-link"></span></a>Quick start</h2>
+        <ul>
+          <li><p>Download the latest release, either as a zip file:  <a
+          href="http://www.ncbi.nlm.nih.gov/staff/maloneyc/DtdAnalyzer/DtdAnalyzer-0.2.1.zip">DtdAnalyzer-0.2.1.zip</a>;
+          or as a gzipped tar: <a
+          href="http://www.ncbi.nlm.nih.gov/staff/maloneyc/DtdAnalyzer/DtdAnalyzer-0.2.1.tar.gz">DtdAnalyzer-0.2.1.tar.gz</a>.</p>
+            <p><em><strong>Note:</strong>  Do not use the "Zip" download button on the main GitHub page!
+            That button downloads the <em>source files</em>, not the pre-built packages. They are
+            different!</em></p>
+          </li>
+          <li><p>Unzip that file on your machine.</p></li>
+          <li><p>Open up a Windows command or a bash shell window.  Add the path to the package root
+        to your PATH environment variable.</p>
+            <p>On Windows:</p>
+            <pre><code>set PATH=%PATH%;-path-to-dtdanalyzer-package-</code></pre>
+            <p>On Unix:</p>
+            <pre><code>export PATH=$PATH:-path-to-dtdanalyzer-package-</code></pre>
+          </li>
+          <li><p>Try the following command, which analyzes the <a
+          href="http://jats.nlm.nih.gov/archiving/1.0/dtd.html">Journal Archiving
+          and Interchange</a> flavor of the <a href="http://jats.nlm.nih.gov/">NLM/NISO
+          Journal Article Tag Suite</a>, and writes the output to a file (make sure
+          you enter it all on one line):</p>
+            <pre><code>dtdanalyzer http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd
+  out.daz.xml</code></pre>
+          </li>
+          <li><p>Check that you have sensible results in the output file,
+          <code>out.daz.xml</code>.</p></li>
+          <li><p>As another example, the next command produces HTML documentation
+          for that DTD.  It should run for a little while and then announce that
+          it's done, and that the documentation is in the <code>doc</code>
+          subdirectory.</p>
+            <pre><code>dtddocumentor http://jats.nlm.nih.gov/archiving/1.0/JATS-archivearticle1.dtd
+  --exclude mml: --exclude-except mml:math</code></pre>
+          </li>
+          <li><p>Open the <code>doc/index.html</code> file there in a browser, and
+          check that it looks correct.</p></li>
+          <li><p>Run <code>--help</code> with any of the tools for more complete
+          usage information, or continue by visiting the documentation pages on the
+          <a href="https://github.com/NCBITools/DtdAnalyzer/wiki">GitHub wiki</a>.</p></li>
+        </ul>
+
+        <h2><a name="documentation" class="anchor" href="#documentation"><span
+        class="mini-icon mini-icon-link"></span></a>Documentation</h2>
+        <p>Detailed documentation is available on the <a
+        href="https://github.com/NCBITools/DtdAnalyzer/wiki">GitHub
+        wiki</a>.</p>
+
+        <h2><a name="discussion-forum--mailing-list" class="anchor"
+        href="#discussion-forum--mailing-list"><span class="mini-icon
+        mini-icon-link"></span></a>Discussion forum / mailing list</h2>
+        <p>This software is in beta stage. </p>
+        <p>Join the <a href="https://groups.google.com/d/forum/dtdanalyzer">DtdAnalyzer
+        Google group</a> for discussions.</p>
+        <p>File bug reports at the <a
+        href="https://github.com/NCBITools/DtdAnalyzer/issues">GitHub issues page</a>.</p>
+
+        <h2><a name="public-domain" class="anchor" href="#public-domain"><span
+        class="mini-icon mini-icon-link"></span></a>Public domain</h2>
+        <p>This work is in the public domain and may be reproduced, published or
+        otherwise used without permission of the National Library of Medicine (NLM).</p>
+        <p>Although all reasonable efforts have been taken to ensure the accuracy
+        and reliability of the software and data, the NLM and the U.S. Government
+        do not and cannot warrant the performance or results that may be obtained
+        by using this software or data. The NLM and the U.S. Government disclaim
+        all warranties, express or implied, including warranties of performance,
+        merchantability or fitness for any  particular purpose.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">DtdAnalyzer maintained by <a
+          href="https://github.com/NCBITools">NCBITools</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a>
+          using the <a href="https://github.com/jsncostello/slate">Slate Theme</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
