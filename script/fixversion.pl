@@ -52,8 +52,8 @@ while (<OLD>) {
 }
 close(OLD) or die "Can't close $old: $!";
 close(NEW) or die "Can't close $new: $!";
-#unlink $old or die "Can't remove $old: $!";
-#rename($new, $old) or die "can't rename $new to $old: $!";
+unlink $old or die "Can't remove $old: $!";
+rename($new, $old) or die "can't rename $new to $old: $!";
 
 if (!$oldVersion) {
     die "Couldn't find a valid version number in build.xml.\n";
@@ -80,8 +80,8 @@ if (!$switchToDev) {
     }
     close(OLD) or die "Can't close $old: $!";
     close(NEW) or die "Can't close $new: $!";
-    #unlink $old or die "Can't remove $old: $!";
-    #rename($new, $old) or die "can't rename $new to $old: $!";
+    unlink $old or die "Can't remove $old: $!";
+    rename($new, $old) or die "can't rename $new to $old: $!";
 }
 
 # Fix ReleaseNotes.md
@@ -108,6 +108,9 @@ $new = "$old.tmp";
 open(OLD, "< $old") or die "Can't open $old: $!";
 open(NEW, "> $new") or die "Can't open $new for writing: $!";
 
+my ($day, $month, $year) = (localtime)[3,4,5];
+my $dateStr = " - " . ($year + 1900) . "-" . ($month + 1) . "-" . $day;
+
 while (<OLD>) {
     if ($switchToDev) {
         if (/\# DtdAnalyzer Release Notes/) {
@@ -119,14 +122,14 @@ while (<OLD>) {
         }
     }
     else {
-        s/\bv$oldVersion\b/v$newVersion/;
+        s/\bv$oldVersion\b/v$newVersion$dateStr/;
         (print NEW $_) or die "Can't write to $new: $!";
     }
 }
 close(OLD) or die "Can't close $old: $!";
 close(NEW) or die "Can't close $new: $!";
-#unlink $old or die "Can't remove $old: $!";
-#rename($new, $old) or die "can't rename $new to $old: $!";
+unlink $old or die "Can't remove $old: $!";
+rename($new, $old) or die "can't rename $new to $old: $!";
 
 # Get rid of old DtdAnalyzer-*.zip etc. files
 unlink glob "DtdAnalyzer-*.zip";

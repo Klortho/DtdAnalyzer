@@ -45,8 +45,8 @@ if (!$gzFile) {
 
 # Now move them:
 print "Found zip and gz version $version, moving to website/downloads.\n";
-#move $zipFile, 'website/downloads';
-#move $gzFile, 'website/downloads';
+move $zipFile, 'website/downloads';
+move $gzFile, 'website/downloads';
 
 # Fix website/index.html
 my ($old, $new);
@@ -61,8 +61,8 @@ while (<OLD>) {
 }
 close(OLD) or die "Can't close $old: $!";
 close(NEW) or die "Can't close $new: $!";
-#unlink $old or die "Can't remove $old: $!";
-#rename($new, $old) or die "can't rename $new to $old: $!";
+unlink $old or die "Can't remove $old: $!";
+rename($new, $old) or die "can't rename $new to $old: $!";
 
 # Fix website/downloads/index.html
 $old = "website/downloads/index.html";
@@ -89,5 +89,5 @@ while (<OLD>) {
 }
 close(OLD) or die "Can't close $old: $!";
 close(NEW) or die "Can't close $new: $!";
-#unlink $old or die "Can't remove $old: $!";
-#rename($new, $old) or die "can't rename $new to $old: $!";
+unlink $old or die "Can't remove $old: $!";
+rename($new, $old) or die "can't rename $new to $old: $!";

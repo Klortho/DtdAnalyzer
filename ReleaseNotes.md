@@ -2,15 +2,9 @@
 
 ## DtdAnalyzer v0.2.1-dev
 
-### Features
-
-### Enhancements
-
-### Bug fixes
-
-### Performance
-
 ### Other
+
+* Test release just to test the release automation scripts.
 
 ## DtdAnalyzer v0.2.1 - 2012-12-19
 
