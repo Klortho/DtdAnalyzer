@@ -1,6 +1,6 @@
 # DtdAnalyzer Release Notes
 
-## Yet to be released changes
+## DtdAnalyzer v0.2.1-dev
 
 ### Features
 

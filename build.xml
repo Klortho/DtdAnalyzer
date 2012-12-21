@@ -41,6 +41,8 @@
     <exclude name="${build}/**"/>
     <exclude name="${build.tests}/**"/>
     <exclude name="build/**"/>
+    <exclude name='DtdAnalyzer-*.zip'/>
+    <exclude name='DtdAnalyzer-*.tar.gz'/>
     <exclude name="${zip}"/>
     <exclude name="${tar}"/>
     <exclude name="${war}"/>
