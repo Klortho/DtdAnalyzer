@@ -44,7 +44,7 @@
   -->
   <x:variable name='lcnames' as="xs:boolean">
     <x:choose>
-      <x:when test='$dtdJA/@lcnames = "true"'>
+      <x:when test='$dtdJA/config/@lcnames = "true"'>
         <x:value-of select='true()'/>
       </x:when>
       <x:otherwise>
@@ -357,6 +357,9 @@
     <xsl:stylesheet version="1.0" xmlns:np="http://ncbi.gov/portal/XSLT/namespace">
 
       <xsl:import href='{$basexslt}'/>
+      <x:if test='$dtdJA/config/@import'>
+        <xsl:import href='{$dtdJA/config/@import}'/>
+      </x:if>
       <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
       
       <xsl:param name='pretty' select='{not($default-minimized)}()'/>

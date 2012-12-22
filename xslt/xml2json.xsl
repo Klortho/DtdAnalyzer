@@ -276,10 +276,8 @@
     
     <xsl:value-of select='concat("{", $nl)'/>
     <xsl:for-each select='$dans/@*'>
-      <xsl:if test='name(.) != "lcnames"'>
-        <xsl:value-of 
-          select='np:key-simple($iu, name(.), np:dq(.), true())'/>
-      </xsl:if>
+      <xsl:value-of 
+        select='np:key-simple($iu, name(.), np:dq(.), true())'/>
     </xsl:for-each>
   </xsl:template>
 
