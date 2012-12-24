@@ -283,28 +283,36 @@
 
   <!--
     simple
-    Delegates either to simple-in-object or simple-in-array.
+    Delegates either to string-in-object or string-in-array.
   -->
   <xsl:template name='string'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='key' select='""'/>
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:choose>
       <xsl:when test='$context = "object" and $key = ""'>
         <xsl:call-template name='string-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "object" and $key != ""'>
         <xsl:call-template name='string-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='key' select='$key'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "array"'>
         <xsl:call-template name="string-in-array">
           <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
 
@@ -336,22 +344,30 @@
     <xsl:param name='indent' select='""'/>
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='key' select='""'/>
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:choose>
       <xsl:when test='$context = "object" and $key = ""'>
         <xsl:call-template name='number-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "object" and $key != ""'>
         <xsl:call-template name='number-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='key' select='$key'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "array"'>
         <xsl:call-template name="number-in-array">
           <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
 
@@ -383,22 +399,30 @@
     <xsl:param name='indent' select='""'/>
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='key' select='""'/>
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:choose>
       <xsl:when test='$context = "object" and $key = ""'>
         <xsl:call-template name='boolean-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "object" and $key != ""'>
         <xsl:call-template name='boolean-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='key' select='$key'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "array"'>
         <xsl:call-template name="boolean-in-array">
           <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='value' select='$value'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
 
@@ -432,12 +456,14 @@
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='key' select='""'/>
     <xsl:param name='kids' select='*'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:choose>
       <xsl:when test='$context = "object" and $key = ""'>
         <xsl:call-template name='array-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='kids' select='$kids'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "object" and $key != ""'>
@@ -445,12 +471,14 @@
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='key' select='$key'/>
           <xsl:with-param name='kids' select='$kids'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "array"'>
         <xsl:call-template name="array-in-array">
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='kids' select='$kids'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
 
@@ -483,12 +511,14 @@
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='key' select='""'/>
     <xsl:param name='kids' select='@*|*'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:choose>
       <xsl:when test='$context = "object" and $key = ""'>
         <xsl:call-template name='object-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='kids' select='$kids'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "object" and $key != ""'>
@@ -496,12 +526,14 @@
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='key' select='$key'/>
           <xsl:with-param name='kids' select='$kids'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test='$context = "array"'>
         <xsl:call-template name="object-in-array">
           <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='kids' select='$kids'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
 
@@ -547,8 +579,11 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:param>
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
+    
     <xsl:value-of 
-      select='np:key-simple($indent, $key, np:string-value(.), position() != last())'/>
+      select='np:key-simple($indent, $key, np:string-value($value), $trailing-comma)'/>
   </xsl:template>
   
   <!-- 
@@ -559,9 +594,11 @@
   -->
   <xsl:template name='string-in-array'>
     <xsl:param name='indent' select='""'/>
-
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
+    
     <xsl:value-of 
-      select='np:simple($indent, np:string-value(.), position() != last())'/>
+      select='np:simple($indent, np:string-value($value), $trailing-comma)'/>
   </xsl:template>
 
   <!--
@@ -581,9 +618,11 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:param>
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:value-of 
-      select='np:key-simple($indent, $key, np:number-value(.), position() != last())'/>
+      select='np:key-simple($indent, $key, np:number-value($value), $trailing-comma)'/>
   </xsl:template>
   
   <!-- 
@@ -594,9 +633,11 @@
   -->
   <xsl:template name='number-in-array'>
     <xsl:param name='indent' select='""'/>
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:value-of 
-      select='np:simple($indent, np:number-value(.), position() != last())'/>
+      select='np:simple($indent, np:number-value($value), $trailing-comma)'/>
   </xsl:template>
 
 
@@ -617,9 +658,11 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:param>
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:value-of 
-      select='np:key-simple($indent, $key, np:boolean-value(.), position() != last())'/>
+      select='np:key-simple($indent, $key, np:boolean-value($value), $trailing-comma)'/>
   </xsl:template>
   
   <!-- 
@@ -630,9 +673,11 @@
   -->
   <xsl:template name='boolean-in-array'>
     <xsl:param name='indent' select='""'/>
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:value-of 
-      select='np:simple($indent, np:boolean-value(.), position() != last())'/>
+      select='np:simple($indent, np:boolean-value($value), $trailing-comma)'/>
   </xsl:template>
   
   
@@ -739,14 +784,20 @@
   <xsl:template name='simple-obj-in-array'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='key' select='np:to-lower(name(.))'/>
-
+    <xsl:param name='value' select='.'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
+    
     <xsl:value-of select='np:start-object($indent)'/>
     <xsl:value-of select='np:key-simple(
-      concat($indent, $iu), $key, np:string-value(.), false()
+      concat($indent, $iu), $key, np:string-value($value), false()
     )'/>
-    <xsl:value-of select='np:end-object($indent, position() != last())'/>
+    
+    <xsl:value-of select='np:end-object($indent, $trailing-comma)'/>
   </xsl:template>
+
   
+  
+
   <!-- 
     Default template for an element or attribute. 
     Reports a problem.

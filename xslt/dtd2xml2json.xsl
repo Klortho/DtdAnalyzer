@@ -24,7 +24,7 @@
   <x:variable name='nl' select='"&#10;"'/>
   
   <!-- Set this to true to write some interesting stuff to debug.xml.  -->
-  <x:variable name='debug' select='false()'/>
+  <x:variable name='debug' select='true()'/>
 
   <!-- Create a variable pointing to the root of the input document. -->
   <x:variable name='daz' select='/'/>
@@ -422,12 +422,15 @@
             <xsl:template match='{$matchString}'>
               <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
+              <xsl:param name='trailing-comma' select='position() != last()'/>
+
               <xsl:call-template name='{$type}'>
                 <xsl:with-param name='indent' select='$indent'/>
                 <xsl:with-param name='context' select='$context'/>
                 <x:if test='$jsonName != ""'>
                   <xsl:with-param name='key' select='{$jsonName}'/>
                 </x:if>
+                <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
               </xsl:call-template>
             </xsl:template>
           </x:when>
@@ -446,6 +449,8 @@
             <xsl:template match='{$matchString}'>
               <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
+              <xsl:param name='trailing-comma' select='position() != last()'/>
+
               <xsl:call-template name='array'>
                 <xsl:with-param name='indent' select='$indent'/>
                 <xsl:with-param name='context' select='$context'/>
@@ -455,6 +460,7 @@
                 <x:if test='$itemSpec/@textKid = "true"'>
                   <xsl:with-param name='kids' select='node()'/>
                 </x:if>
+                <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
               </xsl:call-template>
             </xsl:template>
           </x:when>
@@ -463,6 +469,8 @@
             <xsl:template match='{$matchString}'>
               <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
+              <xsl:param name='trailing-comma' select='position() != last()'/>
+
               <xsl:call-template name='object'>
                 <xsl:with-param name='indent' select='$indent'/>
                 <xsl:with-param name='context' select='$context'/>
@@ -472,6 +480,7 @@
                 <x:if test='$itemSpec/@textKid = "true"'>
                   <xsl:with-param name='kids' select='@*|node()'/>
                 </x:if>
+                <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
               </xsl:call-template>
             </xsl:template>
           </x:when>
