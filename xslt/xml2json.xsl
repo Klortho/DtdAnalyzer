@@ -252,7 +252,7 @@
     <xsl:variable name='nv' select='np:to-lower(normalize-space($v))'/>
     <f:result>
       <xsl:choose>
-        <xsl:when test='$nv = "0" or $nv = "no" or $nv = "false" or $nv = ""'>
+        <xsl:when test='$nv = "0" or $nv = "no" or $nv = "n" or $nv = "false" or $nv = ""'>
           <xsl:text>false</xsl:text>
         </xsl:when>
         <xsl:otherwise>
