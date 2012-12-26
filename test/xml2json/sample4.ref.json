@@ -30,12 +30,9 @@
                 }
             ],
             "properties": {
-                "aa": 2,
-                "qual": 32,
                 "value": "34"
             },
             "oslt": {
-                "indexed": true,
                 "value": "ADB98021.1"
             },
             "splits": [
@@ -68,7 +65,27 @@
                 true,
                 true,
                 true
-            ]
+            ],
+            "test1": [
+                "fleegle",
+                "bingo",
+                "drooper",
+                "snorky"
+            ],
+            "test2": {
+                "c2a": "bingo",
+                "c2b": "drooper"
+            },
+            "test3": {
+                "a3a": "guitar",
+                "a3b": "violin",
+                "c3a": "bingo",
+                "c3b": "drooper",
+                "c3cs": [
+                    "snorky",
+                    "drooper"
+                ]
+            }
         }
     }
 }
