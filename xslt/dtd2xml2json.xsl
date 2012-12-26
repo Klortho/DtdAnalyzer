@@ -489,7 +489,7 @@
                 </x:if>
                 <x:choose>
                   <x:when test='$itemSpec/@textKid = "true"'>
-                    <xsl:with-param name='kids' select='node()'/>
+                    <xsl:with-param name='kids' select='@*|node()'/>
                   </x:when>
                   <x:when test='$itemSpec/@select'>
                     <xsl:with-param name='kids' select='{$itemSpec/@select}'/>
