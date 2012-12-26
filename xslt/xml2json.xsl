@@ -805,6 +805,7 @@
   <xsl:template match='@*|*'>
     <xsl:param name='indent' select='""'/>
     <xsl:param name='context' select='"object"'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:message>
       <xsl:text>FIXME:  No template defined for </xsl:text>
@@ -825,11 +826,13 @@
       <xsl:when test='$context = "array"'>
         <xsl:call-template name='string-in-array'>
           <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name='string-in-object'>
           <xsl:with-param name='indent' select='$indent'/>
+          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -840,6 +843,7 @@
   <xsl:template match="text()" >
     <xsl:param name='indent' select='""'/>
     <xsl:param name='context' select='"object"'/>
+    <xsl:param name='trailing-comma' select='position() != last()'/>
     
     <xsl:if test='normalize-space(.) != ""'>
       <xsl:message>
@@ -850,11 +854,13 @@
         <xsl:when test='$context = "array"'>
           <xsl:call-template name='string-in-array'>
             <xsl:with-param name='indent' select='$indent'/>
+            <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name='string-in-object'>
             <xsl:with-param name='indent' select='$indent'/>
+            <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>

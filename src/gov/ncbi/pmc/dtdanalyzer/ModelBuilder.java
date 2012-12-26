@@ -32,7 +32,6 @@ public class ModelBuilder {
 
     private HashSet _roots;                    // A list of all the root Elements
 
-
     /**
      * New version of constructor.  Does a lot more.
      */
@@ -323,6 +322,7 @@ public class ModelBuilder {
         while ((r = (Element) _toCheck.poll()) != null) {
             ContentModel cm = r.getContentModel();
             String spec = cm.getSpec();
+            
             // If the spec is "any", then we're done -- all elements are reachable
             if (spec.equals("any")) return;
             if (spec.equals("mixed") || spec.equals("element")) {
@@ -330,6 +330,7 @@ public class ModelBuilder {
                 while (kids.hasNext()) {
                     String kn = (String) kids.next();
                     Element k = elements.getElement(kn);
+                    
                     // If we can't find one of the kids in the content model, just throw out
                     // a warning and continue.
                     if (k == null) {
@@ -338,7 +339,9 @@ public class ModelBuilder {
                             "\" includes a child element \"" + kn + "\", but there is " +
                             "no declaration for it.");
                     }
-                    _putReachable(k);
+                    else {
+                        _putReachable(k);
+                    }
                 }
             }
         }

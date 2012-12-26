@@ -20,11 +20,15 @@
     the generated stylesheet. Note that you can always turn on or off pretty-printing;
     this controls the default. The default default is to pretty-print. -->
   <x:param name='default-minimized' select='false()'/>
-  
+
+  <!-- This specifies whether or not to ignore unreachable elements in the DTD.
+    The default is to ignore them. -->
+  <x:param name='ignore-unreachable' select='true()'/>
+
   <x:variable name='nl' select='"&#10;"'/>
   
   <!-- Set this to true to write some interesting stuff to debug.xml.  -->
-  <x:variable name='debug' select='false()'/>
+  <x:variable name='debug' select='true()'/>
 
   <!-- Create a variable pointing to the root of the input document. -->
   <x:variable name='daz' select='/'/>
@@ -60,7 +64,8 @@
     types computed here.
   -->
   <x:variable name='allItems'>
-    <x:for-each select='/declarations/elements/element'>
+    <x:for-each select='/declarations/elements/element[
+        not($ignore-unreachable) or not(@reachable = "false")]'>
       <x:variable name='elemName' select='@name'/>
       
       <!-- Attribute declarations associated with this element -->
@@ -441,7 +446,7 @@
             <xsl:template match='{$matchString}'>
               <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
-              <x:apply-templates select='$itemSpec'/>
+              <x:apply-templates select='$itemSpec' mode='itemspec'/>
             </xsl:template>
           </x:when>
           
@@ -461,8 +466,8 @@
                   <x:when test='$itemSpec/@textKid = "true"'>
                     <xsl:with-param name='kids' select='node()'/>
                   </x:when>
-                  <x:when test='$itemSpec/@content'>
-                    <xsl:with-param name='kids' select='{$itemSpec/@content}'/>
+                  <x:when test='$itemSpec/@select'>
+                    <xsl:with-param name='kids' select='{$itemSpec/@select}'/>
                   </x:when>
                 </x:choose>
                 <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
@@ -486,8 +491,8 @@
                   <x:when test='$itemSpec/@textKid = "true"'>
                     <xsl:with-param name='kids' select='node()'/>
                   </x:when>
-                  <x:when test='$itemSpec/@content'>
-                    <xsl:with-param name='kids' select='{$itemSpec/@content}'/>
+                  <x:when test='$itemSpec/@select'>
+                    <xsl:with-param name='kids' select='{$itemSpec/@select}'/>
                   </x:when>
                 </x:choose>
                 <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
@@ -548,7 +553,7 @@
     of the DTD.  It gives the author a way to override specific defaults of the automatic
     generation of JSON from the XML.
   -->
-  <x:template match='object'>
+  <x:template match='object' mode='itemspec'>
     <x:param name='metaindentlevel' select='0'/>
     <!-- If we are here from recursing within the json annotation, then this
       will be the name of our parent, either object or array.  -->
@@ -614,13 +619,13 @@
     
     <x:choose>
       <x:when test='*'>
-        <x:apply-templates select='*'>
+        <x:apply-templates select='*' mode='itemspec'>
           <x:with-param name='metaindentlevel' select='$metaindentlevel + 1'/>
           <x:with-param name='metacontext' select='"object"'/>
         </x:apply-templates>
       </x:when>
       <x:otherwise>
-        <xsl:apply-templates select='{@content}'>
+        <xsl:apply-templates select='{@select}'>
           <xsl:with-param name='indent' 
             select='concat($indent, {$metaindent}, $iu)'/>
           <xsl:with-param name='context' select='"object"'/>
@@ -639,7 +644,7 @@
     </x:comment>
   </x:template>
   
-  <x:template match='array'>
+  <x:template match='array'  mode='itemspec'>
     <x:param name='metaindentlevel' select='0'/>
     <!-- If we are here from recursing within the json annotation, then this
       will be the name of our parent, either object or array.  -->
@@ -705,13 +710,13 @@
     
     <x:choose>
       <x:when test='*'>
-        <x:apply-templates select='*'>
+        <x:apply-templates select='*' mode='itemspec'>
           <x:with-param name='metaindentlevel' select='$metaindentlevel + 1'/>
           <x:with-param name='metacontext' select='"array"'/>
         </x:apply-templates>
       </x:when>
       <x:otherwise>
-        <xsl:apply-templates select='{@content}'>
+        <xsl:apply-templates select='{@select}'>
           <xsl:with-param name='indent' 
             select='concat($indent, {$metaindent}, $iu)'/>
           <xsl:with-param name='context' select='"array"'/>
@@ -730,20 +735,12 @@
     </x:comment>
   </x:template>
 
-  <x:template match='members'>
+  <x:template match='member|members' mode='itemspec'>
     <x:param name='metaindentlevel' select='0'/>
     <x:param name='metacontext' select='""'/>
     <x:variable name='metaindent' select='concat("$iu", $metaindentlevel)'/>
-    <x:variable name='force-trailing-comma'>
-      <x:choose>
-        <x:when test='position() != last()'>
-          <x:text>true()</x:text>
-        </x:when>
-        <x:otherwise>
-          <x:text>false()</x:text>
-        </x:otherwise>
-      </x:choose>
-    </x:variable>
+    <x:variable name='force-trailing-comma' as='xs:boolean'
+      select='position() != last()'/>
 
     <x:value-of select='$nl'/>
     <x:value-of select='$nl'/>
@@ -752,7 +749,7 @@
     </x:comment>
     <x:value-of select='concat($nl, "      ")'/>
 
-    <xsl:apply-templates select='{@content}'>
+    <xsl:apply-templates select='{@select}'>
       <xsl:with-param name='indent' 
         select='concat($indent, {$metaindent})'/>
       <xsl:with-param name='context' select='"{$metacontext}"'/>
@@ -763,8 +760,7 @@
 
   </x:template>
   
-  
-  <x:template match='string|number|boolean'>
+  <x:template match='string|number|boolean' mode='itemspec'>
     <x:param name='metaindentlevel' select='0'/>
     <!-- If we are here from recursing within the json annotation, then this
       will be the name of our parent, either object or array.  -->
@@ -833,4 +829,12 @@
       <x:text>' </x:text>
     </x:comment>
   </x:template>
+
+  <x:template match='*' mode='itemspec'>
+    <x:message>
+      <x:text>Error:  unrecognized element in itemspec:  </x:text>
+      <x:value-of select='name(.)'/>
+    </x:message>
+  </x:template>
+
 </x:stylesheet>

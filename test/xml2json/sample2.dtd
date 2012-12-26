@@ -34,8 +34,8 @@ children.  So it doesn't fit cleanly into either a JSON array or object.
 ~~json
   <object>
     <number name='count' value='count(*)'/>
-    <array name='"phrasesnotfound"' content='PhraseNotFound'/>
-    <array name='"fieldsnotfound"' content='FieldNotFound'/>
+    <array name='"phrasesnotfound"' select='PhraseNotFound'/>
+    <array name='"fieldsnotfound"' select='FieldNotFound'/>
   </object>
 ~~-->
 <!ELEMENT ErrorList        (PhraseNotFound*,FieldNotFound*)>

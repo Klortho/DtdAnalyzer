@@ -30,6 +30,8 @@
       | splits
       | Booleans
       | test1
+      | test2
+      | test3
     )*>
 <!ATTLIST DocumentSummary uid CDATA #IMPLIED>
 
@@ -112,7 +114,7 @@
 
 <!-- Test that I can override the content for an array  -->
 <!--~~ <test1>
-~~json <array content='@*|*'/>
+~~json <array select='@*|*'/>
 ~~-->
 <!ELEMENT test1 (c1*)>
 <!ELEMENT c1 (#PCDATA) >
@@ -123,7 +125,7 @@
   exclude a set of child elements.  In this case, the child <c2c> might occur
   more than once, so it is not safe to include those kids as object members.. -->
 <!--~~ <test2>
-~~json <object content='c2a|c2b'/>
+~~json <object select='c2a|c2b'/>
 ~~-->
 <!ELEMENT test2 (c2a|c2b|c2c*)>
 <!ELEMENT c2a (#PCDATA) >
@@ -135,8 +137,8 @@
 <!--~~ <test3>
 ~~json 
   <object>
-    <members content='@*|c3a|c3b'/>
-    <array name='"c3cs"' content='c3c'/>
+    <members select='@*|c3a|c3b'/>
+    <array name='"c3cs"' select='c3c'/>
   </object>
 ~~-->
 <!ELEMENT test3 (c3a|c3b|c3c*)>
