@@ -24,7 +24,7 @@
   <x:variable name='nl' select='"&#10;"'/>
   
   <!-- Set this to true to write some interesting stuff to debug.xml.  -->
-  <x:variable name='debug' select='true()'/>
+  <x:variable name='debug' select='false()'/>
 
   <!-- Create a variable pointing to the root of the input document. -->
   <x:variable name='daz' select='/'/>
