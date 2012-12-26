@@ -1,15 +1,19 @@
 {
-    "type": "sample1",
-    "version": "0.3",
-    "dblist": [
-        "pubmed",
-        "protein",
-        "nuccore",
-        "nucleotide"
-    ],
-    "dbinfo": {
-        "dbname": "pubmed",
-        "menuname": "PubMed",
-        "description": "PubMed bibliographic record"
+    "header": {
+        "type": "sample1",
+        "version": "0.3"
+    },
+    "result": {
+        "dblist": [
+            "pubmed",
+            "protein",
+            "nuccore",
+            "nucleotide"
+        ],
+        "dbinfo": {
+            "dbname": "pubmed",
+            "menuname": "PubMed",
+            "description": "PubMed bibliographic record"
+        }
     }
 }

@@ -18,12 +18,6 @@
 
 <!ELEMENT OP               (#PCDATA)>	<!-- (AND|OR|NOT|RANGE|GROUP) -->
 
-<!--~~ <Result>
-This is the root element for a response.
-~~ tags root
-~~-->
-<!ELEMENT Result ( TranslationStack? )>
-
 <!ELEMENT Term             (#PCDATA)>	<!-- .+ -->
 
 <!ELEMENT TermSet          (Term, Field)>
@@ -34,6 +28,7 @@ This one is special because it can take any number of TermSet and/or OP
 children, in any order.  In sample2, we converted this into an array.
 This time, we'll convert it into a fancy tree structure, in custom templates
 implemented in a custom stylesheet.
+~~tags root
 ~~json <custom/>
 ~~-->
 <!ELEMENT TranslationStack ((TermSet|OP)*)>

@@ -154,16 +154,16 @@
     Each of these is designed to be invoked at the start of a new line, so each
     first outputs an indent, if that's given.
 
-      Function name      Output
-      =============      ======
-      simple             value,\n
-      key-simple         "key": value,\n
-      start-object       {\n
-      key-start-object   "key": {\n
-      end-object         },\n
-      start-array        [\n
-      key-start-array    "key": [\n
-      end-array          ],\n
+      Function name            Output
+      =============            ======
+      simple(i, v, tc)         value,\n
+      key-simple(i, k, v, tc)  "key": value,\n
+      start-object(i)          {\n
+      key-start-object(i, k)   "key": {\n
+      end-object(i, tc)         },\n
+      start-array(i)           [\n
+      key-start-array(i, k)    "key": [\n
+      end-array(i, tc)          ],\n
   -->
   <f:function name='np:simple'>
     <xsl:param name='indent'/>
@@ -265,20 +265,40 @@
   <!--============================================================
     Generic templates
   -->
+
+
+
+  <xsl:template match="/">
+    <xsl:call-template name="result-start"/>
+
+    <xsl:apply-templates select='*'>
+      <xsl:with-param name="indent" select="$iu"/>
+      <xsl:with-param name="context" select="'object'"/>
+    </xsl:apply-templates>
+
+    <xsl:value-of select="np:end-object(&#34;&#34;, false())"/>
+  </xsl:template>
   
+
+
+
   <!-- Start-of-output boilerplate -->
   <xsl:template name='result-start'>
     <xsl:param name='resulttype' select='""'/>
     <xsl:param name='version' select='""'/>
-    <xsl:param name='dtd-annotation'/>
+
     <xsl:variable name='dans' 
       select='c:node-set($dtd-annotation)/json'/>
-    
-    <xsl:value-of select='concat("{", $nl)'/>
+
+    <xsl:value-of select='np:start-object("")'/>
+
+    <xsl:value-of select='np:key-start-object($iu, "header")'/>
     <xsl:for-each select='$dans/@*'>
       <xsl:value-of 
-        select='np:key-simple($iu, name(.), np:dq(.), true())'/>
+        select='np:key-simple($iu2, name(.), np:dq(.), position() != last())'/>
     </xsl:for-each>
+    <xsl:value-of select='np:end-object($iu, true())'/>
+    
   </xsl:template>
 
   <!--

@@ -115,9 +115,11 @@
             <x:value-of select='$typeOverride'/>
           </x:when>
           
+        <!--
           <x:when test='@root="true"'>
             <x:text>root</x:text>
           </x:when>
+        -->
           
           <!-- 
             If an element has no attributes, and has text content, then it will be
@@ -373,6 +375,13 @@
         Pass the same value of lcnames that we're using down into the generated stylesheet.
       -->
       <xsl:param name='lcnames' select='{$lcnames}()'/>
+      
+      <!-- 
+        Recapitulation the dtd-annotation as a parameter in the generated stylesheet
+      -->
+      <xsl:param name='dtd-annotation'>
+        <x:copy-of select='$dtdJA'/>
+      </xsl:param>
     
       <x:for-each-group select="$allItems//item"
                         group-by='@groupByKey'>
@@ -415,10 +424,29 @@
                   </xsl:with-param>
                 </x:if>
               </xsl:call-template>
-              <xsl:apply-templates select='@*|*'>
-                <xsl:with-param name='indent' select='$iu'/>
-                <xsl:with-param name='context' select='"object"'/>
-              </xsl:apply-templates>
+
+              <xsl:variable name='indent' select='$iu'/>
+              <xsl:variable name='context' select='"object"'/>
+              <x:choose>
+                <x:when test='$itemSpec/*'>
+                  <x:apply-templates select='$itemSpec' mode='itemspec'/>
+                </x:when>
+                <x:otherwise>
+                  <xsl:call-template name='object'>
+                    <xsl:with-param name='indent' select='$indent'/>
+                    <xsl:with-param name='context' select='$context'/>
+                    <x:choose>
+                      <x:when test='$itemSpec/@textKid = "true"'>
+                        <xsl:with-param name='kids' select='@*|node()'/>
+                      </x:when>
+                      <x:when test='$itemSpec/@select'>
+                        <xsl:with-param name='kids' select='{$itemSpec/@select}'/>
+                      </x:when>
+                    </x:choose>
+                  </xsl:call-template>
+                </x:otherwise>
+              </x:choose>
+
               <xsl:value-of select='np:end-object("", false())'/>
             </xsl:template>
           </x:when>

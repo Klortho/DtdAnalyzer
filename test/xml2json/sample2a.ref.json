@@ -1,16 +1,20 @@
 {
-    "type": "sample2",
-    "version": "0.3",
-    "ERROR": "Invalid db name specified: fleegle",
-    "errorlist": {
-        "count": 4,
-        "phrasesnotfound": [
-            "not found phrase #1",
-            "not found phrase #2"
-        ],
-        "fieldsnotfound": [
-            "not found field #1",
-            "not found field #2"
-        ]
+    "header": {
+        "type": "sample2",
+        "version": "0.3"
+    },
+    "response": {
+        "ERROR": "Invalid db name specified: fleegle",
+        "errorlist": {
+            "count": 4,
+            "phrasesnotfound": [
+                "not found phrase #1",
+                "not found phrase #2"
+            ],
+            "fieldsnotfound": [
+                "not found field #1",
+                "not found field #2"
+            ]
+        }
     }
 }

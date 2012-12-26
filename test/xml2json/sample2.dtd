@@ -58,8 +58,10 @@ children.  So it doesn't fit cleanly into either a JSON array or object.
 <!ELEMENT OP               (#PCDATA)>	<!-- (AND|OR|NOT|RANGE|GROUP) -->
 
 <!--~~ <Result>
-This is the root element for a response.
+This is the root element for a response.  Change the name of the main
+body portion of the returned JSON from "result" to "response".
 ~~ tags root
+~~ json <object name='"response"'/>
 ~~-->
 
 <!ELEMENT Result ( 
