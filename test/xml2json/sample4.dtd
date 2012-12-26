@@ -1,7 +1,10 @@
 <!-- DocSum DTD for all sequence databases -->
 
 <!--~~ !dtd
-~~json <json lcnames='true' type='sample4' version='0.3' />
+~~json 
+  <json type='sample4' version='0.3'>
+    <config lcnames='true' />
+  </json>
 ~~-->
 
 <!--~~ <Result>
@@ -26,6 +29,7 @@
       | OSLT
       | splits
       | Booleans
+      | test1
     )*>
 <!ATTLIST DocumentSummary uid CDATA #IMPLIED>
 
@@ -34,11 +38,11 @@
 <!--~~ <Gi>
 ~~json <number/>
 ~~-->
-<!ELEMENT Gi         (#PCDATA)>
+<!ELEMENT Gi      (#PCDATA)>
 
-<!ELEMENT   Statistics  (Stat)+>
+<!ELEMENT Statistics  (Stat)+>
 
-<!ELEMENT   Stat   EMPTY>
+<!ELEMENT Stat   EMPTY>
 
 <!--~~ @count
 ~~json <number/>
@@ -77,7 +81,10 @@
   hobby CDATA #IMPLIED>
 <!ELEMENT instrument (#PCDATA)>
 
-<!-- Test "unknown"  -->
+<!-- 
+  Test "unknown".  The command dtd2xml2json should print out a warning message,
+  "Need to tell me what to do with element Unknowable".  
+-->
 <!ELEMENT Unknowable (splits+|split+)>
 
 <!-- Test "custom"  -->
@@ -86,9 +93,10 @@
 ~~-->
 <!ELEMENT Customized (splits+|split+)>
  
-<!-- 
+<!--
   This one should report a problem when lcnames is in effect, but not
-  otherwise.
+  otherwise.  When running dtd2xml2json, you should see the warning message:
+  "Need to tell me what to do with element TestLCNames".
 -->
 <!ELEMENT TestLCNames EMPTY>
  <!ATTLIST   TestLCNames
@@ -101,3 +109,40 @@
 ~~json <boolean/>
 ~~-->
 <!ELEMENT Boolean (#PCDATA)>
+
+<!-- Test that I can override the content for an array  -->
+<!--~~ <test1>
+~~json <array content='@*|*'/>
+~~-->
+<!ELEMENT test1 (c1*)>
+<!ELEMENT c1 (#PCDATA) >
+<!ATTLIST test1
+  a1 CDATA #IMPLIED >
+
+<!-- Test overriding content for an object.  This shows how to 
+  exclude a set of child elements.  In this case, the child <c2c> might occur
+  more than once, so it is not safe to include those kids as object members.. -->
+<!--~~ <test2>
+~~json <object content='c2a|c2b'/>
+~~-->
+<!ELEMENT test2 (c2a|c2b|c2c*)>
+<!ELEMENT c2a (#PCDATA) >
+<!ELEMENT c2b (#PCDATA) >
+<!ELEMENT c2c (#PCDATA) >
+
+<!-- This is the same, with the added demo that we'll corral the <c2c> kids
+  into a child array. -->
+<!--~~ <test3>
+~~json 
+  <object>
+    <members content='@*|c3a|c3b'/>
+    <array name='"c3cs"' content='c3c'/>
+  </object>
+~~-->
+<!ELEMENT test3 (c3a|c3b|c3c*)>
+<!ELEMENT c3a (#PCDATA) >
+<!ELEMENT c3b (#PCDATA) >
+<!ELEMENT c3c (#PCDATA) >
+<!ATTLIST test3
+  a3a CDATA #IMPLIED
+  a3b CDATA #IMPLIED>

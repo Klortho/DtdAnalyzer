@@ -8,7 +8,10 @@
 -->
 
 <!--~~ !dtd
-~~json <json lcnames='true' type='sample1' version='0.3' />
+~~json 
+  <json type='sample1' version='0.3'>
+    <config lcnames='true' />
+  </json>
 ~~-->
 
 <!--~~ <Result>

@@ -330,7 +330,14 @@ public class ModelBuilder {
                 while (kids.hasNext()) {
                     String kn = (String) kids.next();
                     Element k = elements.getElement(kn);
-                    if (k == null) throw new Exception("Can't find element \"" + kn + "\"");
+                    // If we can't find one of the kids in the content model, just throw out
+                    // a warning and continue.
+                    if (k == null) {
+                        System.err.println(
+                            "Warning:  the content model for element \"" + r.getName() + 
+                            "\" includes a child element \"" + kn + "\", but there is " +
+                            "no declaration for it.");
+                    }
                     _putReachable(k);
                 }
             }

@@ -457,9 +457,14 @@
                 <x:if test='$jsonName != ""'>
                   <xsl:with-param name='key' select='{$jsonName}'/>
                 </x:if>
-                <x:if test='$itemSpec/@textKid = "true"'>
-                  <xsl:with-param name='kids' select='node()'/>
-                </x:if>
+                <x:choose>
+                  <x:when test='$itemSpec/@textKid = "true"'>
+                    <xsl:with-param name='kids' select='node()'/>
+                  </x:when>
+                  <x:when test='$itemSpec/@content'>
+                    <xsl:with-param name='kids' select='{$itemSpec/@content}'/>
+                  </x:when>
+                </x:choose>
                 <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
               </xsl:call-template>
             </xsl:template>
@@ -477,9 +482,14 @@
                 <x:if test='$jsonName != ""'>
                   <xsl:with-param name='key' select='{$jsonName}'/>
                 </x:if>
-                <x:if test='$itemSpec/@textKid = "true"'>
-                  <xsl:with-param name='kids' select='@*|node()'/>
-                </x:if>
+                <x:choose>
+                  <x:when test='$itemSpec/@textKid = "true"'>
+                    <xsl:with-param name='kids' select='node()'/>
+                  </x:when>
+                  <x:when test='$itemSpec/@content'>
+                    <xsl:with-param name='kids' select='{$itemSpec/@content}'/>
+                  </x:when>
+                </x:choose>
                 <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
               </xsl:call-template>
             </xsl:template>
@@ -720,6 +730,40 @@
     </x:comment>
   </x:template>
 
+  <x:template match='members'>
+    <x:param name='metaindentlevel' select='0'/>
+    <x:param name='metacontext' select='""'/>
+    <x:variable name='metaindent' select='concat("$iu", $metaindentlevel)'/>
+    <x:variable name='force-trailing-comma'>
+      <x:choose>
+        <x:when test='position() != last()'>
+          <x:text>true()</x:text>
+        </x:when>
+        <x:otherwise>
+          <x:text>false()</x:text>
+        </x:otherwise>
+      </x:choose>
+    </x:variable>
+
+    <x:value-of select='$nl'/>
+    <x:value-of select='$nl'/>
+    <x:comment> 
+      <x:text>json annotation for content model: 'members'</x:text> 
+    </x:comment>
+    <x:value-of select='concat($nl, "      ")'/>
+
+    <xsl:apply-templates select='{@content}'>
+      <xsl:with-param name='indent' 
+        select='concat($indent, {$metaindent})'/>
+      <xsl:with-param name='context' select='"{$metacontext}"'/>
+      <x:if test='$force-trailing-comma'>
+        <xsl:with-param name='trailing-comma' select='true()'/>
+      </x:if>
+    </xsl:apply-templates>
+
+  </x:template>
+  
+  
   <x:template match='string|number|boolean'>
     <x:param name='metaindentlevel' select='0'/>
     <!-- If we are here from recursing within the json annotation, then this

@@ -38,6 +38,22 @@
         <Boolean>yes</Boolean>
         <Boolean>true</Boolean>
       </Booleans>
+      <test1 a1="fleegle">
+        <c1>bingo</c1>
+        <c1>drooper</c1>
+        <c1>snorky</c1>
+      </test1>
+      <test2>
+        <c2a>bingo</c2a>
+        <c2b>drooper</c2b>
+        <c2c>snorky</c2c>
+      </test2>
+      <test3 a3a="guitar" a3b="violin">
+        <c3a>bingo</c3a>
+        <c3b>drooper</c3b>
+        <c3c>snorky</c3c>
+        <c3c>drooper</c3c>
+      </test3>
     </DocumentSummary>
   </DocumentSummarySet>
 </Result>

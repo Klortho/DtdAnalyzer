@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # This rudimentary test script does the following:
-# * Runs make-samples.sh, which conversion XSLTs and generates JSON files for each
-#   of the samples
+# * Runs make-samples.sh, which generates conversion XSLTs and then runs 
+#   those to generate JSON files for each of the samples
 # * Compares each of the resultant JSON files with the reference one that is in
 #   git, and fails if they are different
 # * As an added check, runs each resultant JSON through jsonlint
@@ -21,7 +21,7 @@ my $failpref = "****** Failed: ";
 
 
 print "Generating outputs for each of the samples.\n";
-system "./make-samples.sh";
+system "make-samples.sh";
 
 
 

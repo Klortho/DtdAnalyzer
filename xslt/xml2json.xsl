@@ -818,6 +818,7 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:value-of select='name(.)'/>
+      <xsl:value-of select='concat(" (context = ", $context, ")")'/>
     </xsl:message>
     
     <xsl:choose>
