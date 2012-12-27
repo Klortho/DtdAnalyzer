@@ -25,11 +25,11 @@
     The default is to ignore them. -->
   <x:param name='ignore-unreachable' select='true()'/>
 
+  <!-- Set this to true to write some interesting stuff to debug.xml.  -->
+  <x:param name='debug' select='false()'/>
+  
   <x:variable name='nl' select='"&#10;"'/>
   
-  <!-- Set this to true to write some interesting stuff to debug.xml.  -->
-  <x:variable name='debug' select='true()'/>
-
   <!-- Create a variable pointing to the root of the input document. -->
   <x:variable name='daz' select='/'/>
 
@@ -83,7 +83,11 @@
         values. -->
       <x:variable name='typeOverride'>
         <x:choose>
+          <x:when test='$jaName = "member"'>
+            <x:text>members</x:text>
+          </x:when>
           <x:when test='$jaName = "string" or $jaName = "number" or $jaName = "boolean" or
+                        $jaName = "members" or
                         $jaName = "object" or $jaName = "array" or $jaName = "custom"'>
             <x:value-of select='$jaName'/>
           </x:when>
@@ -114,12 +118,6 @@
           <x:when test='$typeOverride != ""'>
             <x:value-of select='$typeOverride'/>
           </x:when>
-          
-        <!--
-          <x:when test='@root="true"'>
-            <x:text>root</x:text>
-          </x:when>
-        -->
           
           <!-- 
             If an element has no attributes, and has text content, then it will be
@@ -415,6 +413,7 @@
                     select='string-join($matchStringSeq, " | ")'/>
 
         <x:choose>
+          <!-- FIXME:  Do we still need this one for "root"? --> 
           <x:when test='$type = "root"'>
             <xsl:template match='{$matchString}'>
               <xsl:call-template name='result-start'>
@@ -469,8 +468,8 @@
           </x:when>
 
           <!-- Very special: an array or object that has specified kids -->
-          <x:when test='($type = "array" or $type = "object") and
-                        $itemSpec/*'>
+          <x:when test='( ($type = "array" or $type = "object") and $itemSpec/* ) or
+                        $type = "members"'>
             <xsl:template match='{$matchString}'>
               <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
@@ -776,8 +775,26 @@
       <x:text>json annotation for content model: 'members'</x:text> 
     </x:comment>
     <x:value-of select='concat($nl, "      ")'/>
+    
+    <!-- Figure out the value to use in the select attribute of the apply-templates.
+      If @select is given in the itemspec, use that.  If metacontext is given, then
+      use the appropriate default for either array or object.  Otherwise, just use
+      "@*|*". -->
+    <x:variable name='select'>
+      <x:choose>
+        <x:when test='@select'>
+          <x:value-of select='@select'/>
+        </x:when>
+        <x:when test='$metacontext = "array"'>
+          <x:value-of select='"*"'/>
+        </x:when>
+        <x:otherwise>
+          <x:value-of select='"@*|*"'/>
+        </x:otherwise>
+      </x:choose>
+    </x:variable>
 
-    <xsl:apply-templates select='{@select}'>
+    <xsl:apply-templates select='{$select}'>
       <xsl:with-param name='indent' 
         select='concat($indent, {$metaindent})'/>
       <xsl:with-param name='context' select='"{$metacontext}"'/>
