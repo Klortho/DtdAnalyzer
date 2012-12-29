@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # This rudimentary test script does the following:
-# * Runs make-samples.sh, which generates conversion XSLTs and then runs 
+# * Runs make-samples.sh, which generates conversion XSLTs and then runs
 #   those to generate JSON files for each of the samples
 # * Compares each of the resultant JSON files with the reference one that is in
 #   git, and fails if they are different

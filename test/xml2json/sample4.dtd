@@ -13,7 +13,11 @@
 <!ELEMENT Result (DocumentSummarySet?)>
 
 <!--~~ <DocumentSummarySet>
-~~json <object/>
+~~json 
+  <object>
+    <array name='"uids"' select='*/@uid'/>
+    <members select='*'/>
+  </object>
 ~~-->
 <!ELEMENT DocumentSummarySet (DocumentSummary)*>
 <!ATTLIST DocumentSummarySet status CDATA #IMPLIED>
