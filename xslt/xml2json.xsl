@@ -314,38 +314,38 @@
     </o>
   </xsl:template>
 
+
+  
+
   <!--
-    simple
-    Delegates either to string-in-object or string-in-array.
+    string
+    There are separate template here for when we don't know the context
+    ("string") or when we do ("string-in-object", "string-in-array").
   -->
   <xsl:template name='string'>
     <xsl:param name='context' select='"unknown"'/>
-    <xsl:param name='key' select='""'/>
+    <xsl:param name='key'>
+      <xsl:choose>
+        <xsl:when test='self::text()'>
+          <xsl:text>value</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>  <!-- This is an attribute or element node -->
+          <xsl:value-of select='np:translate-name()'/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
     <xsl:param name='value' select='.'/>
     
     <xsl:choose>
-      <xsl:when test='$context = "object" and $key = ""'>
-        <xsl:call-template name='string-in-object'>
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test='$context = "object" and $key != ""'>
-        <xsl:call-template name='string-in-object'>
-          <xsl:with-param name='key' select='$key'/>
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
+      <xsl:when test='$context = "object"'>
+        <s name='{$key}'>
+          <xsl:value-of select='$value'/>
+        </s>
       </xsl:when>
       <xsl:when test='$context = "array"'>
-        <xsl:call-template name="string-in-array">
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
-      </xsl:when>
-
-      <xsl:when test='$context = "object"'>
-        <xsl:message>
-          <xsl:text>Error:  bad key passed in for element </xsl:text>
-          <xsl:value-of select='name(.)'/>
-        </xsl:message>
+        <s>
+          <xsl:value-of select='$value'/>
+        </s>
       </xsl:when>
       <xsl:otherwise>
         <xsl:message>
@@ -362,37 +362,158 @@
   </xsl:template>
 
   <!--
+    string-in-object
+    This translates the node into a key:value pair.  If it's a text node, then, by 
+    default, the key will be "value".  If it's an attribute or element node, then, 
+    by default, the key will be the name converted to lowercase (it's up to you
+    to make sure they are unique within the object).
+  -->
+  <xsl:template name='string-in-object'>
+    <xsl:param name='key'>
+      <xsl:choose>
+        <xsl:when test='self::text()'>
+          <xsl:text>value</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>  <!-- This is an attribute or element node -->
+          <xsl:value-of select='np:translate-name()'/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
+    <xsl:param name='value' select='.'/>
+    
+    <s name='{$key}'>
+      <xsl:value-of select='$value'/>
+    </s>
+  </xsl:template>
+  
+  <!-- 
+    string-in-array
+    For text nodes, attributes, or elements that have simple content, when
+    in the context of a JSON array.  This discards the attribute or element name,
+    and produces a quoted string from the content.
+  -->
+  <xsl:template name='string-in-array'>
+    <xsl:param name='value' select='.'/>
+    <s>
+      <xsl:value-of select='$value'/>
+    </s>
+  </xsl:template>
+  
+  
+
+
+
+
+
+  <!--
     number
     Delegates either to number-in-object or number-in-array.
   -->
   <xsl:template name='number'>
     <xsl:param name='context' select='"unknown"'/>
-    <xsl:param name='key' select='""'/>
+    <xsl:param name='key'>
+      <xsl:choose>
+        <xsl:when test='self::text()'>
+          <xsl:text>value</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>  <!-- This is an attribute or element node -->
+          <xsl:value-of select='np:translate-name()'/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
     <xsl:param name='value' select='.'/>
     
     <xsl:choose>
-      <xsl:when test='$context = "object" and $key = ""'>
-        <xsl:call-template name='number-in-object'>
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test='$context = "object" and $key != ""'>
-        <xsl:call-template name='number-in-object'>
-          <xsl:with-param name='key' select='$key'/>
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
+      <xsl:when test='$context = "object"'>
+        <n name='{$key}'>
+          <xsl:value-of select='$value'/>
+        </n>
       </xsl:when>
       <xsl:when test='$context = "array"'>
-        <xsl:call-template name="number-in-array">
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
+        <n>
+          <xsl:value-of select='$value'/>
+        </n>
       </xsl:when>
-
-      <xsl:when test='$context = "object"'>
+      <xsl:otherwise>
         <xsl:message>
-          <xsl:text>Error:  bad key passed in for element </xsl:text>
+          <xsl:text>Error:  context is not defined for element </xsl:text>
           <xsl:value-of select='name(.)'/>
+          <xsl:text> ($context = "</xsl:text>
+          <xsl:value-of select='$context'/>
+          <xsl:text>", $key = "</xsl:text>
+          <xsl:value-of select='$key'/>
+          <xsl:text>")</xsl:text>
         </xsl:message>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
+  <!--
+    number-in-object
+    For text nodes, attributes, or elements that have simple 
+    content, when in the context of a JSON object.  
+  -->
+  <xsl:template name='number-in-object'>
+    <xsl:param name='key'>
+      <xsl:choose>
+        <xsl:when test='self::text()'>
+          <xsl:text>value</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>  <!-- This is an attribute or element node -->
+          <xsl:value-of select='np:translate-name()'/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
+    <xsl:param name='value' select='.'/>
+    
+    <n name='{$key}'>
+      <xsl:value-of select='$value'/>
+    </n>
+  </xsl:template>
+  
+  <!-- 
+    number-in-array
+    For text nodes, attributes, or elements that have simple content, when
+    in the context of a JSON array.  This discards the attribute or element name,
+    and produces a quoted string from the content.
+  -->
+  <xsl:template name='number-in-array'>
+    <xsl:param name='value' select='.'/>
+    <n>
+      <xsl:value-of select='$value'/>
+    </n>
+  </xsl:template>
+  
+  
+  <!--
+    boolean
+    Delegates either to boolean-in-object or boolean-in-array.
+  -->
+  <xsl:template name='boolean'>
+    <xsl:param name='context' select='"unknown"'/>
+    <xsl:param name='key'>
+      <xsl:choose>
+        <xsl:when test='self::text()'>
+          <xsl:text>value</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>  <!-- This is an attribute or element node -->
+          <xsl:value-of select='np:translate-name()'/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
+    <xsl:param name='value' select='.'/>
+    
+    <xsl:choose>
+      <xsl:when test='$context = "object"'>
+        <b name='{$key}'>
+          <xsl:value-of select='np:boolean-value($value)'/>
+        </b>
+      </xsl:when>
+      <xsl:when test='$context = "array"'>
+        <b>
+          <xsl:value-of select='np:boolean-value($value)'/>
+        </b>
       </xsl:when>
       <xsl:otherwise>
         <xsl:message>
@@ -409,51 +530,47 @@
   </xsl:template>
   
   <!--
-    boolean
-    Delegates either to boolean-in-object or boolean-in-array.
+    boolean-in-object
+    For text nodes, attributes, or elements that have simple 
+    content, when in the context of a JSON object.  
   -->
-  <xsl:template name='boolean'>
-    <xsl:param name='context' select='"unknown"'/>
-    <xsl:param name='key' select='""'/>
+  <xsl:template name='boolean-in-object'>
+    <xsl:param name='key'>
+      <xsl:choose>
+        <xsl:when test='self::text()'>
+          <xsl:text>value</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>  <!-- This is an attribute or element node -->
+          <xsl:value-of select='np:translate-name()'/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
     <xsl:param name='value' select='.'/>
     
-    <xsl:choose>
-      <xsl:when test='$context = "object" and $key = ""'>
-        <xsl:call-template name='boolean-in-object'>
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test='$context = "object" and $key != ""'>
-        <xsl:call-template name='boolean-in-object'>
-          <xsl:with-param name='key' select='$key'/>
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test='$context = "array"'>
-        <xsl:call-template name="boolean-in-array">
-          <xsl:with-param name='value' select='$value'/>
-        </xsl:call-template>
-      </xsl:when>
-
-      <xsl:when test='$context = "object"'>
-        <xsl:message>
-          <xsl:text>Error:  bad key passed in for element </xsl:text>
-          <xsl:value-of select='name(.)'/>
-        </xsl:message>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:message>
-          <xsl:text>Error:  context is not defined for element </xsl:text>
-          <xsl:value-of select='name(.)'/>
-          <xsl:text> ($context = "</xsl:text>
-          <xsl:value-of select='$context'/>
-          <xsl:text>", $key = "</xsl:text>
-          <xsl:value-of select='$key'/>
-          <xsl:text>")</xsl:text>
-        </xsl:message>
-      </xsl:otherwise>
-    </xsl:choose>
+    <b name='{$key}'>
+      <xsl:value-of select='np:boolean-value($value)'/>
+    </b>
   </xsl:template>
+  
+  <!-- 
+    boolean-in-array
+    For text nodes, attributes, or elements that have simple content, when
+    in the context of a JSON array.  This discards the attribute or element name,
+    and produces a quoted string from the content.
+  -->
+  <xsl:template name='boolean-in-array'>
+    <xsl:param name='value' select='.'/>
+    
+    <b>
+      <xsl:value-of select='np:boolean-value($value)'/>
+    </b>
+  </xsl:template>
+  
+  
+  
+  
+  
+  
   
   
   <!--
@@ -503,170 +620,10 @@
     </xsl:choose>
   </xsl:template>
   
-  <!--
-    object 
-    Delegates either to object-in-object or object-in-array.
-  -->
-  <xsl:template name='object'>
-    <xsl:param name='context' select='"unknown"'/>
-    <xsl:param name='key' select='""'/>
-    <xsl:param name='kids' select='@*|*'/>
-    
-    <xsl:choose>
-      <xsl:when test='$context = "object" and $key = ""'>
-        <xsl:call-template name='object-in-object'>
-          <xsl:with-param name='kids' select='$kids'/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test='$context = "object" and $key != ""'>
-        <xsl:call-template name='object-in-object'>
-          <xsl:with-param name='key' select='$key'/>
-          <xsl:with-param name='kids' select='$kids'/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test='$context = "array"'>
-        <xsl:call-template name="object-in-array">
-          <xsl:with-param name='kids' select='$kids'/>
-        </xsl:call-template>
-      </xsl:when>
-
-      <xsl:when test='$context = "object"'>
-        <xsl:message>
-          <xsl:text>Error:  bad key passed in for element </xsl:text>
-          <xsl:value-of select='name(.)'/>
-        </xsl:message>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:message>
-          <xsl:text>Error:  context is not defined for element </xsl:text>
-          <xsl:value-of select='name(.)'/>
-          <xsl:text> ($context = "</xsl:text>
-          <xsl:value-of select='$context'/>
-          <xsl:text>", $key = "</xsl:text>
-          <xsl:value-of select='$key'/>
-          <xsl:text>")</xsl:text>
-        </xsl:message>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
   
-  
-  <!--
-    string-in-object
-    For text nodes, attributes, or elements that have simple 
-    content, when in the context of a JSON object.  
-    This translates the node into a key:value pair.  If it's a text node, then, by 
-    default, the key will be "value".  If it's an attribute or element node, then, 
-    by default, the key will be the name converted to lowercase (it's up to you
-    to make sure they are unique within the object).
-  -->
-  <xsl:template name='string-in-object'>
-    <xsl:param name='key'>
-      <xsl:choose>
-        <xsl:when test='self::text()'>
-          <xsl:text>value</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>  <!-- This is an attribute or element node -->
-          <xsl:value-of select='np:translate-name()'/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:param>
-    <xsl:param name='value' select='.'/>
-    
-    <s name='{$key}'>
-      <xsl:value-of select='$value'/>
-    </s>
-  </xsl:template>
-  
-  <!-- 
-    string-in-array
-    For text nodes, attributes, or elements that have simple content, when
-    in the context of a JSON array.  This discards the attribute or element name,
-    and produces a quoted string from the content.
-  -->
-  <xsl:template name='string-in-array'>
-    <xsl:param name='value' select='.'/>
-    
-    <s>
-      <xsl:value-of select='$value'/>
-    </s>
-  </xsl:template>
-
-  <!--
-    number-in-object
-    For text nodes, attributes, or elements that have simple 
-    content, when in the context of a JSON object.  
-  -->
-  <xsl:template name='number-in-object'>
-    <xsl:param name='key'>
-      <xsl:choose>
-        <xsl:when test='self::text()'>
-          <xsl:text>value</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>  <!-- This is an attribute or element node -->
-          <xsl:value-of select='np:translate-name()'/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:param>
-    <xsl:param name='value' select='.'/>
-    
-    <n name='{$key}'>
-      <xsl:value-of select='$value'/>
-    </n>
-  </xsl:template>
-  
-  <!-- 
-    number-in-array
-    For text nodes, attributes, or elements that have simple content, when
-    in the context of a JSON array.  This discards the attribute or element name,
-    and produces a quoted string from the content.
-  -->
-  <xsl:template name='number-in-array'>
-    <xsl:param name='value' select='.'/>
-    
-    <n>
-      <xsl:value-of select='$value'/>
-    </n>
-  </xsl:template>
 
 
-  <!--
-    boolean-in-object
-    For text nodes, attributes, or elements that have simple 
-    content, when in the context of a JSON object.  
-  -->
-  <xsl:template name='boolean-in-object'>
-    <xsl:param name='key'>
-      <xsl:choose>
-        <xsl:when test='self::text()'>
-          <xsl:text>value</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>  <!-- This is an attribute or element node -->
-          <xsl:value-of select='np:translate-name()'/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:param>
-    <xsl:param name='value' select='.'/>
-    
-    <b name='{$key}'>
-      <xsl:value-of select='np:boolean-value($value)'/>
-    </b>
-  </xsl:template>
-  
-  <!-- 
-    boolean-in-array
-    For text nodes, attributes, or elements that have simple content, when
-    in the context of a JSON array.  This discards the attribute or element name,
-    and produces a quoted string from the content.
-  -->
-  <xsl:template name='boolean-in-array'>
-    <xsl:param name='value' select='.'/>
-    
-    <b>
-      <xsl:value-of select='np:boolean-value($value)'/>
-    </b>
-  </xsl:template>
-  
+
   
   
   <!--
@@ -703,6 +660,46 @@
     </a>
   </xsl:template>
   
+  
+  <!--
+    object 
+    Delegates either to object-in-object or object-in-array.
+  -->
+  <xsl:template name='object'>
+    <xsl:param name='context' select='"unknown"'/>
+    <xsl:param name='key' select='np:translate-name()'/>
+    <xsl:param name='kids' select='@*|*'/>
+    
+    <xsl:choose>
+      <xsl:when test='$context = "object"'>
+        <o name='{$key}'>
+          <xsl:apply-templates select='$kids'>
+            <xsl:with-param name='context' select='"object"'/>
+          </xsl:apply-templates>
+        </o>
+      </xsl:when>
+      <xsl:when test='$context = "array"'>
+        <o>
+          <xsl:apply-templates select='$kids'>
+            <xsl:with-param name='context' select='"object"'/>
+          </xsl:apply-templates>
+        </o>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:message>
+          <xsl:text>Error:  context is not defined for element </xsl:text>
+          <xsl:value-of select='name(.)'/>
+          <xsl:text> ($context = "</xsl:text>
+          <xsl:value-of select='$context'/>
+          <xsl:text>", $key = "</xsl:text>
+          <xsl:value-of select='$key'/>
+          <xsl:text>")</xsl:text>
+        </xsl:message>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
   <!-- 
     object-in-object
     For elements that have attributes and/or heterogenous content.  These are 
@@ -730,7 +727,6 @@
   -->
   <xsl:template name='object-in-array'>
     <xsl:param name='kids' select='@*|*'/>
-    
     <o>
       <xsl:apply-templates select='$kids'>
         <xsl:with-param name='context' select='"object"'/>
@@ -738,27 +734,6 @@
     </o>
   </xsl:template>
   
-  <!-- 
-    simple-obj-in-array
-    This is for simple-type XML attributes or elements, but we want to convert
-    them into mini JSON objects.  For example,
-      <PhraseNotFound>fleegle</PhraseNotFound>
-    will be converted to
-      { "phrasenotfound": "fleegle" }
-    This is for elements that appear in an array context, but the content is
-    not strictly homogenous.
-  -->
-  <xsl:template name='simple-obj-in-array'>
-    <xsl:param name='key' select='np:translate-name()'/>
-    <xsl:param name='value' select='.'/>
-
-    <o>
-      <xsl:value-of select='np:key-simple(
-        concat($indent, $iu), $key, np:string-value($value), false()
-      )'/>
-    </o>
-  </xsl:template>
-
   
   
 
@@ -824,17 +799,11 @@
   <xsl:template match='o' mode='serialize-jxml-array'>
     <xsl:param name='indent' select='""'/>
     
-    <!--
-    <xsl:text>START-O></xsl:text>
-    <xsl:text>[[indent is '</xsl:text>
-    <xsl:value-of select='$indent'/>
-    <xsl:text>']]</xsl:text> -->
     <xsl:value-of select='np:start-object($indent)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-object'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
     <xsl:value-of select='np:end-object($indent, position() != last())'/>    
-    <!--<xsl:text>&lt;END-O</xsl:text>-->
   </xsl:template>
   
   <xsl:template match='o' mode='serialize-jxml-object'>
