@@ -1,4 +1,7 @@
-<!-- DocSum DTD for all sequence databases -->
+<!--
+  This is another example DTD for illustrating the features
+  of the dtd2xml2json utility, and for testing.
+-->
 
 <!--~~ !dtd
 ~~json 
@@ -8,15 +11,24 @@
 ~~-->
 
 <!--~~ <Result>
+This is the root element, which will be turned into a JSON array.
 ~~tags root
 ~~-->
 <!ELEMENT Result (DocumentSummarySet?)>
 
 <!--~~ <DocumentSummarySet>
+In this example, the element contains a list of DocumentSummary
+children, each of which has a unique "uid" attribute.  Since it
+would be nice to be able to access these by uid from within 
+Javascript, we'll convert this into a JSON object, rather than
+an array.  But at the top of the object, we'll put a special
+member named "uids", that will be an array of all the uids in
+each of the children.  This array preserves the order of the 
+children, in case that's important.
 ~~json 
   <object>
     <array name='"uids"' select='*/@uid'/>
-    <members select='*'/>
+    <members/>
   </object>
 ~~-->
 <!ELEMENT DocumentSummarySet (DocumentSummary)*>
@@ -30,8 +42,7 @@
       | Gi
       | Statistics
       | Properties
-      | OSLT
-      | splits
+      | MoreProps
       | Booleans
       | test1
       | test2
@@ -39,16 +50,16 @@
     )*>
 <!ATTLIST DocumentSummary uid CDATA #IMPLIED>
 
-<!ELEMENT Title   (#PCDATA)>
+<!ELEMENT Title (#PCDATA)>
 
 <!--~~ <Gi>
 ~~json <number/>
 ~~-->
-<!ELEMENT Gi      (#PCDATA)>
+<!ELEMENT Gi (#PCDATA)>
 
-<!ELEMENT Statistics  (Stat)+>
+<!ELEMENT Statistics (Stat)+>
 
-<!ELEMENT Stat   EMPTY>
+<!ELEMENT Stat EMPTY>
 
 <!--~~ @count
 ~~json <number/>
@@ -70,39 +81,41 @@
   aa        CDATA       #IMPLIED
   qual      CDATA       #IMPLIED>
 
-<!ELEMENT   OSLT        (#PCDATA)>
+
+<!-- This will be converted into an object. -->
+<!ELEMENT MoreProps (prop)>
 
 <!--~~ @indexed
 ~~json <boolean/>
 ~~-->
-<!ATTLIST   OSLT
+<!ATTLIST   MoreProps
   indexed   CDATA       #IMPLIED>
 
+<!ELEMENT  prop (#PCDATA)>
 
-<!-- Test an array of objects. -->
-<!ELEMENT splits (split)+>
-<!ELEMENT split (instrument)>
-<!ATTLIST split
-  name CDATA #IMPLIED
-  hobby CDATA #IMPLIED>
-<!ELEMENT instrument (#PCDATA)>
+
 
 <!-- 
-  Test "unknown".  The command dtd2xml2json should print out a warning message,
-  "Need to tell me what to do with element Unknowable".  
+  Test "unknown".  Since the utility won't be able to figure out what
+  to do this this element, and there are no annotations to tell it,
+  the dtd2xml2json command should print out a warning 
+  message, "Need to tell me what to do with element Unknowable".  
 -->
 <!ELEMENT Unknowable (splits+|split+)>
 
-<!-- Test "custom"  -->
 <!--~~ <Customized>
+Test "custom".  Here, we're explicitly telling the tool not to complain.
+This is usually used in conjunction with an external custom stylesheet,
+and the "custom" annotation here indicates that the template for this
+element is defined in that custom stylesheet.
 ~~json <custom/>
 ~~-->
 <!ELEMENT Customized (splits+|split+)>
  
 <!--
   This one should report a problem when lcnames is in effect, but not
-  otherwise.  When running dtd2xml2json, you should see the warning message:
-  "Need to tell me what to do with element TestLCNames".
+  otherwise.  When running dtd2xml2json, you should see the warning 
+  message: "Need to tell me what to do with element TestLCNames".
 -->
 <!ELEMENT TestLCNames EMPTY>
  <!ATTLIST   TestLCNames
@@ -116,8 +129,10 @@
 ~~-->
 <!ELEMENT Boolean (#PCDATA)>
 
-<!-- Test that I can override the content for an array  -->
 <!--~~ <test1>
+Test that I can override the content for an array.  Normally, 
+attributes are not included, but in this case, the attribute "a1"
+will be included as a member.
 ~~json <array select='@*|*'/>
 ~~-->
 <!ELEMENT test1 (c1*)>
@@ -125,30 +140,37 @@
 <!ATTLIST test1
   a1 CDATA #IMPLIED >
 
-<!-- Test overriding content for an object.  This shows how to 
-  exclude a set of child elements.  In this case, the child <c2c> might occur
-  more than once, so it is not safe to include those kids as object members.. -->
 <!--~~ <test2>
-~~json <object select='c2a|c2b'/>
+Test overriding content for an object.  
+In this case, the child "c2c" might occur more than 
+once, so it is not safe to include those kids as object members directly.
+Instead, we'll corral them into a child array.
+~~json 
+  <object>
+    <members select='@*|c2a|c2b'/>
+    <array name='"c2cs"' select='c2c'/>
+  </object>
 ~~-->
-<!ELEMENT test2 (c2a|c2b|c2c*)>
+<!ELEMENT test2 (c2a,c2b,c2c*)>
 <!ELEMENT c2a (#PCDATA) >
 <!ELEMENT c2b (#PCDATA) >
 <!ELEMENT c2c (#PCDATA) >
+<!ATTLIST test2
+  a2a CDATA #IMPLIED
+  a2b CDATA #IMPLIED>
 
-<!-- This is the same, with the added demo that we'll corral the <c2c> kids
-  into a child array. -->
 <!--~~ <test3>
-~~json 
-  <object>
-    <members select='@*|c3a|c3b'/>
-    <array name='"c3cs"' select='c3c'/>
-  </object>
+In this example, we'll flatten an outer element, meaning that as a wrapper
+it will be discarded and substituted by its unwrapped children.  The context
+of the test3 element is "object", so we have to make sure that the names
+that will be used for the child items are unique in the context of that
+parent object, not just unique among themselves.
+~~json <members/>
 ~~-->
-<!ELEMENT test3 (c3a|c3b|c3c*)>
+<!ELEMENT test3 (c3a, c3b)>
 <!ELEMENT c3a (#PCDATA) >
 <!ELEMENT c3b (#PCDATA) >
-<!ELEMENT c3c (#PCDATA) >
 <!ATTLIST test3
-  a3a CDATA #IMPLIED
-  a3b CDATA #IMPLIED>
+  a3a CDATA #IMPLIED >
+
+<!-- FIXME:  Need to test various overrides and default for name, select, etc.  -->

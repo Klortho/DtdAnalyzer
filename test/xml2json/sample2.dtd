@@ -1,8 +1,6 @@
 <!--    
   This is an example/test DTD for the XML-to-JSON features of the DtdAnalyzer.
   This DTD tests some of the more complex features.
-  
-  The elements are here in alphabetical order for convenience.
 -->
 <!-- ================================================================= -->
 
@@ -13,53 +11,10 @@
   </json>
 ~~-->
 
-<!--~~ <Count>
-Here we override the default type, indicating that this is a JSON number.
-~~json <number/>
-~~-->
-<!ELEMENT Count            (#PCDATA)>	<!-- \d+ -->
-
-<!--~~ <ERROR>
-This element (tested in sample2a.xml) becomes a key-value pair, and the key is
-specified by the name attribute here.  By default, the key would be "error", but
-we want to preserve the all-uppercase "ERROR".  Note that the value of the name 
-attribute is an XPath expression, so it is enclosed in quotes.
-~~json <json name='"ERROR"'/>
-~~-->
-<!ELEMENT ERROR            (#PCDATA)>	<!-- .+ -->
-
-<!--~~ <ErrorList>
-This one is special because it can take any number of TermSet and/or OP
-children.  So it doesn't fit cleanly into either a JSON array or object.
-~~json
-  <object>
-    <number name='count' value='count(*)'/>
-    <array name='"phrasesnotfound"' select='PhraseNotFound'/>
-    <array name='"fieldsnotfound"' select='FieldNotFound'/>
-  </object>
-~~-->
-<!ELEMENT ErrorList        (PhraseNotFound*,FieldNotFound*)>
-
-<!ELEMENT Explode          (#PCDATA)>	<!-- (Y|N) -->
-
-<!ELEMENT Field            (#PCDATA)>	<!-- .+ -->
-
-<!ELEMENT FieldNotFound    (#PCDATA)>	<!-- .+ -->
-
-<!ELEMENT From             (#PCDATA)>	<!-- .+ -->
-
-<!--~~ <Id>
-~~json <number/>
-~~-->
-<!ELEMENT Id               (#PCDATA)>	<!-- \d+ -->
-
-<!ELEMENT IdList           (Id*)>
-
-<!ELEMENT OP               (#PCDATA)>	<!-- (AND|OR|NOT|RANGE|GROUP) -->
-
 <!--~~ <Result>
-This is the root element for a response.  Change the name of the main
-body portion of the returned JSON from "result" to "response".
+This is the root element for a response.  The following annotation
+changes the name of the main body portion of the returned JSON from 
+"result" to "response".
 ~~ tags root
 ~~ json <object name='"response"'/>
 ~~-->
@@ -68,9 +23,7 @@ body portion of the returned JSON from "result" to "response".
                    ( 
                      ( ProblemFound,
                        Count,
-                       ( RetMax,
-                         RetStart,
-                         IdList,
+                       ( IdList,
                          TranslationSet,
                          TranslationStack?
                        )?
@@ -80,41 +33,99 @@ body portion of the returned JSON from "result" to "response".
                    ErrorList?
                  )>
 
-<!--~~ <RetMax>
-~~json <number/>
-~~-->
-<!ELEMENT RetMax           (#PCDATA)>	<!-- \d+ -->
-
-<!--~~ <RetStart>
-~~json <number/>
-~~-->
-<!ELEMENT RetStart         (#PCDATA)>	<!-- \d+ -->
-
-<!ELEMENT PhraseNotFound   (#PCDATA)>	<!-- .+ -->
-
 <!--~~ <ProblemFound>
-This should be converted into a JSON boolean.
+This will be converted into a JSON boolean.
 ~~json <boolean/>
 ~~-->
-<!ELEMENT ProblemFound     (#PCDATA)> <!-- (TRUE|FALSE)  -->
+<!ELEMENT ProblemFound (#PCDATA)>
 
-<!ELEMENT Term             (#PCDATA)>	<!-- .+ -->
+<!--~~ <Count>
+This will be converted into a JSON number.
+~~json <number/>
+~~-->
+<!ELEMENT Count (#PCDATA)>
 
-<!ELEMENT TermSet          (Term, Field, Count, Explode)>
+<!-- Here we'll rely on the default behavior, which will turn
+  this into a JSON array. -->
+<!ELEMENT IdList (Id*)>
 
-<!ELEMENT To               (#PCDATA)>	<!-- .+ -->
+<!--~~ <Id>
+An Id is a number.  These are put into JSON without quotes.
+~~json <number/>
+~~-->
+<!ELEMENT Id (#PCDATA)>
 
-<!ELEMENT Translation      (From, To)>
+<!-- Again, here we'll rely on the default behavior, which will 
+  turn this into a JSON array. -->
+<!ELEMENT TranslationSet (Translation*)>
+
+<!-- The default behavior for this turns it into a JSON object.  -->
+<!ELEMENT Translation (From, To)>
+
+<!-- Default here turns this into a JSON string.  -->
+<!ELEMENT From (#PCDATA)>
+
+<!-- Ditto. -->
+<!ELEMENT To (#PCDATA)>	
 
 <!--~~ <TranslationStack>
-This one is special because it can take any number of TermSet and/or OP
-children, in any order.  So it doesn't fit cleanly into either a JSON array or object.
-Since we know that TermSet's will get converted to objects, and OP's will get
-converted to strings, we can just turn this into an array, without any loss of
-information.
+This one is special because it can take any number of TermSet and/or 
+OP children, in any order.  So it doesn't fit cleanly into either a 
+JSON array or object.  Therefore, we have to provide annotation to tell
+the converter what to do.  Since we know that TermSet's will get 
+converted to objects, and OP's will get converted to strings, we can 
+turn this into an array, and the elements of the array will be 
+distinguishable by their types, so they won't be ambiguous.
 ~~json <array/>
 ~~-->
 <!ELEMENT TranslationStack ((TermSet|OP)*)>
 
-<!ELEMENT TranslationSet   (Translation*)>
+<!-- Rely on default behavior:  JSON object.  -->
+<!ELEMENT TermSet (Term, Explode)>
+
+<!-- Rely on default behavior:  JSON string.  -->
+<!ELEMENT Term (#PCDATA)>	
+
+<!--~~ <Explode>
+In XML, this takes a value of "Y" or "N".  We'll turn this into a
+JSON boolean.  The library is smart enough to know that "Y" means "true"
+and "N" means "false".
+~~json <boolean/>
+~~-->
+<!ELEMENT Explode (#PCDATA)>	<!-- (Y|N) -->
+
+<!-- Rely on default behavior:  JSON string.  -->
+<!ELEMENT OP (#PCDATA)>
+
+<!--~~ <ERROR>
+This element (tested in sample2a.xml) becomes a key-value pair, and the 
+key is specified by the name attribute here.  By default, the key would 
+be "error", but we want to preserve the all-uppercase "ERROR".  Note 
+that the value of the name attribute is an XPath expression, so it is 
+enclosed in quotes.
+~~json <json name='"ERROR"'/>
+~~-->
+<!ELEMENT ERROR (#PCDATA)>	
+
+<!--~~ <ErrorList>
+Like TranslationStack, above, this one is special because it can take 
+any number of PhraseNotFound and/or FieldNotFound children, so it 
+doesn't fit cleanly into either a JSON array or object.
+In this case, we will construct a JSON object that has three members.  
+~~json
+  <object>
+    <number name='"count"' value='count(*)'/>
+    <array name='"phrasesnotfound"' select='PhraseNotFound'/>
+    <array name='"fieldsnotfound"' select='FieldNotFound'/>
+  </object>
+~~-->
+<!ELEMENT ErrorList (PhraseNotFound*, FieldNotFound*)>
+
+<!-- Rely on default behavior:  JSON string.  -->
+<!ELEMENT FieldNotFound (#PCDATA)>	
+
+<!-- Rely on default behavior:  JSON string.  -->
+<!ELEMENT PhraseNotFound (#PCDATA)>
+
+
 

@@ -3,34 +3,35 @@
   This DTD tests the ability to implement some of the templates in
   an external custom stylesheet.
   
-  The elements are here in alphabetical order for convenience.
+  The external stylesheet is specified as the configuration parameter "import"
+  in the DTD annotation below.
 -->
 <!-- ================================================================= -->
 
 <!--~~ !dtd
 ~~json 
   <json type='sample3' version='0.3'>
-    <config lcnames='true' />
+    <config lcnames='true' import='sample3.xsl'/>
   </json>
 ~~-->
 
-<!ELEMENT Field            (#PCDATA)>	<!-- .+ -->
-
-<!ELEMENT OP               (#PCDATA)>	<!-- (AND|OR|NOT|RANGE|GROUP) -->
-
-<!ELEMENT Term             (#PCDATA)>	<!-- .+ -->
-
-<!ELEMENT TermSet          (Term, Field)>
-
 
 <!--~~ <TranslationStack>
-This one is special because it can take any number of TermSet and/or OP
-children, in any order.  In sample2, we converted this into an array.
-This time, we'll convert it into a fancy tree structure, in custom templates
-implemented in a custom stylesheet.
+This one is special because it can take any number of TermSet and/or 
+OP children, in any order.  In sample2, we converted this into an 
+array. This time, we'll convert it into a fancy tree structure, in 
+custom templates implemented in a custom stylesheet.
 ~~tags root
 ~~json <custom/>
 ~~-->
 <!ELEMENT TranslationStack ((TermSet|OP)*)>
+
+<!ELEMENT TermSet          (Term, Field)>
+
+<!ELEMENT Term             (#PCDATA)>	
+
+<!ELEMENT Field            (#PCDATA)>	
+
+<!ELEMENT OP               (#PCDATA)>	
 
 

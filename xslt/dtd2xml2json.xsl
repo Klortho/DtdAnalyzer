@@ -28,6 +28,10 @@
   <!-- Set this to true to write some interesting stuff to debug.xml.  -->
   <x:param name='debug' select='false()'/>
   
+  <!-- Set this to true to cause the generated stylesheet to output
+    JXML instead of JSON. -->
+  <x:param name='jxml-out' select='false()'/>
+  
   <x:variable name='nl' select='"&#10;"'/>
   
   <!-- Create a variable pointing to the root of the input document. -->
@@ -359,13 +363,23 @@
     </x:if>
 
     <!-- Generate the structure of the XSL stylesheet -->
-    <xsl:stylesheet version="1.0" xmlns:np="http://ncbi.gov/portal/XSLT/namespace">
+    <xsl:stylesheet version="1.0" 
+      xmlns:np="http://ncbi.gov/portal/XSLT/namespace"
+      exclude-result-prefixes='np xs'>
 
       <xsl:import href='{$basexslt}'/>
       <x:if test='$dtdJA/config/@import'>
         <xsl:import href='{$dtdJA/config/@import}'/>
       </x:if>
-      <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
+      <x:choose>
+        <x:when test='$jxml-out'>
+          <xsl:output method="xml" version="1.0" encoding="UTF-8" 
+            indent="yes" omit-xml-declaration="yes"/>
+        </x:when>
+        <x:otherwise>
+          <xsl:output method="text" encoding="UTF-8"/>
+        </x:otherwise>
+      </x:choose>
       
       <xsl:param name='pretty' select='{not($default-minimized)}()'/>
 
@@ -380,7 +394,17 @@
       <xsl:param name='dtd-annotation'>
         <x:copy-of select='$dtdJA'/>
       </xsl:param>
-    
+      
+      <!-- 
+        If we're supposed to put out JXML instead of JSON, override the
+        root template to prevent serialization.
+      -->
+      <x:if test='$jxml-out'>
+        <xsl:template match='/'>
+          <xsl:call-template name='root'/>
+        </xsl:template>
+      </x:if>
+      
       <x:for-each-group select="$allItems//item"
                         group-by='@groupByKey'>
         <x:variable name='itemSpec' select='current-group()[1]/*'/>
@@ -424,7 +448,6 @@
                 </x:if>
               </xsl:call-template>
 
-              <xsl:variable name='indent' select='$iu'/>
               <xsl:variable name='context' select='"object"'/>
               <x:choose>
                 <x:when test='$itemSpec/*'>
@@ -432,7 +455,6 @@
                 </x:when>
                 <x:otherwise>
                   <xsl:call-template name='object'>
-                    <xsl:with-param name='indent' select='$indent'/>
                     <xsl:with-param name='context' select='$context'/>
                     <x:choose>
                       <x:when test='$itemSpec/@textKid = "true"'>
@@ -452,17 +474,13 @@
           
           <x:when test='$type = "string" or $type = "number" or $type = "boolean"'>
             <xsl:template match='{$matchString}'>
-              <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
-              <xsl:param name='trailing-comma' select='position() != last()'/>
 
               <xsl:call-template name='{$type}'>
-                <xsl:with-param name='indent' select='$indent'/>
                 <xsl:with-param name='context' select='$context'/>
                 <x:if test='$jsonName != ""'>
                   <xsl:with-param name='key' select='{$jsonName}'/>
                 </x:if>
-                <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
               </xsl:call-template>
             </xsl:template>
           </x:when>
@@ -471,7 +489,6 @@
           <x:when test='( ($type = "array" or $type = "object") and $itemSpec/* ) or
                         $type = "members"'>
             <xsl:template match='{$matchString}'>
-              <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
               <x:apply-templates select='$itemSpec' mode='itemspec'/>
             </xsl:template>
@@ -479,12 +496,9 @@
           
           <x:when test='$type = "array"'>
             <xsl:template match='{$matchString}'>
-              <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
-              <xsl:param name='trailing-comma' select='position() != last()'/>
 
               <xsl:call-template name='array'>
-                <xsl:with-param name='indent' select='$indent'/>
                 <xsl:with-param name='context' select='$context'/>
                 <x:if test='$jsonName != ""'>
                   <xsl:with-param name='key' select='{$jsonName}'/>
@@ -497,19 +511,15 @@
                     <xsl:with-param name='kids' select='{$itemSpec/@select}'/>
                   </x:when>
                 </x:choose>
-                <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
               </xsl:call-template>
             </xsl:template>
           </x:when>
           
           <x:when test='$type = "object"'>
             <xsl:template match='{$matchString}'>
-              <xsl:param name='indent' select='""'/>
               <xsl:param name='context' select='"unknown"'/>
-              <xsl:param name='trailing-comma' select='position() != last()'/>
 
               <xsl:call-template name='object'>
-                <xsl:with-param name='indent' select='$indent'/>
                 <xsl:with-param name='context' select='$context'/>
                 <x:if test='$jsonName != ""'>
                   <xsl:with-param name='key' select='{$jsonName}'/>
@@ -522,7 +532,6 @@
                     <xsl:with-param name='kids' select='{$itemSpec/@select}'/>
                   </x:when>
                 </x:choose>
-                <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
               </xsl:call-template>
             </xsl:template>
           </x:when>
@@ -559,10 +568,8 @@
         <x:if test='$itemSpec/@textKid = "true"'>
           <x:for-each select='current-group()'>
             <xsl:template match="{@name}/text()">
-              <xsl:param name="indent" select='""'/>
               <xsl:param name="context" select='"unknown"'/>
               <xsl:call-template name="string">
-                <xsl:with-param name="indent" select="$indent"/>
                 <xsl:with-param name="context" select="$context"/>
               </xsl:call-template>
             </xsl:template>
@@ -580,201 +587,156 @@
     of the DTD.  It gives the author a way to override specific defaults of the automatic
     generation of JSON from the XML.
   -->
-  <x:template match='object' mode='itemspec'>
-    <x:param name='metaindentlevel' select='0'/>
+  
+  <x:template match='object|array' mode='itemspec'>
     <!-- If we are here from recursing within the json annotation, then this
       will be the name of our parent, either object or array.  -->
     <x:param name='metacontext' select='""'/>
-    <x:variable name='metaindent' select='concat("$iu", $metaindentlevel)'/>
-    <x:variable name='trailing-comma'>
+    
+    <x:comment> 
+      <x:text>Handling itemspec &lt;</x:text>
+      <x:value-of select='name(.)'/>
+      <x:text>></x:text> 
+    </x:comment>
+    
+    <x:variable name='jsontype'>
       <x:choose>
-        <x:when test='$metacontext = ""'>
-          <x:text>position() != last()</x:text>
-        </x:when>
-        <x:when test='position() != last()'>
-          <x:text>true()</x:text>
+        <x:when test='name(.) = "object"'>
+          <x:value-of select='"o"'/>
         </x:when>
         <x:otherwise>
-          <x:text>false()</x:text>
+          <x:value-of select='"a"'/>
         </x:otherwise>
       </x:choose>
     </x:variable>
     
-    <x:value-of select='$nl'/>
-    <x:value-of select='$nl'/>
-    <x:comment> 
-      <x:text>json annotation for content model: object</x:text> 
-    </x:comment>
-    <x:value-of select='concat($nl, "      ")'/>
-    
-    <!-- Now output the start, which will depend on context.
-      If $metacontext is "object", then definitely output key.  Otherwise,
-      if $metacontext is blank, then we have to use $context. -->
-    <x:choose>
-      <x:when test='$metacontext = "array"'>
-        <xsl:value-of select='np:start-object(concat($indent, {$metaindent}))'/>
-      </x:when>
-      <x:when test='$metacontext = "object"'>
-        <xsl:value-of 
-          select='np:key-start-object(concat($indent, {$metaindent}), {@name})'/>
-      </x:when>
-      <x:when test='$metacontext = ""'>
-        <xsl:choose>
-          <xsl:when test='$context = "array"'>
-            <xsl:value-of select='np:start-object(concat($indent, {$metaindent}))'/>
-          </xsl:when>
-          <xsl:otherwise> <!-- $context = "object" -->
-            <xsl:variable name='key'>
-              <x:attribute name='select'>
-                <x:choose>
-                  <x:when test='@name'>
-                    <x:value-of select='@name'/>
-                  </x:when>
-                  <x:otherwise>
-                    <x:text>np:to-lower(name(.))</x:text>
-                  </x:otherwise>
-                </x:choose>
-              </x:attribute>
-            </xsl:variable>
-            
-            <xsl:value-of 
-              select='np:key-start-object(concat($indent, {$metaindent}), $key)'/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </x:when>
-    </x:choose>
-    
-    <x:choose>
-      <x:when test='*'>
-        <x:apply-templates select='*' mode='itemspec'>
-          <x:with-param name='metaindentlevel' select='$metaindentlevel + 1'/>
-          <x:with-param name='metacontext' select='"object"'/>
-        </x:apply-templates>
-      </x:when>
-      <x:otherwise>
-        <xsl:apply-templates select='{@select}'>
-          <xsl:with-param name='indent' 
-            select='concat($indent, {$metaindent}, $iu)'/>
-          <xsl:with-param name='context' select='"object"'/>
-        </xsl:apply-templates>
-      </x:otherwise>
-    </x:choose>
-
-    <xsl:value-of 
-      select='np:end-object(concat($indent, {$metaindent}),  {$trailing-comma})'/>
-
-    <x:value-of select='$nl'/>
-    <x:comment> 
-      <x:text> done: '</x:text> 
-      <x:value-of select='name(.)'/>
-      <x:text>' </x:text>
-    </x:comment>
+    <!-- The resultant JSON entity, either <o> or <a> -->
+    <x:element name='{$jsontype}'>  
+      <!-- Add either the 'name' attribute, or a conditional that 
+        causes the name to be generated from the document-instance -->
+      <x:call-template name='itemspec-nodename'>
+        <x:with-param name='metacontext' select='$metacontext'/>
+      </x:call-template>
+      
+      <x:variable name='nextmetacontext' select='name(.)'/>
+      
+      <x:choose>
+        <x:when test='*'>
+          <x:apply-templates select='*' mode='itemspec'>
+            <x:with-param name='metacontext' select='$nextmetacontext'/>
+          </x:apply-templates>
+        </x:when>
+        <x:otherwise>
+          <xsl:apply-templates select='{@select}'>
+            <xsl:with-param name='context' select='"{$nextmetacontext}"'/>
+          </xsl:apply-templates>
+        </x:otherwise>
+      </x:choose>
+    </x:element>
   </x:template>
   
-  <x:template match='array'  mode='itemspec'>
-    <x:param name='metaindentlevel' select='0'/>
-    <!-- If we are here from recursing within the json annotation, then this
-      will be the name of our parent, either object or array.  -->
-    <x:param name='metacontext' select='""'/>
-    <x:variable name='metaindent' select='concat("$iu", $metaindentlevel)'/>
-    <x:variable name='trailing-comma'>
-      <x:choose>
-        <x:when test='$metacontext = ""'>
-          <x:text>position() != last()</x:text>
-        </x:when>
-        <x:when test='position() != last()'>
-          <x:text>true()</x:text>
-        </x:when>
-        <x:otherwise>
-          <x:text>false()</x:text>
-        </x:otherwise>
-      </x:choose>
-    </x:variable>
-    
-    <x:value-of select='$nl'/>
-    <x:value-of select='$nl'/>
-    <x:comment> 
-      <x:text>json annotation for content model: 'array'</x:text> 
-    </x:comment>
-    <x:value-of select='concat($nl, "      ")'/>
 
-    <!-- Now output the start, which will depend on context.
-      If $metacontext is "object", then definitely output key.  Otherwise,
-      if $metacontext is blank, then we have to use $context. -->
+  <!-- 
+    This template either generates a "name" attribute node that gets
+    affixed to the JSON entity, or a generated-XSLT if statement that
+    causes the name to be computed when the instance document is 
+    transformed.
+    Determine if this node needs a @name attribute, based on 
+    the value of $metacontext:
+      - "object" - yes.
+      - "array" - no.  
+      - "" - this itemspec has no parent, so we need to rely on the
+        $context when the stylesheet is run on the instance document,
+        and not the $metacontext.
+  -->
+  <x:template name='itemspec-nodename'>
+    <x:param name='metacontext' select='""'/>
+
     <x:choose>
-      <x:when test='$metacontext = "array"'>
-        <xsl:value-of select='np:start-array(concat($indent, {$metaindent}))'/>
-      </x:when>
       <x:when test='$metacontext = "object"'>
-        <xsl:value-of 
-          select='np:key-start-array(concat($indent, {$metaindent}), {@name})'/>
+        <x:attribute name='name'>
+          <x:value-of select='concat("{", @name, "}")'/>
+        </x:attribute>
       </x:when>
       <x:when test='$metacontext = ""'>
-        <xsl:choose>
-          <xsl:when test='$context = "array"'>
-            <xsl:value-of select='np:start-array(concat($indent, {$metaindent}))'/>
-          </xsl:when>
-          <xsl:otherwise> <!-- $context = "object" -->
-            <xsl:variable name='key'>
+        <xsl:if test='$context = "object"'>
+          <xsl:attribute name='name'>
+            <xsl:value-of>
               <x:attribute name='select'>
                 <x:choose>
                   <x:when test='@name'>
                     <x:value-of select='@name'/>
                   </x:when>
                   <x:otherwise>
-                    <x:text>np:to-lower(name(.))</x:text>
+                    <x:text>np:translate-name()</x:text>
                   </x:otherwise>
                 </x:choose>
               </x:attribute>
-            </xsl:variable>
-            
-            <xsl:value-of 
-              select='np:key-start-array(concat($indent, {$metaindent}), $key)'/>
-          </xsl:otherwise>
-        </xsl:choose>
+            </xsl:value-of>
+          </xsl:attribute>
+        </xsl:if>
       </x:when>
     </x:choose>
-    
-    <x:choose>
-      <x:when test='*'>
-        <x:apply-templates select='*' mode='itemspec'>
-          <x:with-param name='metaindentlevel' select='$metaindentlevel + 1'/>
-          <x:with-param name='metacontext' select='"array"'/>
-        </x:apply-templates>
-      </x:when>
-      <x:otherwise>
-        <xsl:apply-templates select='{@select}'>
-          <xsl:with-param name='indent' 
-            select='concat($indent, {$metaindent}, $iu)'/>
-          <xsl:with-param name='context' select='"array"'/>
-        </xsl:apply-templates>
-      </x:otherwise>
-    </x:choose>
+  </x:template>
+  
 
-    <xsl:value-of 
-      select='np:end-array(concat($indent, {$metaindent}), {$trailing-comma})'/>
+
+  <x:template match='string|number|boolean' mode='itemspec'>
+    <x:param name='metacontext' select='""'/>    
     
-    <x:value-of select='$nl'/>
     <x:comment> 
-      <x:text> done: '</x:text> 
+      <x:text>Handling itemspec &lt;</x:text>
       <x:value-of select='name(.)'/>
-      <x:text>' </x:text>
+      <x:text>></x:text> 
     </x:comment>
+
+    <x:variable name='jsontype'>
+      <x:choose>
+        <x:when test='name(.) = "string"'>
+          <x:value-of select='"s"'/>
+        </x:when>
+        <x:when test='name(.) = "number"'>
+          <x:value-of select='"n"'/>
+        </x:when>
+        <x:otherwise>
+          <x:value-of select='"b"'/>
+        </x:otherwise>
+      </x:choose>
+    </x:variable>
+
+    <!-- The resultant JSON entity, either <s>, <n>, or <b> -->
+    <x:element name='{$jsontype}'>  
+      <!-- Add either the 'name' attribute, or a conditional that 
+        causes the name to be generated from the document-instance -->
+      <x:call-template name='itemspec-nodename'>
+        <x:with-param name='metacontext' select='$metacontext'/>
+      </x:call-template>
+      
+      <!-- $value-expr is the XPath expression that will be used to get the 
+        content for this -->
+      <x:variable name='value-expr'>
+        <x:choose>
+          <x:when test='@value'>
+            <x:value-of select='@value'/>
+          </x:when>
+          <x:otherwise>
+            <x:text>.</x:text>
+          </x:otherwise>
+        </x:choose>
+      </x:variable>
+
+      <xsl:value-of select='{$value-expr}'/>
+    </x:element>
   </x:template>
 
-  <x:template match='member|members' mode='itemspec'>
-    <x:param name='metaindentlevel' select='0'/>
-    <x:param name='metacontext' select='""'/>
-    <x:variable name='metaindent' select='concat("$iu", $metaindentlevel)'/>
-    <x:variable name='force-trailing-comma' as='xs:boolean'
-      select='position() != last()'/>
 
-    <x:value-of select='$nl'/>
-    <x:value-of select='$nl'/>
+
+  <x:template match='member|members' mode='itemspec'>
+    <x:param name='metacontext' select='""'/>
+    
     <x:comment> 
-      <x:text>json annotation for content model: 'members'</x:text> 
+      <x:text>Handling itemspec &lt;member> or &lt;members></x:text> 
     </x:comment>
-    <x:value-of select='concat($nl, "      ")'/>
     
     <!-- Figure out the value to use in the select attribute of the apply-templates.
       If @select is given in the itemspec, use that.  If metacontext is given, then
@@ -793,86 +755,26 @@
         </x:otherwise>
       </x:choose>
     </x:variable>
-
+    
+    <!-- Figure out the value to use in the context parameter.  If metacontext
+      is given, use that (wrapped in quotes).  Otherwise, use the value 
+      "$context", causing the 
+      generated stylesheet to pass it's context along. -->
+    <x:variable name='context-param'>
+      <x:choose>
+        <x:when test='$metacontext != ""'>
+          <x:value-of select='concat("&apos;", $metacontext, "&apos;")'/>
+        </x:when>
+        <x:otherwise>
+          <x:text>$context</x:text>
+        </x:otherwise>
+      </x:choose>
+    </x:variable>
+    
     <xsl:apply-templates select='{$select}'>
-      <xsl:with-param name='indent' 
-        select='concat($indent, {$metaindent})'/>
-      <xsl:with-param name='context' select='"{$metacontext}"'/>
-      <x:if test='$force-trailing-comma'>
-        <xsl:with-param name='trailing-comma' select='true()'/>
-      </x:if>
+      <xsl:with-param name='context' select='{$context-param}'/>
     </xsl:apply-templates>
-
-  </x:template>
-  
-  <x:template match='string|number|boolean' mode='itemspec'>
-    <x:param name='metaindentlevel' select='0'/>
-    <!-- If we are here from recursing within the json annotation, then this
-      will be the name of our parent, either object or array.  -->
-    <x:param name='metacontext' select='""'/>    
-    <x:variable name='metaindent' select='concat("$iu", $metaindentlevel)'/>
-    <x:variable name='trailing-comma'>
-      <x:choose>
-        <x:when test='position() != last()'>
-          <x:text>true()</x:text>
-        </x:when>
-        <x:otherwise>
-          <x:text>false()</x:text>
-        </x:otherwise>
-      </x:choose>
-    </x:variable>
     
-    <x:value-of select='$nl'/>
-    <x:value-of select='$nl'/>
-    <x:comment> 
-      <x:text>json annotation for content model: '</x:text> 
-      <x:value-of select='name(.)'/>
-      <x:text>'</x:text>
-    </x:comment>
-    <x:value-of select='concat($nl, "      ")'/>
-    
-    <!-- $value-expr is the XPath expression that will be used to get the content
-      for this -->
-    <x:variable name='value-expr'>
-      <x:choose>
-        <x:when test='@value'>
-          <x:value-of select='@value'/>
-        </x:when>
-        <x:otherwise>
-          <x:text>.</x:text>
-        </x:otherwise>
-      </x:choose>
-    </x:variable>
-    <!-- Next we wrap that XPath expression in a function call that converts
-      it into the proper JSON type.  E.g.  "np:number-value(.)" -->
-    <x:variable name='v' select='concat(
-      "np:", name(.), "-value(", $value-expr, ")")'/>
-    
-    <!-- Now output the stuff, which will depend on context.
-      If $metacontext is "object", then definitely output key.  
-      Note that metacontext is never "" for simple types.
-    -->
-    <x:choose>
-      <x:when test='$metacontext = "array"'>
-        <xsl:value-of 
-          select='np:simple(
-            concat($indent, {$metaindent}), {$v}, {$trailing-comma}
-          )'/>
-      </x:when>
-      <x:when test='$metacontext = "object"'>
-        <xsl:value-of 
-          select='np:key-simple(
-            concat($indent, {$metaindent}), "{@name}", {$v}, {$trailing-comma}
-          )'/>
-      </x:when>
-    </x:choose>
-    
-    <x:value-of select='$nl'/>
-    <x:comment> 
-      <x:text> done: '</x:text> 
-      <x:value-of select='name(.)'/>
-      <x:text>' </x:text>
-    </x:comment>
   </x:template>
 
   <x:template match='*' mode='itemspec'>

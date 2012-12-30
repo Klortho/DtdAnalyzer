@@ -2,35 +2,34 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:np="http://ncbi.gov/portal/XSLT/namespace"
                 version="1.0">
-  
-  <xsl:import href="../../xslt/xml2json.xsl"/>
 
   <!-- 
-    For the TranslationStack, just for fun, I took on the challenge of converting it
-    into a JSON tree structure.  The stack is a sequence of TermSet objects and 
-    binary operators, in reverse-polish notation.  It is tricky to convert this into
-    a tree structure, using recursion within XSLT.
+    This is an example of using a custom stylesheet to handle XML-to-JSON
+    conversions that can't be handled by the DTD annotations.
+    
+    In this case, we're doing a pretty elaborate transformation of the
+    TranslationStack element.  The stack is a sequence of TermSet objects and 
+    binary operators, in reverse-polish notation (see sample3.xml).  
+    These templates convert that into a nested tree structure,
+    using recursion within XSLT.
   -->
   <xsl:template match='TranslationStack'>
-    <xsl:param name='indent' select='""'/>
-
-    <xsl:value-of select='concat($indent, np:mkey("translationstack"), $nl)'/>
     <xsl:call-template name='term-tree'>
-      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
       <xsl:with-param name='elems' select='*'/>
-      <xsl:with-param name='trailing-comma' select='position() != last()'/>
+      <xsl:with-param name='key' select='"translationstack"'/>
     </xsl:call-template>
   </xsl:template>
   
-  <!-- term-tree is the entry point for the recursion.  It prints out one node of
+  <!-- 
+    term-tree is the entry point for the recursion.  It prints out one node of
     the tree.  When the $elems is a single TermSet, it prints it as a JSON object.
     When it is a list, with an operator at the end, it prints it as an array of
     three elements, e.g.,   [ "AND", { ... }, { ... } ]
   -->
   <xsl:template name='term-tree'>
-    <xsl:param name='indent' select='""'/>
     <xsl:param name='elems'/>
-    <xsl:param name='trailing-comma' select='false()'/>
+    <!-- This is only used on the top-level -->
+    <xsl:param name='key'/>
     
     <xsl:variable name='numelems' select='count($elems)'/>
     <xsl:variable name='lastelem' select='$elems[last()]'/>
@@ -40,53 +39,53 @@
         as an object inside an array.  -->
       <xsl:when test='$numelems = 1'>
         <xsl:for-each select='$elems[1]'>
-          <xsl:call-template name='object-in-array'>
-            <xsl:with-param name='indent' select='$indent'/>
-            <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
-          </xsl:call-template>
+          <xsl:call-template name='object-in-array'/>
         </xsl:for-each>
       </xsl:when>
       
       <!-- We ignore the "GROUP" operator - not sure what it is for. -->
       <xsl:when test='$lastelem[self::OP] and string($lastelem) = "GROUP"'>
         <xsl:call-template name='term-tree'>
-          <xsl:with-param name='indent' select='$indent'/>
           <xsl:with-param name='elems' select='$elems[position() &lt; last()]'/>
-          <xsl:with-param name='trailing-comma' select='$trailing-comma'/>
         </xsl:call-template>
       </xsl:when>
       
       <!-- If the last thing on the stack is a binary operator, then put out
         an array. -->
       <xsl:when test='$lastelem[self::OP]'>
-        <xsl:value-of select='np:start-array($indent)'/>
-        <xsl:value-of 
-          select='np:simple(concat($indent, $iu), np:dq($lastelem), true())'/>
-        
-        <!-- Count how many elements compose the second of my operands -->
-        <xsl:variable name='num-top-elems'>
-          <xsl:call-template name='count-top-elems'>
-            <xsl:with-param name='elems' 
-              select='$elems[position() &lt; last()]'/>
+        <a>
+          <!-- If this is the top-level array, it will be inside an object wrapper,
+            and so will have a name. -->
+          <xsl:if test='$key != ""'>
+            <xsl:attribute name='name'>
+              <xsl:value-of select='$key'/>
+            </xsl:attribute>
+          </xsl:if>
+          
+          <s>
+            <xsl:value-of select='$lastelem'/>
+          </s>
+          
+          <!-- Count how many elements compose the second of my operands -->
+          <xsl:variable name='num-top-elems'>
+            <xsl:call-template name='count-top-elems'>
+              <xsl:with-param name='elems' 
+                select='$elems[position() &lt; last()]'/>
+            </xsl:call-template>
+          </xsl:variable>
+          
+          <!-- Recurse for the first operand.  -->
+          <xsl:call-template name='term-tree'>
+            <xsl:with-param name='elems'
+              select='$elems[position() &lt; $numelems - $num-top-elems]'/>
           </xsl:call-template>
-        </xsl:variable>
-        
-        <!-- Recurse for the first operand.  -->
-        <xsl:call-template name='term-tree'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='elems'
-            select='$elems[position() &lt; $numelems - $num-top-elems]'/>
-          <xsl:with-param name='trailing-comma' select='true()'/>
-        </xsl:call-template>
-        
-        <!-- Recurse for the second operand. -->
-        <xsl:call-template name='term-tree'>
-          <xsl:with-param name='indent' select='concat($indent, $iu)'/>
-          <xsl:with-param name='elems'
-            select='$elems[position() >= $numelems - $num-top-elems and position() &lt; last()]'/>
-        </xsl:call-template>
-        
-        <xsl:value-of select='np:end-array($indent, $trailing-comma)'/>
+          
+          <!-- Recurse for the second operand. -->
+          <xsl:call-template name='term-tree'>
+            <xsl:with-param name='elems'
+              select='$elems[position() >= $numelems - $num-top-elems and position() &lt; last()]'/>
+          </xsl:call-template>
+        </a>
       </xsl:when>
     </xsl:choose>
   </xsl:template>

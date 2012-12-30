@@ -6,8 +6,6 @@
     "response": {
         "problemfound": false,
         "count": 5163,
-        "retmax": 20,
-        "retstart": 0,
         "idlist": [
             101595451,
             101594756,
@@ -22,9 +20,7 @@
         "translationstack": [
             {
                 "term": "\"obstetrics\"[MeSH Terms]",
-                "field": "MeSH Terms",
-                "count": 5163,
-                "explode": "Y"
+                "explode": true
             },
             "GROUP"
         ],

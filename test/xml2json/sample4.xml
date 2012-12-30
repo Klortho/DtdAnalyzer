@@ -9,26 +9,11 @@
       <Statistics>
         <Stat type="all" count="4"/>
         <Stat type="blob_size" count="5964"/>
-        <Stat type="cdregion" count="1"/>
-        <Stat type="cdregion" count="1"/>
-        <Stat type="gene" count="1"/>
       </Statistics>
       <Properties aa="2" qual="32">34</Properties>
-      <OSLT indexed="yes">ADB98021.1</OSLT>
-      <splits>
-        <split name='fleegle' hobby='fun'>
-          <instrument>guitar</instrument>
-        </split>
-        <split name='bingo' hobby='fun'>
-          <instrument>drums</instrument>
-        </split>
-        <split name='drooper' hobby='fun'>
-          <instrument>bass</instrument>
-        </split>
-        <split name='snorky' hobby='fun'>
-          <instrument>keyboards</instrument>
-        </split>
-      </splits>
+      <MoreProps indexed="yes">
+        <prop>ADB98021.1</prop>
+      </MoreProps>
       <Booleans>
         <Boolean></Boolean>  <!-- empty string is false -->
         <Boolean> no </Boolean>
@@ -43,16 +28,15 @@
         <c1>drooper</c1>
         <c1>snorky</c1>
       </test1>
-      <test2>
+      <test2 a2a="guitar" a2b="violin">
         <c2a>bingo</c2a>
         <c2b>drooper</c2b>
         <c2c>snorky</c2c>
+        <c2c>drooper</c2c>
       </test2>
-      <test3 a3a="guitar" a3b="violin">
-        <c3a>bingo</c3a>
-        <c3b>drooper</c3b>
-        <c3c>snorky</c3c>
-        <c3c>drooper</c3c>
+      <test3 a3a="foo">
+        <c3a>bar</c3a>
+        <c3b>buzz</c3b>
       </test3>
     </DocumentSummary>
   </DocumentSummarySet>

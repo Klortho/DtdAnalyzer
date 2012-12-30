@@ -3,37 +3,36 @@
         "type": "sample3",
         "version": "0.3"
     },
-    "translationstack": 
+    "translationstack": [
+        "AND",
         [
-            "AND",
+            "OR",
             [
                 "OR",
-                [
-                    "OR",
-                    {
-                        "term": "\"neoplasms\"[MeSH Terms]",
-                        "field": "MeSH Terms"
-                    },
-                    {
-                        "term": "\"neoplasms\"[All Fields]",
-                        "field": "All Fields"
-                    }
-                ],
                 {
-                    "term": "\"cancer\"[All Fields]",
+                    "term": "\"neoplasms\"[MeSH Terms]",
+                    "field": "MeSH Terms"
+                },
+                {
+                    "term": "\"neoplasms\"[All Fields]",
                     "field": "All Fields"
                 }
             ],
-            [
-                "RANGE",
-                {
-                    "term": "2012/09/25[EDAT]",
-                    "field": "EDAT"
-                },
-                {
-                    "term": "2012/11/24[EDAT]",
-                    "field": "EDAT"
-                }
-            ]
+            {
+                "term": "\"cancer\"[All Fields]",
+                "field": "All Fields"
+            }
+        ],
+        [
+            "RANGE",
+            {
+                "term": "2012/09/25[EDAT]",
+                "field": "EDAT"
+            },
+            {
+                "term": "2012/11/24[EDAT]",
+                "field": "EDAT"
+            }
         ]
+    ]
 }

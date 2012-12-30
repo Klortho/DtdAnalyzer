@@ -3,8 +3,6 @@
 <Result>
   <ProblemFound>false</ProblemFound>
   <Count>5163</Count>
-  <RetMax>20</RetMax>
-  <RetStart>0</RetStart>
   <IdList>
     <Id>101595451</Id>
     <Id>101594756</Id>
@@ -19,8 +17,6 @@
   <TranslationStack>
     <TermSet>
       <Term>"obstetrics"[MeSH Terms]</Term>
-      <Field>MeSH Terms</Field>
-      <Count>5163</Count>
       <Explode>Y</Explode>
     </TermSet>
     <OP>GROUP</OP>

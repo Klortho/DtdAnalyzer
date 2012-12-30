@@ -121,7 +121,8 @@ public class App {
     private String basexslt = null;
     private boolean defaultMinimized = false;
     private boolean full = false;
-
+    private boolean debug = false;
+    private boolean jxmlOut = false;
 
     /**
      * Constructor.  The list of options should be in the same order that you want them
@@ -376,6 +377,12 @@ public class App {
             if (line.hasOption("full")) {
                 full = true;
             }
+            if (line.hasOption("debug")) {
+                debug = true;
+            }
+            if (line.hasOption("jxml-out")) {
+                jxmlOut = true;
+            }
         }
         catch( ParseException exp ) {
             usageError(exp.getMessage());
@@ -587,6 +594,20 @@ public class App {
     }
 
     /**
+     * If --debug was given, this returns true, otherwise false.
+     */
+    public boolean getDebug() {
+        return debug;
+    }
+
+    /**
+     * If --jxml-out was given, this returns true, otherwise false.
+     */
+    public boolean getJxmlOut() {
+        return jxmlOut;
+    }
+
+    /**
      * Get the output file/stream.  This will only be initialized if needOutput was
      * true when you called the constructor.
      */
@@ -793,6 +814,19 @@ public class App {
                     "will be generated from the DTD, as opposed to just extracting the " +
                     "rules in the annotations.")
                 .create("f")
+        );
+        allOpts.put("debug",
+            OptionBuilder
+                .withLongOpt("debug")
+                .withDescription("Turns on debugging.")
+                .create("q")
+        );
+        allOpts.put("jxml-out",
+            OptionBuilder
+                .withLongOpt("jxml-out")
+                .withDescription("Causes the generated stylesheet to output the JXML " +
+                    "intermediate format instead of JSON.")
+                .create()
         );
 
 

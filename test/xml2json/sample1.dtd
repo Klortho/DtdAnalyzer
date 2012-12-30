@@ -3,8 +3,13 @@
   funcionality of the DtdAnalyzer.
   
   This example is very simple, and relies solely on the default behavior of the
-  dtd2xml2json transformation.  That means that there are no json-annotations
-  used to override the default behavior.
+  dtd2xml2json transformation.  That means that, other than the top-level DTD
+  annotations, there are no json-annotations used to override the default behavior.
+  
+  The top-level DTD annotations, just below, specify some values that will be
+  put into the header of the result:  type and version.  It also sets the
+  configuration paramter "lcnames" to "true", which causes the element names
+  to be converted into lowercase when used as JSON key values.
 -->
 
 <!--~~ !dtd
@@ -14,24 +19,21 @@
   </json>
 ~~-->
 
-<!--~~ <Result>
-This is the root element for a response.
-~~ tags root
-~~-->
-<!ELEMENT Result      (DbList,DbInfo?)>
+<!-- <Result>  This is the root element, it will be turned into a JSON object. -->
+<!ELEMENT Result (DbList, DbInfo?)>
 
 <!-- <DbList> will be converted into a JSON array. -->
-<!ELEMENT DbList      (DbName+)>
+<!ELEMENT DbList (DbName+)>
 
 <!-- <DbName> will be converted into a JSON string. -->
-<!ELEMENT DbName      (#PCDATA)>      <!-- \S+ -->
+<!ELEMENT DbName (#PCDATA)>
 
 <!-- <DbInfo> will be converted into a JSON object. -->
-<!ELEMENT DbInfo      (DbName, MenuName, Description)>
+<!ELEMENT DbInfo (DbName, MenuName, Description)>
 
 <!-- <MenuName> will be converted into a JSON string. -->
-<!ELEMENT MenuName    (#PCDATA)>      <!-- .+ -->
+<!ELEMENT MenuName (#PCDATA)>
 
 <!-- <Description> will be converted into a JSON string. -->
-<!ELEMENT Description (#PCDATA)>      <!-- .+ -->
+<!ELEMENT Description (#PCDATA)>
 
