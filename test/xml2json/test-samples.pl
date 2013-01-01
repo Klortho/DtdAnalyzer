@@ -42,7 +42,7 @@ foreach my $s (@samples) {
 
 if ($test_jsonlint) {
     print "Testing that each new output is valid JSON.\n";
-    foreach my $s (@samples) {
+    foreach my $s (@samples)m {
         my $sjson = $s . ".json";
         my $jsonlint_cmd = "jsonlint $sjson";
         system($jsonlint_cmd . " > /dev/null 2>\&1");
