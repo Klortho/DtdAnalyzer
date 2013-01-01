@@ -228,7 +228,7 @@ pull out the child elements, and discard the attributes.
                  test20-a2 CDATA #IMPLIED>
 
 <!--~~ <test21>
-Test an array with some mixed-up kis
+Test an array with some mixed-up kids
 ~~json 
   <array>
     <members select='@*|test21-c2'/>
