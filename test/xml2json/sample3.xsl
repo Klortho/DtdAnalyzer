@@ -16,7 +16,7 @@
   <xsl:template match='TranslationStack'>
     <xsl:call-template name='term-tree'>
       <xsl:with-param name='elems' select='*'/>
-      <xsl:with-param name='key' select='"translationstack"'/>
+      <xsl:with-param name='k' select='"translationstack"'/>
     </xsl:call-template>
   </xsl:template>
   
@@ -29,7 +29,7 @@
   <xsl:template name='term-tree'>
     <xsl:param name='elems'/>
     <!-- This is only used on the top-level -->
-    <xsl:param name='key'/>
+    <xsl:param name='k'/>
     
     <xsl:variable name='numelems' select='count($elems)'/>
     <xsl:variable name='lastelem' select='$elems[last()]'/>
@@ -39,7 +39,7 @@
         as an object inside an array.  -->
       <xsl:when test='$numelems = 1'>
         <xsl:for-each select='$elems[1]'>
-          <xsl:call-template name='object-in-array'/>
+          <xsl:call-template name='o-in-a'/>
         </xsl:for-each>
       </xsl:when>
       
@@ -56,9 +56,9 @@
         <a>
           <!-- If this is the top-level array, it will be inside an object wrapper,
             and so will have a name. -->
-          <xsl:if test='$key != ""'>
-            <xsl:attribute name='name'>
-              <xsl:value-of select='$key'/>
+          <xsl:if test='$k != ""'>
+            <xsl:attribute name='k'>
+              <xsl:value-of select='$k'/>
             </xsl:attribute>
           </xsl:if>
           

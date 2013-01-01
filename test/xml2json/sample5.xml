@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Root SYSTEM "sample5.dtd">
+
+<Root>
+  <test00 test00-a1="attribute test00-a1"
+    test00-a2="attribute test00-a2">
+    <test00-c1>child element test00-c1</test00-c1>
+    <test00-c2>child element test00-c2</test00-c2>
+  </test00>
+  
+  <test01 test01-a1="attribute test01-a1"
+          test01-a2="attribute test01-a2">
+    <test01-c1>child element test01-c1</test01-c1>
+    <test01-c2>child element test01-c2</test01-c2>
+  </test01>
+  
+  <test02 test02-a1="attribute test02-a1"
+    test02-a2="attribute test02-a2">
+    <test02-c1>child element test02-c1</test02-c1>
+    <test02-c2>child element test02-c2</test02-c2>
+  </test02>
+  
+  <test03 test03-a1="attribute test03-a1"
+    test03-a2="attribute test03-a2">
+    <test03-c1>child element test03-c1</test03-c1>
+    <test03-c2>child element test03-c2</test03-c2>
+  </test03>
+  
+  <test04 test04-a1="attribute test04-a1"
+    test04-a2="attribute test04-a2">
+    <test04-c1>child element test04-c1</test04-c1>
+    <test04-c2>child element test04-c2</test04-c2>
+  </test04>
+
+  <test05 test05-a1="attribute test05-a1"
+    test05-a2="attribute test05-a2">
+    <test05-c1>child element test05-c1</test05-c1>
+    <test05-c2>child element test05-c2</test05-c2>
+  </test05>
+  
+  <test06 test06-a1="attribute test06-a1"
+    test06-a2="attribute test06-a2">
+    <test06-c1>child element test06-c1</test06-c1>
+    <test06-c2>child element test06-c2</test06-c2>
+  </test06>
+  
+  <test07 test07-a1="attribute test07-a1"
+    test07-a2="attribute test07-a2">
+    <test07-c1>child element test07-c1</test07-c1>
+    <test07-c2>child element test07-c2</test07-c2>
+  </test07>
+
+  <test08 test08-a1="attribute test08-a1"
+          test08-a2="attribute test08-a2"
+          test08-a4=" false "
+          test08-a5="  n"
+          test08-a6="  y "
+          test08-a10="  0.1  "
+          test08-a11="-5  "
+    >
+    <test08-c1>child element test08-c1</test08-c1>
+    <test08-c2>child element test08-c2</test08-c2>
+  </test08>
+
+  <test09 test09-a1="attribute test09-a1"
+    test09-a2="attribute test09-a2">
+    <test09-c1>child element test09-c1</test09-c1>
+    <test09-c2>child element test09-c2</test09-c2>
+  </test09>
+  
+
+  <test15>
+    <test15-c1>drooper</test15-c1>
+    <test15-c1>bingo</test15-c1>
+  </test15>
+  
+  <test16 test16-a1="attribute test16-a1"
+    test16-a2="attribute test16-a2">
+    <test16-c1>child element test16-c1</test16-c1>
+    <test16-c2>child element test16-c2</test16-c2>
+  </test16>
+  
+  <test17 test17-a1="attribute test17-a1"
+    test17-a2="attribute test17-a2">
+    <test17-c1>child element test17-c1</test17-c1>
+    <test17-c2>child element test17-c2</test17-c2>
+  </test17>
+  
+  <test18 test18-a1="attribute test18-a1"
+    test18-a2="attribute test18-a2">
+    <test18-c1>child element test18-c1</test18-c1>
+    <test18-c2>child element test18-c2</test18-c2>
+  </test18>
+  
+  <test19 test19-a1="attribute test19-a1"
+    test19-a2="attribute test19-a2">
+    <test19-c1>child element test19-c1</test19-c1>
+    <test19-c2>child element test19-c2</test19-c2>
+  </test19>
+  
+  <test20 test20-a1="attribute test20-a1"
+    test20-a2="attribute test20-a2">
+    <test20-c1>child element test20-c1</test20-c1>
+    <test20-c2>child element test20-c2</test20-c2>
+  </test20>
+  
+  <test21 test21-a1="attribute test21-a1"
+    test21-a2="attribute test21-a2"
+    test21-a3='  f '
+    test21-a4='1e04'>
+    <test21-c1>child element test21-c1</test21-c1>
+    <test21-c2>child element test21-c2</test21-c2>
+  </test21>
+  
+  <test26 test26-a1="attribute test26-a1"
+    test26-a2="attribute test26-a2">
+    <test26-c1>child element test26-c1</test26-c1>
+    <test26-c2>child element test26-c2</test26-c2>
+  </test26>
+  
+  <test27 test27-a1="attribute test27-a1"
+    test27-a2="attribute test27-a2">
+    <test27-c1>child element test27-c1</test27-c1>
+    <test27-c2>child element test27-c2</test27-c2>
+  </test27>
+  
+  <array-container>
+    <test28 test28-a1="attribute test28-a1"
+      test28-a2="attribute test28-a2">
+      <test28-c1>child element test28-c1</test28-c1>
+      <test28-c2>child element test28-c2</test28-c2>
+    </test28>
+  </array-container>  
+
+
+
+
+</Root>

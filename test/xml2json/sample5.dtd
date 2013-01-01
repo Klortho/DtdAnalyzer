@@ -1,0 +1,289 @@
+<!--
+  This DTD attempts to comprehensively test all of the various types of
+  JSON annotations
+-->
+
+<!--~~ !dtd
+~~json
+  <json type='sample5' version='0.3'>
+    <config lcnames='true' />
+  </json>
+~~-->
+
+<!--~~ <Root>
+~~tags root
+~~json <object/>
+~~-->
+<!ELEMENT Root ( 
+  test00?,
+  test01?, test02?, test03?, test04?, test05?, test06?, 
+  test07?, test08?, test09?,
+  test15?, test16?, test17, test18, test19, test20,
+  test21,
+  test26, test27, array-container )>
+
+<!--==========================================-->
+<!-- test objects  -->
+
+<!--~~ <test00>
+Test without annotation, this will be turned into an object.
+~~-->
+<!ELEMENT test00 ( test00-c1, test00-c2 )>
+<!ELEMENT test00-c1 (#PCDATA)>
+<!ELEMENT test00-c2 (#PCDATA)>
+<!ATTLIST test00 test00-a1 CDATA #IMPLIED
+                 test00-a2 CDATA #IMPLIED>
+
+
+<!--~~ <test01>
+Test the o annotation by itself.
+~~json <object/>
+~~-->
+<!ELEMENT test01 ( test01-c1, test01-c2 )>
+<!ELEMENT test01-c1 (#PCDATA)>
+<!ELEMENT test01-c2 (#PCDATA)>
+<!ATTLIST test01 test01-a1 CDATA #IMPLIED
+                 test01-a2 CDATA #IMPLIED>
+
+<!--~~ <test02>
+Test the o annotation with a key.
+~~json <object key='test02-key'/>
+~~-->
+<!ELEMENT test02 ( test02-c1, test02-c2 )>
+<!ELEMENT test02-c1 (#PCDATA)>
+<!ELEMENT test02-c2 (#PCDATA)>
+<!ATTLIST test02 test02-a1 CDATA #IMPLIED
+                 test02-a2 CDATA #IMPLIED>
+
+<!--~~ <test03>
+Test the o annotation with a name with an XPath expression.
+~~json <object name='@test03-a1'/>
+~~-->
+<!ELEMENT test03 ( test03-c1, test03-c2 )>
+<!ELEMENT test03-c1 (#PCDATA)>
+<!ELEMENT test03-c2 (#PCDATA)>
+<!ATTLIST test03 test03-a1 CDATA #IMPLIED
+                 test03-a2 CDATA #IMPLIED>
+
+<!--~~ <test04>
+Test the o annotation with a select.
+~~json <object select='@*|test04-c2'/>
+~~-->
+<!ELEMENT test04 ( test04-c1, test04-c2 )>
+<!ELEMENT test04-c1 (#PCDATA)>
+<!ELEMENT test04-c2 (#PCDATA)>
+<!ATTLIST test04 test04-a1 CDATA #IMPLIED
+                 test04-a2 CDATA #IMPLIED>
+
+<!--~~ <test05>
+Test with a member child.
+~~json 
+  <object>
+    <members/>
+  </object>
+~~-->
+<!ELEMENT test05 ( test05-c1, test05-c2 )>
+<!ELEMENT test05-c1 (#PCDATA)>
+<!ELEMENT test05-c2 (#PCDATA)>
+<!ATTLIST test05 test05-a1 CDATA #IMPLIED
+                 test05-a2 CDATA #IMPLIED>
+
+<!--~~ <test06>
+Test a member child that has a @select.  This should be similar to test04.
+~~json 
+  <object>
+    <members select='@*|test06-c2'/>
+  </object>
+~~-->
+<!ELEMENT test06 ( test06-c1, test06-c2 )>
+<!ELEMENT test06-c1 (#PCDATA)>
+<!ELEMENT test06-c2 (#PCDATA)>
+<!ATTLIST test06 test06-a1 CDATA #IMPLIED
+                 test06-a2 CDATA #IMPLIED>
+
+<!--~~ <test07>
+Test lots of different string kids.
+~~json 
+  <object>
+    <string key='a1' select='@test07-a1'/>
+    <string name='@test07-a2' select='@test07-a2'/>
+    <string key='3'>Here's a nice string.</string>
+  </object>
+~~-->
+<!ELEMENT test07 ( test07-c1, test07-c2 )>
+<!ELEMENT test07-c1 (#PCDATA)>
+<!ELEMENT test07-c2 (#PCDATA)>
+<!ATTLIST test07 test07-a1 CDATA #IMPLIED
+                 test07-a2 CDATA #IMPLIED>
+
+<!--~~ <test08>
+Test an array kid with various grandkids.
+~~json 
+  <object>
+    <array key='fleegle'>
+      <string key='a1' select='@test08-a1'/>
+      <string name='@test08-a2' select='@test08-a2'/>
+      <string key='3'>Here's a nice string.</string>
+    </array>
+    <array key='drooper'>
+      <boolean key='a4' select='@test08-a4'/>
+      <boolean name='@test08-a5' select='@test08-a5'/>
+      <boolean name='@test08-a6' select='@test08-a6'/>
+      <boolean key='7'> false </boolean>
+      <boolean key='8'> 0 </boolean>
+      <boolean key='9'> true </boolean>
+    </array>
+    <array key='snorky'>
+      <number key='a10' select='@test08-a10'/>
+      <number name='@test08-a11' select='@test08-a11'/>
+      <number key='12'> 22</number>
+    </array>
+  </object>
+~~-->
+<!ELEMENT test08 ( test08-c1, test08-c2 )>
+<!ELEMENT test08-c1 (#PCDATA)>
+<!ELEMENT test08-c2 (#PCDATA)>
+<!ATTLIST test08 test08-a1 CDATA #IMPLIED
+                 test08-a2 CDATA #IMPLIED
+                 test08-a4 CDATA #IMPLIED
+                 test08-a5 CDATA #IMPLIED
+                 test08-a6 CDATA #IMPLIED
+                 test08-a10 CDATA #IMPLIED
+                 test08-a11 CDATA #IMPLIED>
+
+<!--~~ <test09>
+Test an object with text kids.
+~~json <object/>
+~~-->
+<!ELEMENT test09 (#PCDATA | test09-c1 | test09-c2)*>
+<!ELEMENT test09-c1 (#PCDATA)>
+<!ELEMENT test09-c2 (#PCDATA)>
+<!ATTLIST test09 test09-a1 CDATA #IMPLIED
+                 test09-a2 CDATA #IMPLIED>
+
+
+
+<!--==========================================-->
+<!-- test arrays  -->
+
+<!--~~ <test15>
+Without annotation, this should be turned into an array.
+~~-->
+<!ELEMENT test15 ( test15-c1+ ) >
+<!ELEMENT test15-c1 (#PCDATA)>
+
+<!--~~ <test16>
+Test the a annotation by itself.  Note that this will drop
+the attributes, since by default, the selector for array is "*".
+~~json <array/>
+~~-->
+<!ELEMENT test16 ( test16-c1, test16-c2 )>
+<!ELEMENT test16-c1 (#PCDATA)>
+<!ELEMENT test16-c2 (#PCDATA)>
+<!ATTLIST test16 test16-a1 CDATA #IMPLIED
+                 test16-a2 CDATA #IMPLIED>
+
+<!--~~ <test17>
+Test the a annotation with a key.
+~~json <array key='test17-key'/>
+~~-->
+<!ELEMENT test17 ( test17-c1, test17-c2 )>
+<!ELEMENT test17-c1 (#PCDATA)>
+<!ELEMENT test17-c2 (#PCDATA)>
+<!ATTLIST test17 test17-a1 CDATA #IMPLIED
+                 test17-a2 CDATA #IMPLIED>
+
+<!--~~ <test18>
+Test the a annotation with a name.
+~~json <array name='@test18-a1'/>
+~~-->
+<!ELEMENT test18 ( test18-c1, test18-c2 )>
+<!ELEMENT test18-c1 (#PCDATA)>
+<!ELEMENT test18-c2 (#PCDATA)>
+<!ATTLIST test18 test18-a1 CDATA #IMPLIED
+                 test18-a2 CDATA #IMPLIED>
+
+<!--~~ <test19>
+Test the a annotation with a select.
+~~json <array select='@*|test19-c2'/>
+~~-->
+<!ELEMENT test19 ( test19-c1, test19-c2 )>
+<!ELEMENT test19-c1 (#PCDATA)>
+<!ELEMENT test19-c2 (#PCDATA)>
+<!ATTLIST test19 test19-a1 CDATA #IMPLIED
+                 test19-a2 CDATA #IMPLIED>
+
+<!--~~ <test20>
+Test an array with a member child.  This "members" will only
+pull out the child elements, and discard the attributes.
+~~json 
+  <array>
+    <members/>
+  </array>
+~~-->
+<!ELEMENT test20 ( test20-c1, test20-c2 )>
+<!ELEMENT test20-c1 (#PCDATA)>
+<!ELEMENT test20-c2 (#PCDATA)>
+<!ATTLIST test20 test20-a1 CDATA #IMPLIED
+                 test20-a2 CDATA #IMPLIED>
+
+<!--~~ <test21>
+Test an array with some mixed-up kis
+~~json 
+  <array>
+    <members select='@*|test21-c2'/>
+    <string select='@test21-a2'/>
+    <string>Here's a nice string.</string>
+    <boolean> 0 </boolean>
+    <boolean select='@test21-a3'/>
+    <number>  3.14159</number>
+    <number select='@test21-a4'/>
+  </array>
+~~-->
+<!ELEMENT test21 ( test21-c1, test21-c2 )>
+<!ELEMENT test21-c1 (#PCDATA)>
+<!ELEMENT test21-c2 (#PCDATA)>
+<!ATTLIST test21 test21-a1 CDATA #IMPLIED
+                 test21-a2 CDATA #IMPLIED
+                 test21-a3 CDATA #IMPLIED
+                 test21-a4 CDATA #IMPLIED>
+
+
+<!--==========================================-->
+<!-- test members -->
+
+<!--~~ <test26>
+Test members by itself.  This should cause this element to be "flattened".
+All the attributes and child elements will be inserted as key:value pairs
+right in the parent object.
+~~json <members/>
+~~-->
+<!ELEMENT test26 ( test26-c1, test26-c2 )>
+<!ELEMENT test26-c1 (#PCDATA)>
+<!ELEMENT test26-c2 (#PCDATA)>
+<!ATTLIST test26 test26-a1 CDATA #IMPLIED
+                 test26-a2 CDATA #IMPLIED>
+
+<!--~~ <test27>
+Test members with a @select.
+~~json <members select='@test27-a1|test27-c2'/>
+~~-->
+<!ELEMENT test27 ( test27-c1, test27-c2 )>
+<!ELEMENT test27-c1 (#PCDATA)>
+<!ELEMENT test27-c2 (#PCDATA)>
+<!ATTLIST test27 test27-a1 CDATA #IMPLIED
+                 test27-a2 CDATA #IMPLIED>
+
+<!--~~ <test28>
+Test members as the root annotation, without a select,
+inside an array.  First we'll need to declare a container element
+to provide the array.
+~~json <members/>
+~~-->
+<!ELEMENT array-container (test28)+ >
+<!ELEMENT test28 ( test28-c1, test28-c2 )>
+<!ELEMENT test28-c1 (#PCDATA)>
+<!ELEMENT test28-c2 (#PCDATA)>
+<!ATTLIST test28 test28-a1 CDATA #IMPLIED
+                 test28-a2 CDATA #IMPLIED>
+

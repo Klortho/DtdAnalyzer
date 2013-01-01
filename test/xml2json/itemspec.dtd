@@ -1,0 +1,74 @@
+<!--
+  This is the informal DTD that specifies what is allowed within JSON annotations.
+  This DTD is just for documentation purposes - not used in any validation.
+
+  The following names are synonyms, and only the canonical (short) names are used in the
+  DTD below:
+    Elements:
+      o = object
+      a = array
+      s = string
+      n = number
+      b = boolean
+      c = custom
+      m = member = members
+    Attributes:
+      s = select
+      k = key
+      n = name
+
+  An additional element, "u", is allowed in the itemspec (but not the annotation)
+  indicating that we don't know what to do with this element, and it will result
+  in a warning message.
+
+
+  Additional constraints:
+    - The element "json" can only appear as the top-level element of an annotation,
+      and is a placeholder meaning, "use the default type".
+
+    - Within an "o", any annotation except "m" must have an @n or @k attribute.
+    - The member element cannot have either a key or name attribute
+    - A simple type can either have an @s attribute or text content, but not both.
+    - In strict JXML, the text node value of <b> should be either "true" or "false",
+      with no whitespace.
+    - Also, in strict JXML, the value of <n> should be a valid decimal number, with
+      no leading or trailing whitespace.
+-->
+
+<!ENTITY % container_content "(o|a|s|n|b|m)*">
+
+<!ELEMENT json %container_content;>
+
+
+<!ELEMENT o %container_content;>
+<!ELEMENT a %container_content;>
+
+<!ENTITY % simple_content "(#PCDATA)">
+<!ELEMENT s %simple_content;>
+<!ELEMENT n %simple_content;>
+<!ELEMENT b %simple_content;>
+
+<!ELEMENT m EMPTY>
+
+<!ELEMENT c EMPTY>
+
+
+<!--
+  Most elements can take key, name, and/or select attributes.
+  Note that key and name should never be used together.
+-->
+<!ENTITY % spec_attrs "
+  k CDATA #IMPLIED
+  n CDATA #IMPLIED
+  s CDATA #IMPLIED
+">
+<!ATTLIST json %spec_attrs;>
+<!ATTLIST o %spec_attrs;>
+<!ATTLIST a %spec_attrs;>
+<!ATTLIST s %spec_attrs;>
+<!ATTLIST n %spec_attrs;>
+<!ATTLIST b %spec_attrs;>
+
+<!ATTLIST m "s CDATA #IMPLIED">
+
+

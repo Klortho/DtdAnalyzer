@@ -103,7 +103,7 @@ key is specified by the name attribute here.  By default, the key would
 be "error", but we want to preserve the all-uppercase "ERROR".  Note 
 that the value of the name attribute is an XPath expression, so it is 
 enclosed in quotes.
-~~json <json name='"ERROR"'/>
+~~json <json key='ERROR'/>
 ~~-->
 <!ELEMENT ERROR (#PCDATA)>	
 
@@ -114,7 +114,7 @@ doesn't fit cleanly into either a JSON array or object.
 In this case, we will construct a JSON object that has three members.  
 ~~json
   <object>
-    <number name='"count"' value='count(*)'/>
+    <number name='"count"' select='count(*)'/>
     <array name='"phrasesnotfound"' select='PhraseNotFound'/>
     <array name='"fieldsnotfound"' select='FieldNotFound'/>
   </object>
