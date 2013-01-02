@@ -1,5 +1,17 @@
 # DtdAnalyzer Release Notes
 
+## DtdAnalyzer v0.3-dev
+
+### Features
+
+### Enhancements
+
+### Bug fixes
+
+### Performance
+
+### Other
+
 ## DtdAnalyzer v0.3 - 2013-1-1
 
 ### Features

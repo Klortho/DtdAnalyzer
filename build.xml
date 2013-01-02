@@ -2,7 +2,7 @@
 <project name="DtdAnalyzer" basedir="." default="all">
 
   <property name="name" value="DtdAnalyzer"/>
-  <property name="version" value="0.3"/>
+  <property name="version" value="0.3-dev"/>
   <property name="project.package" value="gov.ncbi.pmc.dtdanalyzer"/>
   <property name="project.path" value="gov/ncbi/pmc/dtdanalyzer"/>
   <property name="src" value="src"/>
