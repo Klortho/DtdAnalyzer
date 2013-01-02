@@ -13,8 +13,7 @@
     <sch:schema>
       <sch:title>
         <xsl:text>ISO Schematron file created from </xsl:text>
-        <xsl:value-of
-          select="if(declarations/title) then declarations/title else /declarations/dtd/@relSysId"/>
+        <xsl:value-of select="if(declarations/title) then declarations/title else /declarations/dtd/@relSysId"/>
       </sch:title>
       <sch:ns prefix="mml" uri="http://www.w3.org/1998/Math/MathML"/>
       <sch:ns prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -27,6 +26,8 @@
       <xsl:apply-templates select="declarations/*"/>
     </sch:schema>
   </xsl:template>
+  
+  <xsl:template match="declarations/dtd | declarations/title"/>
 
   <xsl:template match="elements">
     <sch:pattern id="elements">
@@ -110,20 +111,36 @@
     <xsl:choose>
       <xsl:when test="self::report">
         <sch:report>
-          <xsl:copy-of select="@*" copy-namespaces="no"/>
-          <xsl:copy-of select="*|text()" copy-namespaces="no"/>
+          <xsl:for-each select="@*">
+            <xsl:attribute name="{./name()}">
+              <xsl:value-of select="normalize-space(.)"/>
+            </xsl:attribute>
+          </xsl:for-each>
+          <xsl:apply-templates select="*|text()"/>
         </sch:report>
       </xsl:when>
       <xsl:when test="self::assert">
         <sch:assert>
-          <xsl:copy-of select="@*" copy-namespaces="no"/>
-          <xsl:copy-of select="*|text()" copy-namespaces="no"/>
+          <xsl:for-each select="@*">
+            <xsl:attribute name="{./name()}">
+              <xsl:value-of select="normalize-space(.)"/>
+            </xsl:attribute>
+          </xsl:for-each>
+          <xsl:apply-templates select="*|text()"/>
         </sch:assert>
       </xsl:when>
       <xsl:otherwise>
         <xsl:copy-of select="." copy-namespaces="no"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="annotation[@type='schematron']/*/*">
+    <xsl:copy-of select="." copy-namespaces="no"/>
+  </xsl:template>
+  
+  <xsl:template match="text()[ancestor::annotation[@type='schematron']]">
+    <xsl:value-of select="normalize-space(.)"/>
   </xsl:template>
 
   <!-- =================== -->
