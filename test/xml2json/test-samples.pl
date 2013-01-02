@@ -12,7 +12,7 @@ use strict;
 use File::Compare;
 
 my @samples = qw(
-    sample1 sample2a sample2b sample2c sample3 sample4
+    sample1 sample2a sample2b sample2c sample3 sample4 sample5
 );
 # Set this to true if you have jsonlint installed.
 my $test_jsonlint = 0;
@@ -42,7 +42,7 @@ foreach my $s (@samples) {
 
 if ($test_jsonlint) {
     print "Testing that each new output is valid JSON.\n";
-    foreach my $s (@samples)m {
+    foreach my $s (@samples) {
         my $sjson = $s . ".json";
         my $jsonlint_cmd = "jsonlint $sjson";
         system($jsonlint_cmd . " > /dev/null 2>\&1");

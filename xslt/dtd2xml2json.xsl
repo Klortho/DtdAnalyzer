@@ -278,7 +278,11 @@
       </xsl:variable>
 
       <!-- 
-        This will be true if an element can have a text node child
+        This will be true if an element can have a text node child, 
+        but not mixed content.  (That is, text and only text, no element children).
+        This whole scheme doesn't handle mixed content well.  Mixed content is 
+        still best handled by custom templates. But, see sample5.dtd, test45, 
+        for one example.
       -->
       <xsl:variable name='textKid' as='xs:boolean'>
         <xsl:value-of select='($type = "o" or $type = "a") and
@@ -526,6 +530,9 @@
                     <x:with-param name='k' select='"{$jsonKey}"'/>
                   </xsl:when>
                 </xsl:choose>
+                <xsl:if test='$itemSpec/@s'>
+                  <x:with-param name='value' select='{$itemSpec/@s}'/>
+                </xsl:if>
               </x:call-template>
             </x:template>
           </xsl:when>
@@ -554,11 +561,11 @@
                   </xsl:when>
                 </xsl:choose>
                 <xsl:choose>
-                  <xsl:when test='$itemSpec/@textKid = "true"'>
-                    <x:with-param name='kids' select='node()'/>
-                  </xsl:when>
                   <xsl:when test='$itemSpec/@s'>
                     <x:with-param name='kids' select='{$itemSpec/@s}'/>
+                  </xsl:when>
+                  <xsl:when test='$itemSpec/@textKid = "true"'>
+                    <x:with-param name='kids' select='node()'/>
                   </xsl:when>
                 </xsl:choose>
               </x:call-template>
@@ -580,11 +587,11 @@
                   </xsl:when>
                 </xsl:choose>
                 <xsl:choose>
-                  <xsl:when test='$itemSpec/@textKid = "true"'>
-                    <x:with-param name='kids' select='@*|node()'/>
-                  </xsl:when>
                   <xsl:when test='$itemSpec/@s'>
                     <x:with-param name='kids' select='{$itemSpec/@s}'/>
+                  </xsl:when>
+                  <xsl:when test='$itemSpec/@textKid = "true"'>
+                    <x:with-param name='kids' select='@*|node()'/>
                   </xsl:when>
                 </xsl:choose>
               </x:call-template>
@@ -834,7 +841,7 @@
     </xsl:variable>
 
     <!-- 
-      FIXME:  I think I also need to take @textKids into account here.
+      FIXME:  I think I also need to take @textKid into account here.
     -->
     
     <!-- Figure out the value to use in the select attribute of the apply-templates.

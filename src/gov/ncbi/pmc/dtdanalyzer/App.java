@@ -196,7 +196,7 @@ public class App {
                 System.out.println(
                     "DtdAnalyzer utility, version " + version + "\n" +
                     "Built " + buildtime + "\n" +
-                    "See http://ncbitools.github.com/DtdAnalyzer/"
+                    "See http://dtd.nlm.nih.gov/ncbi/dtdanalyzer/"
                 );
                 System.exit(0);
             }
@@ -633,7 +633,7 @@ public class App {
             OptionBuilder
                 .withLongOpt( "version" )
                 .withDescription("Print version number and exit.")
-                .create("v")
+                .create('v')
         );
         allOpts.put("doc",
             OptionBuilder
@@ -726,7 +726,7 @@ public class App {
                 .withDescription("Parameter name & value to pass to the XSLT.  You can use multiple " +
                     "instances of this option.")
                 .withArgName( "param=value" )
-                .create("P")
+                .create('P')
         );
         allOpts.put("dir",
             OptionBuilder
@@ -798,14 +798,14 @@ public class App {
                     "Defaults to \"../../xslt/xml2json.xsl\".")
                 .hasArg()
                 .withArgName("basexslt")
-                .create("b")
+                .create('b')
         );
         allOpts.put("default-minimized",
             OptionBuilder
                 .withLongOpt("default-minimized")
                 .withDescription("If this option is given, then the default output from " +
                     "the generated stylesheet will minimized, and not pretty.")
-                .create("u")
+                .create('u')
         );
         allOpts.put("full",
             OptionBuilder
@@ -813,13 +813,17 @@ public class App {
                 .withDescription("If this option is given, then a complete schematron " +
                     "will be generated from the DTD, as opposed to just extracting the " +
                     "rules in the annotations.")
-                .create("f")
+                .create('f')
         );
+        /* 
+          The 'q' here is a hack to get around some weird behavior that I can't figure out.
+          If the 'q' is omitted, this option just doesn't work.
+        */
         allOpts.put("debug",
             OptionBuilder
                 .withLongOpt("debug")
                 .withDescription("Turns on debugging.")
-                .create("q")
+                .create('q')
         );
         allOpts.put("jxml-out",
             OptionBuilder

@@ -15,7 +15,7 @@ DtdAnalyzer provides a set of tools:
 
 ## Home page and documentation
 
-The home page for this project is at http://ncbitools.github.com/DtdAnalyzer/.
+The home page for this project is at http://dtd.nlm.nih.gov/ncbi/dtdanalyzer.
 
 Detailed documentation is available on the [GitHub
 wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
@@ -23,9 +23,9 @@ wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 ##Quick start
 
 * Download the latest release, either as a zip file:
-  [DtdAnalyzer-0.2.1.zip](http://www.ncbi.nlm.nih.gov/staff/maloneyc/DtdAnalyzer/DtdAnalyzer-0.2.1.zip);
+  [DtdAnalyzer-0.2.1.zip](http://dtd.ncbi.nlm.nih.gov/ncbi/dtdanalyzer/downloads/DtdAnalyzer-0.2.1.zip);
   or as a gzipped tar:
-  [DtdAnalyzer-0.2.1.tar.gz](http://www.ncbi.nlm.nih.gov/staff/maloneyc/DtdAnalyzer/DtdAnalyzer-0.2.1.tar.gz).
+  [DtdAnalyzer-0.2.1.tar.gz](http://dtd.ncbi.nlm.nih.gov/ncbi/dtdanalyzer/downloads/DtdAnalyzer-0.2.1.tar.gz).
 
   _**Note:**  Do not use the "Zip" download button on the main GitHub page!
   That button downloads the *source files*, not the pre-built packages.
@@ -68,7 +68,7 @@ wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
     --exclude mml: --exclude-except mml:math
   ```
 
-* Open the `doc/index.html` file there in a browser, and check that it looks correct.
+* Open the `doc/index.html` file in a browser, and check that it looks correct.
 
 * Run `--help` with any of the tools for more complete usage information,
   or continue by visiting the documentation pages on the [GitHub

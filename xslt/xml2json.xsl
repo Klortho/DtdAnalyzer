@@ -423,12 +423,12 @@
     <xsl:choose>
       <xsl:when test='$context = "o"'>
         <n k='{$k}'>
-          <xsl:value-of select='$value'/>
+          <xsl:value-of select='normalize-space($value)'/>
         </n>
       </xsl:when>
       <xsl:when test='$context = "a"'>
         <n>
-          <xsl:value-of select='$value'/>
+          <xsl:value-of select='normalize-space($value)'/>
         </n>
       </xsl:when>
       <xsl:otherwise>
@@ -465,7 +465,7 @@
     <xsl:param name='value' select='.'/>
     
     <n k='{$k}'>
-      <xsl:value-of select='$value'/>
+      <xsl:value-of select='normalize-space($value)'/>
     </n>
   </xsl:template>
   
@@ -478,7 +478,7 @@
   <xsl:template name='n-in-a'>
     <xsl:param name='value' select='.'/>
     <n>
-      <xsl:value-of select='$value'/>
+      <xsl:value-of select='normalize-space($value)'/>
     </n>
   </xsl:template>
   
@@ -767,15 +767,20 @@
   </xsl:template>
   
   <!-- Default template for text nodes.  Throw them away if they
-    are all blanks.  Report a problem otherwise.    -->
+    are all blanks.  Report a problem otherwise.
+    Let's not report a problem and see if that's okay.  See sample5, test45
+    and following.
+  -->
   <xsl:template match="text()" >
     <xsl:param name='context' select='"o"'/>
     
     <xsl:if test='normalize-space(.) != ""'>
+    <!--
       <xsl:message>
         <xsl:text>FIXME:  non-blank text node with no template match.  Parent element: </xsl:text>
         <xsl:value-of select='name(..)'/>
       </xsl:message>
+    -->
       <xsl:choose>
         <xsl:when test='$context = "a"'>
           <xsl:call-template name='s-in-a'/>

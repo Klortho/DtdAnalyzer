@@ -132,7 +132,84 @@
     </test28>
   </array-container>  
 
+  <test35 test35-a1="attribute test35-a1"
+    test35-a2="attribute test35-a2">
+    <test35-c1>child element test35-c1</test35-c1>
+    <test35-c2>child element test35-c2</test35-c2>
+  </test35>
+  
+  <test36 test36-a1="attribute test36-a1"
+    test36-a2="attribute test36-a2">
+    <test36-c1>child element test36-c1</test36-c1>
+    <test36-c2>child element test36-c2</test36-c2>
+  </test36>
+  
+  <test37 test37-a1="attribute test37-a1"
+    test37-a2="attribute test37-a2">
+    <test37-c1>child element test37-c1</test37-c1>
+    <test37-c2>child element test37-c2</test37-c2>
+  </test37>
+  
+  <test38 test38-a1="attribute test38-a1"
+    test38-a2="attribute test38-a2">
+    <test38-c1>child element test38-c1</test38-c1>
+    <test38-c2>child element test38-c2</test38-c2>
+  </test38>
+  
+  <test39 test39-a1="attribute test39-a1"
+    test39-a2="attribute test39-a2">
+    <test39-c1>child element test39-c1</test39-c1>
+    <test39-c2>child element test39-c2</test39-c2>
+  </test39>
+  
+  <test45 test45-a1="attribute test45-a1"
+    test45-a2="attribute test45-a2">
+    Text child of test45.
+    <test45-c1>child element test45-c1</test45-c1>
+    <test45-c2>child element test45-c2</test45-c2>
+  </test45>
+  
+  <test46 test46-a1="attribute test46-a1"
+    test46-a2="attribute test46-a2">
+    Text child of test46.
+    <test46-c1>child element test46-c1</test46-c1>
+    <test46-c2>child element test46-c2</test46-c2>
+  </test46>
 
-
-
+  <test47>47</test47>
+  
+  <test48 test48-a1="attribute test48-a1"
+    test48-a2="attribute test48-a2">
+    Text child of test48.
+  </test48>
+  
+  <test49 test49-a1="attribute test49-a1"
+    test49-a2="attribute test49-a2">
+    Text child of test49.
+  </test49>
+  
+  <test50 test50-a1="attribute test50-a1"
+    test50-a2="attribute test50-a2">
+    Text child of test50.
+  </test50>
+  
+  <test51 test51-a1="attribute test51-a1"
+    test51-a2="attribute test51-a2">
+    51
+  </test51>
+  
+  <test55> test55 text content </test55>
+  
+  <test56> 
+    56
+  </test56>
+  
+  <test57 test57-a1="fifty-seven"> n </test57>
+  
+  <test58 test58-a1="fifty-eight"> don't care about this text </test58>
+  
+  <test59 test59-a1="  59  "> don't care about this text </test59>
+  
+  <test60 test60-a1="  0 "> don't care about this text </test60>
+  
 </Root>

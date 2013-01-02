@@ -15,12 +15,13 @@
 ~~json <object/>
 ~~-->
 <!ELEMENT Root ( 
-  test00?,
-  test01?, test02?, test03?, test04?, test05?, test06?, 
-  test07?, test08?, test09?,
-  test15?, test16?, test17, test18, test19, test20,
-  test21,
-  test26, test27, array-container )>
+  test00, test01, test02, test03, test04, test05, test06, 
+  test07, test08, test09,
+  test15, test16, test17, test18, test19, test20, test21,
+  test26, test27, array-container,
+  test35, test36, test37, test38, test39,
+  test45, test46, test47, test48, test49, test50, test51,
+  test55, test56, test57, test58, test59, test60  )>
 
 <!--==========================================-->
 <!-- test objects  -->
@@ -255,7 +256,9 @@ Test an array with some mixed-up kis
 <!--~~ <test26>
 Test members by itself.  This should cause this element to be "flattened".
 All the attributes and child elements will be inserted as key:value pairs
-right in the parent object.
+right in the parent object.  Because the context of this, when it is 
+resolved at runtime, is "o", the default selector will be "@*|*" (all
+attributes and child elements).
 ~~json <members/>
 ~~-->
 <!ELEMENT test26 ( test26-c1, test26-c2 )>
@@ -277,7 +280,9 @@ Test members with a @select.
 <!--~~ <test28>
 Test members as the root annotation, without a select,
 inside an array.  First we'll need to declare a container element
-to provide the array.
+to provide the array.  The context of this, resolved at runtime, will
+be "a", so the default selector will be "*" (only child elements;
+attributes will be dropped.)
 ~~json <members/>
 ~~-->
 <!ELEMENT array-container (test28)+ >
@@ -286,4 +291,185 @@ to provide the array.
 <!ELEMENT test28-c2 (#PCDATA)>
 <!ATTLIST test28 test28-a1 CDATA #IMPLIED
                  test28-a2 CDATA #IMPLIED>
+
+<!--==========================================-->
+<!-- test json as the root annotation -->
+
+<!--~~ <test35>
+Test json without any attributes.  This will have no effect.
+~~json <json/>
+~~-->
+<!ELEMENT test35 ( test35-c1, test35-c2 )>
+<!ELEMENT test35-c1 (#PCDATA)>
+<!ELEMENT test35-c2 (#PCDATA)>
+<!ATTLIST test35 test35-a1 CDATA #IMPLIED
+                 test35-a2 CDATA #IMPLIED>
+
+<!--~~ <test36>
+Test json with a key.  
+~~json <json key='TEST36'/>
+~~-->
+<!ELEMENT test36 ( test36-c1, test36-c2 )>
+<!ELEMENT test36-c1 (#PCDATA)>
+<!ELEMENT test36-c2 (#PCDATA)>
+<!ATTLIST test36 test36-a1 CDATA #IMPLIED
+                 test36-a2 CDATA #IMPLIED>
+
+<!--~~ <test37>
+Test json with a name.  
+~~json <json name='test37-c2'/>
+~~-->
+<!ELEMENT test37 ( test37-c1, test37-c2 )>
+<!ELEMENT test37-c1 (#PCDATA)>
+<!ELEMENT test37-c2 (#PCDATA)>
+<!ATTLIST test37 test37-a1 CDATA #IMPLIED
+                 test37-a2 CDATA #IMPLIED>
+
+<!--~~ <test38>
+Test json with a select.  
+~~json <json select='*'/>
+~~-->
+<!ELEMENT test38 ( test38-c1, test38-c2 )>
+<!ELEMENT test38-c1 (#PCDATA)>
+<!ELEMENT test38-c2 (#PCDATA)>
+<!ATTLIST test38 test38-a1 CDATA #IMPLIED
+                 test38-a2 CDATA #IMPLIED>
+
+<!--~~ <test39>
+Test json with a bunch of stuff.  
+~~json 
+  <json name='@test39-a1'>
+    <object key='fleegle'>
+      <string name='@test39-a2'>This is the way the world ends ...</string>
+    </object>
+    <array key='bingo'>
+      <string>... not with a bang but a whimper.</string>
+    </array>
+    <members select='*'/>
+  </json>
+~~-->
+<!ELEMENT test39 ( test39-c1, test39-c2 )>
+<!ELEMENT test39-c1 (#PCDATA)>
+<!ELEMENT test39-c2 (#PCDATA)>
+<!ATTLIST test39 test39-a1 CDATA #IMPLIED
+                 test39-a2 CDATA #IMPLIED>
+
+<!--==========================================-->
+<!-- test elements with text children -->
+
+<!--~~ <test45>
+Here's an element with mixed content.  (Hypothetical) business rules specify
+that there will be at most one non-whitespace text node.  In the object, the
+text node will have the key "value".
+Note that it is hard to fit true mixed content into an object.  It is best handled
+either in an array (see the next test), or by using custom templates.
+~~json 
+  <object select='@*|node()'/>
+~~-->
+<!ELEMENT test45 ( #PCDATA | test45-c1 | test45-c2 )*>
+<!ELEMENT test45-c1 (#PCDATA)>
+<!ELEMENT test45-c2 (#PCDATA)>
+<!ATTLIST test45 test45-a1 CDATA #IMPLIED
+                 test45-a2 CDATA #IMPLIED>
+
+<!--~~ <test46>
+Here's an element with mixed content, put into an array.
+~~json 
+  <array select='@*|node()'/>
+~~-->
+<!ELEMENT test46 ( #PCDATA | test46-c1 | test46-c2 )*>
+<!ELEMENT test46-c1 (#PCDATA)>
+<!ELEMENT test46-c2 (#PCDATA)>
+<!ATTLIST test46 test46-a1 CDATA #IMPLIED
+                 test46-a2 CDATA #IMPLIED>
+
+<!--~~ <test47>
+An element with text-only content and no attributes.  This will just
+be turned into a string.
+~~-->
+<!ELEMENT test47 (#PCDATA)>
+
+<!--~~ <test48>
+An element with text-only content and attributes.
+~~-->
+<!ELEMENT test48 (#PCDATA)>
+<!ATTLIST test48 test48-a1 CDATA #IMPLIED
+                 test48-a2 CDATA #IMPLIED>
+
+<!--~~ <test49>
+An element with text-only content and attributes, stuffed into an array.
+Since it's an array, by default, attributes are dropped.
+~~json <array/>
+~~-->
+<!ELEMENT test49 (#PCDATA)>
+<!ATTLIST test49 test49-a1 CDATA #IMPLIED
+                 test49-a2 CDATA #IMPLIED>
+
+<!--~~ <test50>
+The same thing but with a select attribute, that let's us include attributes.
+~~json <array select='@*|node()'/>
+~~-->
+<!ELEMENT test50 (#PCDATA)>
+<!ATTLIST test50 test50-a1 CDATA #IMPLIED
+                 test50-a2 CDATA #IMPLIED>
+
+<!--~~ <test51>
+Here's how to indicate that the text content is a number.
+~~json 
+  <object>
+    <number key='value' select='text()'/>
+    <members/>
+  </object>
+~~-->
+<!ELEMENT test51 (#PCDATA)>
+<!ATTLIST test51 test51-a1 CDATA #IMPLIED
+                 test51-a2 CDATA #IMPLIED>
+
+
+<!--==========================================-->
+<!-- test elements with simple types -->
+
+<!--~~ <test55>
+Same as test47 above, an element with text-only content and no attributes.  This will just
+be turned into a string.
+~~-->
+<!ELEMENT test55 (#PCDATA)>
+
+<!--~~ <test56>
+Specify that it is a number, and specify a key.
+~~json <number key='TEST56'/>
+~~-->
+<!ELEMENT test56 (#PCDATA)>
+
+<!--~~ <test57>
+Specify that it is a boolean, and specify a name that comes from an attribute.
+~~json <boolean name='@test57-a1'/>
+~~-->
+<!ELEMENT test57 (#PCDATA)>
+<!ATTLIST test57 test57-a1 CDATA #IMPLIED>
+
+<!--~~ <test58>
+Specify a string, but the value should come from one of the attributes.
+~~json <string select='@test58-a1'/>
+~~-->
+<!ELEMENT test58 (#PCDATA)>
+<!ATTLIST test58 test58-a1 CDATA #IMPLIED>
+
+<!--~~ <test59>
+Same thing but a number.
+~~json <number select='@test59-a1'/>
+~~-->
+<!ELEMENT test59 (#PCDATA)>
+<!ATTLIST test59 test59-a1 CDATA #IMPLIED>
+
+<!--~~ <test60>
+Same thing but a boolean.
+~~json <boolean select='@test60-a1'/>
+~~-->
+<!ELEMENT test60 (#PCDATA)>
+<!ATTLIST test60 test60-a1 CDATA #IMPLIED>
+
+
+
+
 
