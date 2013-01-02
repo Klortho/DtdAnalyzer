@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project name="DtdAnalyzer" basedir="." default="all">
 
   <property name="name" value="DtdAnalyzer"/>
@@ -41,6 +41,7 @@
     <exclude name="${build}/**"/>
     <exclude name="${build.tests}/**"/>
     <exclude name="build/**"/>
+    <exclude name="website/**"/>
     <exclude name='DtdAnalyzer-*.zip'/>
     <exclude name='DtdAnalyzer-*.tar.gz'/>
     <exclude name="${zip}"/>
@@ -53,9 +54,9 @@
     <exclude name="velocity.log"/>
   </patternset>
 
-  <property name="execfiles" 
+  <property name="execfiles"
     value="dtd2xml2json dtdanalyzer dtdcompare dtddocumentor dtdschematron
-           script/getlibs.sh script/setenv.sh 
+           script/getlibs.sh script/setenv.sh
            test/xml2json/make-samples.sh test/xml2json/test-samples.pl"/>
 
   <target name="clean" description="Deletes all generated artifacts">
