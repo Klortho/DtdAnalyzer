@@ -14,3 +14,6 @@ xsltproc sample3-2json.xsl sample3.xml > sample3.json
 dtd2xml2json sample4.dtd -b ../../xslt/xml2json.xsl sample4-2json.xsl
 xsltproc sample4-2json.xsl sample4.xml > sample4.json
 
+dtd2xml2json sample5.dtd -b ../../xslt/xml2json.xsl sample5-2json.xsl
+xsltproc sample5-2json.xsl sample5.xml > sample5.json
+

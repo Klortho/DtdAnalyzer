@@ -2,6 +2,11 @@
 
 ## DtdAnalyzer v0.2.1-dev
 
+### Features
+
+* New dtd2xml2json utility for auto-generating stylesheets that convert
+  XML documents into JSON.
+
 ### Other
 
 * Test release just to test the release automation scripts.

@@ -17,9 +17,9 @@
       k = key
       n = name
 
-  An additional element, "u", is allowed in the itemspec (but not the annotation)
-  indicating that we don't know what to do with this element, and it will result
-  in a warning message.
+  An additional element, "u" ("unknown"), is allowed in the itemspec (but not the 
+  annotation) indicating that we don't know what to do with this element, and it 
+  will result in a warning message.
 
 
   Additional constraints:
@@ -29,6 +29,8 @@
     - Within an "o", any annotation except "m" must have an @n or @k attribute.
     - The member element cannot have either a key or name attribute
     - A simple type can either have an @s attribute or text content, but not both.
+    - A container type (json, object, or array) can have either an @s attribute, or
+      content, but not both.
     - In strict JXML, the text node value of <b> should be either "true" or "false",
       with no whitespace.
     - Also, in strict JXML, the value of <n> should be a valid decimal number, with

@@ -38,7 +38,10 @@
 
 
   <!--=================================================================================
-    Some utility functions copied from xml2json.xsl
+    Some utility functions copied from xml2json.xsl.
+    FIXME:  we should import xml2json.xsl, so we don't have to copy this.  But that's
+    an XSLT 1.0 stylesheet, and the EXSLT function extension doesn't work right.  But,
+    the functions could both be rewritten to invoke a shared template.
   -->
   <xsl:function name='np:boolean-value'>
     <xsl:param name='v'/>
@@ -80,84 +83,6 @@
   </xsl:variable>
 
 
-  <!-- 
-    These templates are applied to the json annotations, and just normalize
-    the element and attribute names to their canonical values.
-    E.g. "object" -> "o".
-  -->
-  <xsl:template match='@*|node()' mode='normalize-ja'>
-    <xsl:copy>
-      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
-    </xsl:copy>
-  </xsl:template>
-
-  <!-- These are allowed to have a text node child -->
-  <xsl:template match='s|n|b'>
-    <xsl:copy>
-      <xsl:apply-templates select='@*|text()'/>
-    </xsl:copy>
-  </xsl:template>
-  
-  <xsl:template match='object' mode='normalize-ja'>
-    <o>
-      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
-    </o>
-  </xsl:template>
-
-  <xsl:template match='array' mode='normalize-ja'>
-    <a>
-      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
-    </a>
-  </xsl:template>
-  
-  <xsl:template match='string' mode='normalize-ja'>
-    <s>
-      <xsl:apply-templates select='@*|text()' mode='normalize-ja'/>
-    </s>
-  </xsl:template>
-  
-  <xsl:template match='number' mode='normalize-ja'>
-    <n>
-      <xsl:apply-templates select='@*|text()' mode='normalize-ja'/>
-    </n>
-  </xsl:template>
-  
-  <xsl:template match='boolean' mode='normalize-ja'>
-    <b>
-      <xsl:apply-templates select='@*|text()' mode='normalize-ja'/>
-    </b>
-  </xsl:template>
-  
-  <xsl:template match='member|members' mode='normalize-ja'>
-    <m>
-      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
-    </m>
-  </xsl:template>
-  
-  <xsl:template match='custom' mode='normalize-ja'>
-    <c>
-      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
-    </c>
-  </xsl:template>
-  
-  <xsl:template match='@select' mode='normalize-ja'>
-    <xsl:attribute name='s'>
-      <xsl:value-of select='.'/>
-    </xsl:attribute>
-  </xsl:template>
-  
-  <xsl:template match='@key' mode='normalize-ja'>
-    <xsl:attribute name='k'>
-      <xsl:value-of select='.'/>
-    </xsl:attribute>
-  </xsl:template>
-  
-  <xsl:template match='@name' mode='normalize-ja'>
-    <xsl:attribute name='n'>
-      <xsl:value-of select='.'/>
-    </xsl:attribute>
-  </xsl:template>
-  
   
   <!-- 
     This template does some basic validation of the JSON annotations.
@@ -353,7 +278,11 @@
       </xsl:variable>
 
       <!-- 
-        This will be true if an element can have a text node child
+        This will be true if an element can have a text node child, 
+        but not mixed content.  (That is, text and only text, no element children).
+        This whole scheme doesn't handle mixed content well.  Mixed content is 
+        still best handled by custom templates. But, see sample5.dtd, test45, 
+        for one example.
       -->
       <xsl:variable name='textKid' as='xs:boolean'>
         <xsl:value-of select='($type = "o" or $type = "a") and
@@ -601,6 +530,9 @@
                     <x:with-param name='k' select='"{$jsonKey}"'/>
                   </xsl:when>
                 </xsl:choose>
+                <xsl:if test='$itemSpec/@s'>
+                  <x:with-param name='value' select='{$itemSpec/@s}'/>
+                </xsl:if>
               </x:call-template>
             </x:template>
           </xsl:when>
@@ -629,11 +561,11 @@
                   </xsl:when>
                 </xsl:choose>
                 <xsl:choose>
-                  <xsl:when test='$itemSpec/@textKid = "true"'>
-                    <x:with-param name='kids' select='node()'/>
-                  </xsl:when>
                   <xsl:when test='$itemSpec/@s'>
                     <x:with-param name='kids' select='{$itemSpec/@s}'/>
+                  </xsl:when>
+                  <xsl:when test='$itemSpec/@textKid = "true"'>
+                    <x:with-param name='kids' select='node()'/>
                   </xsl:when>
                 </xsl:choose>
               </x:call-template>
@@ -655,11 +587,11 @@
                   </xsl:when>
                 </xsl:choose>
                 <xsl:choose>
-                  <xsl:when test='$itemSpec/@textKid = "true"'>
-                    <x:with-param name='kids' select='@*|node()'/>
-                  </xsl:when>
                   <xsl:when test='$itemSpec/@s'>
                     <x:with-param name='kids' select='{$itemSpec/@s}'/>
+                  </xsl:when>
+                  <xsl:when test='$itemSpec/@textKid = "true"'>
+                    <x:with-param name='kids' select='@*|node()'/>
                   </xsl:when>
                 </xsl:choose>
               </x:call-template>
@@ -756,7 +688,6 @@
       </xsl:choose>
     </xsl:element>
   </xsl:template>
-  
 
   <!-- 
     This template either generates a "k" attribute node that gets
@@ -815,7 +746,6 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
   
   <xsl:template match='s|n|b' mode='itemspec'>
     <xsl:param name='metacontext' select='""'/>    
@@ -887,8 +817,6 @@
     </xsl:element>
   </xsl:template>
 
-
-
   <xsl:template match='m' mode='itemspec'>
     <xsl:param name='metacontext' select='""'/>
     
@@ -913,7 +841,7 @@
     </xsl:variable>
 
     <!-- 
-      FIXME:  I think I also need to take @textKids into account here.
+      FIXME:  I think I also need to take @textKid into account here.
     -->
     
     <!-- Figure out the value to use in the select attribute of the apply-templates.
@@ -957,8 +885,6 @@
       </xsl:otherwise>
     </xsl:choose>
     
-    
-    
   </xsl:template>
 
   <xsl:template match='*' mode='itemspec'>
@@ -967,5 +893,86 @@
       <xsl:value-of select='name(.)'/>
     </xsl:message>
   </xsl:template>
+
+
+  <!--=================================================================================
+    These templates are applied to the json annotations, and just normalize
+    the element and attribute names to their canonical values.
+    E.g. "object" -> "o".
+  -->
+  <xsl:template match='@*|node()' mode='normalize-ja'>
+    <xsl:copy>
+      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <!-- These are allowed to have a text node child -->
+  <xsl:template match='s|n|b'>
+    <xsl:copy>
+      <xsl:apply-templates select='@*|text()'/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match='object' mode='normalize-ja'>
+    <o>
+      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
+    </o>
+  </xsl:template>
+  
+  <xsl:template match='array' mode='normalize-ja'>
+    <a>
+      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
+    </a>
+  </xsl:template>
+  
+  <xsl:template match='string' mode='normalize-ja'>
+    <s>
+      <xsl:apply-templates select='@*|text()' mode='normalize-ja'/>
+    </s>
+  </xsl:template>
+  
+  <xsl:template match='number' mode='normalize-ja'>
+    <n>
+      <xsl:apply-templates select='@*|text()' mode='normalize-ja'/>
+    </n>
+  </xsl:template>
+  
+  <xsl:template match='boolean' mode='normalize-ja'>
+    <b>
+      <xsl:apply-templates select='@*|text()' mode='normalize-ja'/>
+    </b>
+  </xsl:template>
+  
+  <xsl:template match='member|members' mode='normalize-ja'>
+    <m>
+      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
+    </m>
+  </xsl:template>
+  
+  <xsl:template match='custom' mode='normalize-ja'>
+    <c>
+      <xsl:apply-templates select='@*|*' mode='normalize-ja'/>
+    </c>
+  </xsl:template>
+  
+  <xsl:template match='@select' mode='normalize-ja'>
+    <xsl:attribute name='s'>
+      <xsl:value-of select='.'/>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <xsl:template match='@key' mode='normalize-ja'>
+    <xsl:attribute name='k'>
+      <xsl:value-of select='.'/>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <xsl:template match='@name' mode='normalize-ja'>
+    <xsl:attribute name='n'>
+      <xsl:value-of select='.'/>
+    </xsl:attribute>
+  </xsl:template>
+  
+  
 
 </xsl:stylesheet>

@@ -12,7 +12,7 @@ use strict;
 use File::Compare;
 
 my @samples = qw(
-    sample1 sample2a sample2b sample2c sample3 sample4
+    sample1 sample2a sample2b sample2c sample3 sample4 sample5
 );
 # Set this to true if you have jsonlint installed.
 my $test_jsonlint = 0;
