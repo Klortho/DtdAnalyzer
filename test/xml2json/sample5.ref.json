@@ -1,0 +1,198 @@
+{
+    "header": {
+        "type": "sample5",
+        "version": "0.3"
+    },
+    "root": {
+        "test00": {
+            "test00-a1": "attribute test00-a1",
+            "test00-a2": "attribute test00-a2",
+            "test00-c1": "child element test00-c1",
+            "test00-c2": "child element test00-c2"
+        },
+        "test01": {
+            "test01-a1": "attribute test01-a1",
+            "test01-a2": "attribute test01-a2",
+            "test01-c1": "child element test01-c1",
+            "test01-c2": "child element test01-c2"
+        },
+        "test02-key": {
+            "test02-a1": "attribute test02-a1",
+            "test02-a2": "attribute test02-a2",
+            "test02-c1": "child element test02-c1",
+            "test02-c2": "child element test02-c2"
+        },
+        "attribute test03-a1": {
+            "test03-a1": "attribute test03-a1",
+            "test03-a2": "attribute test03-a2",
+            "test03-c1": "child element test03-c1",
+            "test03-c2": "child element test03-c2"
+        },
+        "test04": {
+            "test04-a1": "attribute test04-a1",
+            "test04-a2": "attribute test04-a2",
+            "test04-c2": "child element test04-c2"
+        },
+        "test05": {
+            "test05-a1": "attribute test05-a1",
+            "test05-a2": "attribute test05-a2",
+            "test05-c1": "child element test05-c1",
+            "test05-c2": "child element test05-c2"
+        },
+        "test06": {
+            "test06-a1": "attribute test06-a1",
+            "test06-a2": "attribute test06-a2",
+            "test06-c2": "child element test06-c2"
+        },
+        "test07": {
+            "a1": "attribute test07-a1",
+            "attribute test07-a2": "attribute test07-a2",
+            "3": "Here's a nice string."
+        },
+        "test08": {
+            "fleegle": [
+                "attribute test08-a1",
+                "attribute test08-a2",
+                "Here's a nice string."
+            ],
+            "drooper": [
+                false,
+                false,
+                true,
+                false,
+                false,
+                true
+            ],
+            "snorky": [
+                0.1,
+                -5,
+                22
+            ]
+        },
+        "test09": {
+            "test09-a1": "attribute test09-a1",
+            "test09-a2": "attribute test09-a2",
+            "test09-c1": "child element test09-c1",
+            "test09-c2": "child element test09-c2"
+        },
+        "test15": [
+            "drooper",
+            "bingo"
+        ],
+        "test16": [
+            "child element test16-c1",
+            "child element test16-c2"
+        ],
+        "test17-key": [
+            "child element test17-c1",
+            "child element test17-c2"
+        ],
+        "attribute test18-a1": [
+            "child element test18-c1",
+            "child element test18-c2"
+        ],
+        "test19": [
+            "attribute test19-a1",
+            "attribute test19-a2",
+            "child element test19-c2"
+        ],
+        "test20": [
+            "child element test20-c1",
+            "child element test20-c2"
+        ],
+        "test21": [
+            "attribute test21-a1",
+            "attribute test21-a2",
+            "  f ",
+            "1e04",
+            "child element test21-c2",
+            "attribute test21-a2",
+            "Here's a nice string.",
+            false,
+            false,
+            3.14159,
+            1e04
+        ],
+        "test26-a1": "attribute test26-a1",
+        "test26-a2": "attribute test26-a2",
+        "test26-c1": "child element test26-c1",
+        "test26-c2": "child element test26-c2",
+        "test27-a1": "attribute test27-a1",
+        "test27-c2": "child element test27-c2",
+        "array-container": [
+            "child element test28-c1",
+            "child element test28-c2"
+        ],
+        "test35": {
+            "test35-a1": "attribute test35-a1",
+            "test35-a2": "attribute test35-a2",
+            "test35-c1": "child element test35-c1",
+            "test35-c2": "child element test35-c2"
+        },
+        "TEST36": {
+            "test36-a1": "attribute test36-a1",
+            "test36-a2": "attribute test36-a2",
+            "test36-c1": "child element test36-c1",
+            "test36-c2": "child element test36-c2"
+        },
+        "child element test37-c2": {
+            "test37-a1": "attribute test37-a1",
+            "test37-a2": "attribute test37-a2",
+            "test37-c1": "child element test37-c1",
+            "test37-c2": "child element test37-c2"
+        },
+        "test38": {
+            "test38-c1": "child element test38-c1",
+            "test38-c2": "child element test38-c2"
+        },
+        "attribute test39-a1": {
+            "fleegle": {
+                "attribute test39-a2": "This is the way the world ends ..."
+            },
+            "bingo": [
+                "... not with a bang but a whimper."
+            ],
+            "test39-c1": "child element test39-c1",
+            "test39-c2": "child element test39-c2"
+        },
+        "test45": {
+            "test45-a1": "attribute test45-a1",
+            "test45-a2": "attribute test45-a2",
+            "value": "\n    Text child of test45.\n    ",
+            "test45-c1": "child element test45-c1",
+            "test45-c2": "child element test45-c2"
+        },
+        "test46": [
+            "attribute test46-a1",
+            "attribute test46-a2",
+            "\n    Text child of test46.\n    ",
+            "child element test46-c1",
+            "child element test46-c2"
+        ],
+        "test47": "47",
+        "test48": {
+            "test48-a1": "attribute test48-a1",
+            "test48-a2": "attribute test48-a2",
+            "value": "\n    Text child of test48.\n  "
+        },
+        "test49": [
+            "\n    Text child of test49.\n  "
+        ],
+        "test50": [
+            "attribute test50-a1",
+            "attribute test50-a2",
+            "\n    Text child of test50.\n  "
+        ],
+        "test51": {
+            "value": 51,
+            "test51-a1": "attribute test51-a1",
+            "test51-a2": "attribute test51-a2"
+        },
+        "test55": " test55 text content ",
+        "TEST56": 56,
+        "fifty-seven": false,
+        "test58": "fifty-eight",
+        "test59": 59,
+        "test60": false
+    }
+}
