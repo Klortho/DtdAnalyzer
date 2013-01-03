@@ -5,8 +5,6 @@
   <DbList>
     <DbName>pubmed</DbName>
     <DbName>protein</DbName>
-    <DbName>nuccore</DbName>
-    <DbName>nucleotide</DbName>
   </DbList>
   <DbInfo>
     <DbName>pubmed</DbName>

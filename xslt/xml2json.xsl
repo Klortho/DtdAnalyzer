@@ -296,9 +296,11 @@
       select='c:node-set($dtd-annotation)/json'/>
 
     <o>
-      <xsl:call-template name='header'>
-        <xsl:with-param name='header-strings' select='$header-strings'/>
-      </xsl:call-template>
+      <xsl:if test='$header-strings'>
+        <xsl:call-template name='header'>
+          <xsl:with-param name='header-strings' select='$header-strings'/>
+        </xsl:call-template>
+      </xsl:if>
       <xsl:apply-templates select='*'>
         <xsl:with-param name="context" select="'o'"/>
       </xsl:apply-templates>

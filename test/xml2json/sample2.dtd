@@ -16,7 +16,7 @@ This is the root element for a response.  The following annotation
 changes the name of the main body portion of the returned JSON from 
 "result" to "response".
 ~~ tags root
-~~ json <object name='"response"'/>
+~~ json <object key='response'/>
 ~~-->
 
 <!ELEMENT Result ( 
@@ -92,17 +92,15 @@ JSON boolean.  The library is smart enough to know that "Y" means "true"
 and "N" means "false".
 ~~json <boolean/>
 ~~-->
-<!ELEMENT Explode (#PCDATA)>	<!-- (Y|N) -->
+<!ELEMENT Explode (#PCDATA)>
 
 <!-- Rely on default behavior:  JSON string.  -->
 <!ELEMENT OP (#PCDATA)>
 
 <!--~~ <ERROR>
 This element (tested in sample2a.xml) becomes a key-value pair, and the 
-key is specified by the name attribute here.  By default, the key would 
-be "error", but we want to preserve the all-uppercase "ERROR".  Note 
-that the value of the name attribute is an XPath expression, so it is 
-enclosed in quotes.
+key is specified here.  By default, the key would 
+be "error", but we want to preserve the all-uppercase "ERROR". 
 ~~json <json key='ERROR'/>
 ~~-->
 <!ELEMENT ERROR (#PCDATA)>	
@@ -114,9 +112,9 @@ doesn't fit cleanly into either a JSON array or object.
 In this case, we will construct a JSON object that has three members.  
 ~~json
   <object>
-    <number name='"count"' select='count(*)'/>
-    <array name='"phrasesnotfound"' select='PhraseNotFound'/>
-    <array name='"fieldsnotfound"' select='FieldNotFound'/>
+    <number key='count' select='count(*)'/>
+    <array key='phrasesnotfound' select='PhraseNotFound'/>
+    <array key='fieldsnotfound' select='FieldNotFound'/>
   </object>
 ~~-->
 <!ELEMENT ErrorList (PhraseNotFound*, FieldNotFound*)>

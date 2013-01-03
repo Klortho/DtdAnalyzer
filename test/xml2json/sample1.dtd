@@ -12,13 +12,6 @@
   to be converted into lowercase when used as JSON key values.
 -->
 
-<!--~~ !dtd
-~~json 
-  <json type='sample1' version='0.3'>
-    <config lcnames='true' />
-  </json>
-~~-->
-
 <!-- <Result>  This is the root element, it will be turned into a JSON object. -->
 <!ELEMENT Result (DbList, DbInfo?)>
 
