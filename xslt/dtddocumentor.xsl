@@ -27,7 +27,9 @@
     except those that match the regular expression $exclude-except. -->
 	<xsl:param name="exclude-elems" select="' '"/>
 	<xsl:param name="exclude-except" select="' '"/>
-  
+	
+  <!-- Controls documentation generation for parameter and general entities -->
+    <xsl:param name="entities" select="'off'"/>  
 
 	<xsl:key name="entitiesByLCName" match="entity" use="lower-case(@name)"/>
 
@@ -78,7 +80,9 @@
 	</xsl:template>
 
 	<xsl:template match="parameterEntities | generalEntities">
-		<xsl:apply-templates select="entity" mode="build-page"/>
+		<xsl:if test="$entities='on'">
+			<xsl:apply-templates select="entity" mode="build-page"/>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template match="dtd">
@@ -228,13 +232,13 @@
 						<xsl:apply-templates select="attributes" mode="sidebar"/>
 					</ul>
 				</xsl:if>
-				<xsl:if test="parameterEntities">
+				<xsl:if test="parameterEntities and $entities='on'">
 					<p class="sidebar-outer">Parameter Entities</p>
 					<ul class="sidebar-inner">
 						<xsl:apply-templates select="parameterEntities" mode="sidebar"/>
 					</ul>
 				</xsl:if>
-				<xsl:if test="generalEntities">
+				<xsl:if test="generalEntities and $entities='on'">
 					<p class="sidebar-outer">General Entities</p>
 					<ul class="sidebar-inner">
 						<xsl:apply-templates select="generalEntities" mode="sidebar"/>
