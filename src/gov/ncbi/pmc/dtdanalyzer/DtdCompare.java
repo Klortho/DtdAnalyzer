@@ -27,7 +27,7 @@ public class DtdCompare {
      * that they will appear in the usage message.
      */
     private static String[] optList = {
-        "help", "version", "doc", "system", "public", "catalog", "title", 
+        "help", "version", "system", "doc", "public", "catalog", "title", 
         "param"
     };
     
@@ -42,6 +42,15 @@ public class DtdCompare {
      */
     private static OptionHandler optHandler = new OptionHandler() {
         public boolean handleOption(Option opt) {
+            String optName = opt.getLongOpt();
+          
+          /*
+            if (optName.equals("...")) {
+                ... = opt.getValue();
+                return true;
+            }
+          */
+            
             return false;
         }
     };
@@ -53,16 +62,14 @@ public class DtdCompare {
 
 
         app = new App(args, optList, optHandler, customOpts, true, 2,  /* this "2" means we want two dtds */
-            "dtdcompare [<options>]",
+            "dtdcompare 2 X {[-s] <system-id> | -d <xml-file> | -p <public-id>} " +
+            "[<options>] [<out>]",
             "\nThis utility compares two DTDs and writes an HTML report. " +
             "Exactly two DTDs should be specified on the command line, with any " +
-            "combination of the --doc, --system, and --public options.\n\n"
+            "combination of the --system, --doc, and --public options.\n\n"
         );
-        Options options = app.getActiveOpts();
+        app.initialize();
 
-        // Get the parsed command line arguments
-        CommandLine line = app.getLine();
-        
         // Parse DTD 2 and save the results in a temporary file.
         File f = null;
 
@@ -129,8 +136,20 @@ public class DtdCompare {
      * handle the option.
      */
     private static HashMap initCustomOpts() {
-        HashMap _customOpts = new HashMap();
+        HashMap _opts = new HashMap();
+
+        // Re-specifying title here, so we can change the description.
+        _opts.put("title",
+            OptionBuilder
+                .withLongOpt( "title" )
+                .withDescription("Specify the title of one of the DTDs. If this option " +
+                    "is given once, the title will apply to the first DTD.  Give the " +
+                    "option twice to specify titles for both DTDs.")
+                .hasArg()
+                .withArgName("dtd-title")
+                .create('t')
+        );
         
-        return _customOpts;
+        return _opts;
     }
 }

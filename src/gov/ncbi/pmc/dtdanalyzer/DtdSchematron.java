@@ -29,7 +29,7 @@ public class DtdSchematron {
      * that they will appear in the usage message.
      */
     private static String[] optList = {
-        "help", "version", "doc", "system", "public",
+        "help", "version", "system", "doc", "public",
         "full",
         "catalog", "title", "roots", "docproc", "markdown", "param"
     };
@@ -45,9 +45,21 @@ public class DtdSchematron {
      */
     private static OptionHandler optHandler = new OptionHandler() {
         public boolean handleOption(Option opt) {
+            String optName = opt.getLongOpt();
+          
+            if (optName.equals("full")) {
+                full = true;
+                return true;
+            }
+
             return false;
         }
     };
+
+
+    // DtdSchematron-specific command line option values
+    private static boolean full = false;
+
 
     /**
      * Main execution point. Checks arguments, then converts the DTD into XML.
@@ -60,18 +72,16 @@ public class DtdSchematron {
 
 
         app = new App(args, optList, optHandler, customOpts, true,
-            "DtdSchematron [-d <xml-file> | [-s] <system-id> | -p <public-id>] " +
+            "DtdSchematron [[-s] <system-id> | -d <xml-file> | -p <public-id>] " +
             "[-f] " +
             "[-c <catalog>] [-t <title>] [<out>]",
             "\nThis generates a schematron file from a DTD."
         );
-        Options options = app.getActiveOpts();
-
-        // Get the parsed command line arguments
-        CommandLine line = app.getLine();
+        app.initialize();
     
         // This parses the DTD, and corrals the data into a model:
-        ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
+        ModelBuilder model = 
+            new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
         XMLWriter writer = new XMLWriter(model);
 
         // Now run the XSLT transformation.  This will be the dtdschematron.xsl
@@ -92,7 +102,6 @@ public class DtdSchematron {
             }
             
             // Get the full option, if given, and pass that in.
-            boolean full = app.getFull();
             xslt.setParameter("complete", full ? "yes" : "no");
 
             // Use this constructor because Saxon always 
@@ -115,8 +124,17 @@ public class DtdSchematron {
      * handle the option.
      */
     private static HashMap initCustomOpts() {
-        HashMap _customOpts = new HashMap();
+        HashMap _opts = new HashMap();
         
-        return _customOpts;
+        _opts.put("full",
+            OptionBuilder
+                .withLongOpt("full")
+                .withDescription("If this option is given, then a complete schematron " +
+                    "will be generated from the DTD, as opposed to just extracting the " +
+                    "rules in the annotations.")
+                .create('f')
+        );
+
+        return _opts;
     }
 }

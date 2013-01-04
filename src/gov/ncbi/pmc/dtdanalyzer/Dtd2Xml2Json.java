@@ -29,9 +29,9 @@ public class Dtd2Xml2Json {
      * that they will appear in the usage message.
      */
     private static String[] optList = {
-        "help", "version", "doc", "system", "public", 
+        "help", "version", "system", "doc", "public", 
         "basexslt", "default-minimized",
-        "catalog", "title", "roots", "docproc", "markdown", "param",
+        "catalog", "docproc", "markdown", "param",
         "debug", "jxml-out"
     };
 
@@ -40,15 +40,39 @@ public class Dtd2Xml2Json {
      */
     private static HashMap customOpts = initCustomOpts();
 
+
     /**
      * This inner class will be invoked for each of the command-line options that was given.
      * If it is a custom option, handle it here, otherwise, kick it back to App.
      */
     private static OptionHandler optHandler = new OptionHandler() {
         public boolean handleOption(Option opt) {
+            String optName = opt.getLongOpt();
+
+            if (optName.equals("basexslt")) {
+                basexslt = opt.getValue("basexslt");
+                return true;
+            }
+            
+            if (optName.equals("default-minimized")) {
+                defaultMinimized = true;
+                return true;
+            }
+          
+            if (optName.equals("jxml-out")) {
+                jxmlOut = true;
+                return true;
+            }
+
             return false;
         }
     };
+
+    // Dtd2Xml2Json-specific command line option values
+
+    private static String basexslt = null;
+    private static boolean defaultMinimized = false;
+    private static boolean jxmlOut = false;
 
     /**
      * Main execution point. Checks arguments, then converts the DTD into XML.
@@ -61,17 +85,13 @@ public class Dtd2Xml2Json {
 
 
         app = new App(args, optList, optHandler, customOpts, true,
-            "dtd2xml2json [-d <xml-file> | [-s] <system-id> | -p <public-id>] " +
-            "[-b <basexslt>] [-u] " +
-            "[-c <catalog>] [-t <title>] [<out>]",
+            "dtd2xml2json {[-s] <system-id> | -d <xml-file> | -p <public-id>} " +
+            "[<options>] [<out>]",
             "\nThis generates an XSLT stylesheet from a DTD.  The stylesheet transforms " +
             "instance XML documents into JSON format."
         );
-        Options options = app.getActiveOpts();
+        app.initialize();
 
-        // Get the parsed command line arguments
-        CommandLine line = app.getLine();
-    
         // This parses the DTD, and corrals the data into a model:
         ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
         XMLWriter writer = new XMLWriter(model);
@@ -94,11 +114,9 @@ public class Dtd2Xml2Json {
             }
 
             // Get the basexslt option, if given, and pass those it in as a param
-            String basexslt = app.getBaseXslt();
             if (basexslt != null) xslt.setParameter("basexslt", basexslt);
             
             // Get the defaultpretty option, if given, and pass that in.
-            boolean defaultMinimized = app.getDefaultMinimized();
             xslt.setParameter("default-minimized", defaultMinimized);
 
             // Get the debug option, if given, and pass that in.
@@ -106,7 +124,6 @@ public class Dtd2Xml2Json {
             xslt.setParameter("debug", debug);
 
             // Get the jxml-out option, if given, and pass that in.
-            boolean jxmlOut = app.getJxmlOut();
             xslt.setParameter("jxml-out", jxmlOut);
 
 
@@ -130,8 +147,32 @@ public class Dtd2Xml2Json {
      * handle the option.
      */
     private static HashMap initCustomOpts() {
-        HashMap _customOpts = new HashMap();
+        HashMap _opts = new HashMap();
+
+        _opts.put("basexslt",
+            OptionBuilder
+                .withLongOpt("basexslt")
+                .withDescription("Path to the XSLT which will be imported by the output XSLT. " +
+                    "Defaults to \"xml2json.xsl\".")
+                .hasArg()
+                .withArgName("basexslt")
+                .create('b')
+        );
+        _opts.put("default-minimized",
+            OptionBuilder
+                .withLongOpt("default-minimized")
+                .withDescription("If this option is given, then the default output from " +
+                    "the generated stylesheet will minimized, and not pretty.")
+                .create('u')
+        );
+        _opts.put("jxml-out",
+            OptionBuilder
+                .withLongOpt("jxml-out")
+                .withDescription("Causes the generated stylesheet to output the JXML " +
+                    "intermediate format instead of JSON. This is used for debugging.")
+                .create()
+        );
         
-        return _customOpts;
+        return _opts;
     }
 }

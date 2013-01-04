@@ -29,7 +29,7 @@ public class DtdAnalyzer {
      * that they will appear in the usage message.
      */
     private static String[] optList = {
-        "help", "version", "doc", "system", "public", "catalog", "xslt", "title", 
+        "help", "version", "system", "doc", "public", "catalog", "xslt", "title", 
         "roots", "docproc", "markdown", "param"
     };
     
@@ -44,6 +44,28 @@ public class DtdAnalyzer {
      */
     private static OptionHandler optHandler = new OptionHandler() {
         public boolean handleOption(Option opt) {
+            String optName = opt.getLongOpt();
+
+            // Check for, and handle, the --xsl option
+            if ( optName.equals("xslt") ) {
+                try {
+                    TransformerFactory f = TransformerFactory.newInstance();
+                    File xslFile = new File(opt.getValue());
+                    if ( ! xslFile.exists() || ! xslFile.isFile() ) {
+                        System.err.println("Error: Specified xsl " + xslFile.toString() + 
+                            " is not a file" );
+                        System.exit(1);
+                    }
+                    app.setXslt( f.newTransformer(new StreamSource(xslFile)) );
+                }
+                catch (TransformerConfigurationException e) {
+                    System.err.println("Error configuring xslt transformer: " + e.getMessage());
+                    System.exit(1);
+                }
+                return true;
+            }
+
+
             return false;
         }
     };
@@ -57,17 +79,12 @@ public class DtdAnalyzer {
      */
     public static void main (String[] args) {
 
-
         app = new App(args, optList, optHandler, customOpts, true,
-            "dtdanalyzer [-d <xml-file> | -s <system-id> | -p <public-id>] " +
-            "[-c <catalog>] [-x <xslt>] [-t <title>] [<out>]",
+            "dtdanalyzer {[-s] <system-id> | -d <xml-file> | -p <public-id>} " +
+            "[<options>] [<out>]",
             "\nThis utility analyzes a DTD and writes an XML output file."
         );
-        //Options options = app.getActiveOpts();
-
-        // Get the parsed command line arguments
-        //CommandLine line = app.getLine();
-
+        app.initialize();
 
         // This parses the DTD, and corrals the data into a model:
         ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
@@ -111,8 +128,17 @@ public class DtdAnalyzer {
      * handle the option.
      */
     private static HashMap initCustomOpts() {
-        HashMap _customOpts = new HashMap();
-        
-        return _customOpts;
+        HashMap _opts = new HashMap();
+
+        _opts.put("xslt",
+            OptionBuilder
+                .withLongOpt( "xslt" )
+                .withDescription("An XSLT script to run to post-process the output.")
+                .hasArg()
+                .withArgName("xslt")
+                .create('x')
+        );
+
+        return _opts;
     }
 }

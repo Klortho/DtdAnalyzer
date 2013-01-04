@@ -31,7 +31,7 @@ public class DtdDocumentor {
      * that they will appear in the usage message.
      */
     private static String[] optList = {
-        "help", "version", "doc", "system", "public", "dir",
+        "help", "version", "system", "doc", "public", "dir",
         "catalog", "title", "roots", "docproc", "markdown", "param",
         "css", "js", "include", "nosuffixes", "exclude", "exclude-except"
     };
@@ -47,9 +47,50 @@ public class DtdDocumentor {
      */
     private static OptionHandler optHandler = new OptionHandler() {
         public boolean handleOption(Option opt) {
+            String optName = opt.getLongOpt();
+
+            if (optName.equals("dir")) {
+                dir = opt.getValue();
+                return true;
+            }
+            if (optName.equals("css")) {
+                css = opt.getValue();
+                return true;
+            }
+            if (optName.equals("js")) {
+                js = opt.getValue();
+                return true;
+            }
+            if (optName.equals("include")) {
+                include = opt.getValue();
+                return true;
+            }
+            if (optName.equals("nosuffixes")) {
+                suffixes = false;
+                return true;
+            }
+            if (optName.equals("exclude")) {
+                excludeElems = opt.getValue();
+                return true;
+            }
+            if (optName.equals("exclude-except")) {
+                excludeExcept = opt.getValue();
+                return true;
+            }
+            
+
             return false;
         }
     };
+
+    // DtdDocumentor-specific command line option values
+    private static String dir = null;
+    private static String css = null;
+    private static String js = null;
+    private static String include = null;
+    private static boolean suffixes = true;
+    private static String excludeElems = null;
+    private static String excludeExcept = null;
 
     /**
      * Main execution point. Checks arguments, then converts the DTD into XML.
@@ -62,18 +103,16 @@ public class DtdDocumentor {
     public static void main (String[] args) {
 
         app = new App(args, optList, optHandler, customOpts, false,
-            "dtddocumentor [-h] [-d <xml-file> | -s <system-id> | -p <public-id>] " +
-            "[-dir <dir>] [-c <catalog>] [-t <title>] [-r <roots>] [-m]",
+            "dtddocumentor {[-s] <system-id> | -d <xml-file> | -p <public-id>} " +
+            "[<options>]",
             "\nThis utility generates HTML documentation from a DTD.  The above " +
             "is a summary of arguments; the complete list is below."
         );
-        Options options = app.getActiveOpts();
-
-        // Get the parsed command line arguments
-        CommandLine line = app.getLine();
+        app.initialize();
     
         // This parses the DTD, and corrals the data into a model:
-        ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
+        ModelBuilder model = 
+            new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
 
         XMLWriter writer = new XMLWriter(model);
 
@@ -96,31 +135,24 @@ public class DtdDocumentor {
             }
             
             // Now get the dir, css, etc. options and pass those in as params
-            String dir = app.getDir();
             if (dir == null) dir = "doc";
             xslt.setParameter("dir", dir);
             
             // We set the defaults for css and js here, which should match the default in the 
             // stylesheet.  The reason is that the Java code needs to know what the filename is, so
             // that it can copy it into the destination directory
-            String css = app.getCss();
             if (css == null) css = "dtddoc.css";
             xslt.setParameter("css", css);
             
-            String js = app.getJs();
             if (js == null) js = "expand.js";
             xslt.setParameter("js", js);
             
-            String include = app.getInclude();
             if (include != null) xslt.setParameter("include-files", include);
             
-            boolean suffixes = app.getSuffixes();
             xslt.setParameter("filesuffixes", suffixes);
             
-            String excludeElems = app.getExcludeElems();
             if (excludeElems != null) xslt.setParameter("exclude-elems", excludeElems);
             
-            String excludeExcept = app.getExcludeExcept();
             if (excludeExcept != null) xslt.setParameter("exclude-except", excludeExcept);
             
             // Use this constructor because Saxon always 
@@ -163,8 +195,72 @@ public class DtdDocumentor {
      * handle the option.
      */
     private static HashMap initCustomOpts() {
-        HashMap _customOpts = new HashMap();
+        HashMap _opts = new HashMap();
+
+        _opts.put("dir",
+            OptionBuilder
+                .withLongOpt("dir")
+                .withDescription("Specify the directory to which to write the output files. " +
+                    "Defaults to \"doc\".")
+                .hasArg()
+                .withArgName("dir")
+                .create()
+        );
+        _opts.put("css",
+            OptionBuilder
+                .withLongOpt("css")
+                .withDescription("Specify a CSS file that is included in a <link> element within " +
+                    " each HTML output page.  Defaults to dtddoc.css.")
+                .hasArg()
+                .withArgName("file")
+                .create()
+        );
+        _opts.put("js",
+            OptionBuilder
+                .withLongOpt("js")
+                .withDescription("Specify a Javascript file that is invoked from each HTML " +
+                    "output page.  Defaults to expand.js.")
+                .hasArg()
+                .withArgName("file")
+                .create()
+        );
+        _opts.put("include",
+            OptionBuilder
+                .withLongOpt("include")
+                .withDescription("Allows you to specify any number of additional " +
+                    "CSS and/or JS files.  This should be a space-delimited list.")
+                .hasArg()
+                .withArgName("files")
+                .create()
+        );
+        _opts.put("nosuffixes",
+            OptionBuilder
+                .withLongOpt("nosuffixes")
+                .withDescription("If this option is given, it prevents the documentor " +
+                    "from adding suffixes to output filenames.  By default, these are " +
+                    "added to prevent problems on Windows machines when filenames differ " +
+                    "only by case (for example, \"leftarrow.html\" and \"LeftArrow\".html). ")
+                .create()
+        );
+        _opts.put("exclude",
+            OptionBuilder
+                .withLongOpt("exclude")
+                .withDescription("List of elements that should be excluded from the " +
+                    "documentation.  This is a regular expression.")
+                .hasArg()
+                .withArgName("elems")
+                .create()
+        );
+        _opts.put("exclude-except",
+            OptionBuilder
+                .withLongOpt("exclude-except")
+                .withDescription("List of exceptions to the elements that should " +
+                    "be excluded.  This is also a regular expression.")
+                .hasArg()
+                .withArgName("elems")
+                .create()
+        );
         
-        return _customOpts;
+        return _opts;
     }
 }

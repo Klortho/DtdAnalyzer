@@ -63,23 +63,37 @@ public class App {
     // that are in effect for this particular invokation.  (The list will differ depending on the
     // driver class; i.e. DtdAnalyzer, DtdDocumentor, etc.)
     private Options activeOpts = new Options();
-    
-    // This is the list of long names of the options, as passed into the constructor
-    private String[] optList;
-    
-    // This is the application class (e.g. DtdDocumentor).  We'll pass each command line
-    // option to it first for processing.
-    private OptionHandler optHandler;
 
     // This holds the superset of all possible options for any applications here.  Each
     // driver class will pick and choose from this set.  Use the long option name for the
     // key of this hash.
     private HashMap commonOpts = initCommonOpts();
 
-    // This is used to sort the options, when outputting the usage message.
-    private OptionComparator oc;
 
-    // Usage info, these are passed to the HelpFormatter
+
+    // This is the list of long names of the options, as passed into the constructor
+    private String[] optList;
+    
+    // This is passed in from the application class, and provides a function that will handle
+    // any custom command-line options for that application.
+    private OptionHandler optHandler;
+
+    // True if the application takes a final command-line argument that specifies the
+    // output.
+    private boolean wantOutput;
+
+    // The number of DTDs that this application wants.  Usually this is one, but 
+    // DtdCompare, for example, requires two.
+    private int numDtds;
+
+
+
+
+    // The set of custom options that is passed to use from the application class.
+    private HashMap customOpts;
+
+    // Usage info, these are passed in as constructor arguments from the application class,
+    // and passed along to the HelpFormatter.
     private String cmdLineSyntax;
     private String usageHeader;
 
@@ -91,9 +105,6 @@ public class App {
     // one tool (dtdcompare) requires two DTDs.
     private DtdSpecifier[] dtdSpecifiers;
 
-    // Number of DTDs that we are expecting from the command-line arguments.
-    private int numDtds;
-    
     // Used when parsing the command line:  number of DTDs we've seen so far.
     private int numDtdsFound;
     
@@ -116,62 +127,59 @@ public class App {
 
     private StreamResult output = null;
 
-
-
-    // FIXME:
-    // If --title was given, this holds the value
-    //private String dtdTitle = null;
-
-
-    // DtdDocumentor and other options, to be passed in as XSLT params.
-
-    private String dir = null;
-    private String css = null;
-    private String js = null;
-    private String include = null;
-    private boolean suffixes = true;
-    private String excludeElems = null;
-    private String excludeExcept = null;
-    private String basexslt = null;
-    private boolean defaultMinimized = false;
-    private boolean full = false;
+    // If --debug were given, this would be true.
     private boolean debug = false;
-    private boolean jxmlOut = false;
+
+
 
     /**
      * Constructor.  The list of options should be in the same order that you want them
      * to be output in the usage message.
-     *
-     * @param wantOutput - if this is true, and if there's a final unused argument on the
-     *   line, then it will be considered to be a filename we should write the output to.
      */
-    public App(String[] args, String[] _optList, OptionHandler _optHandler, 
+    public App(String[] _args, String[] _optList, OptionHandler _optHandler, 
                HashMap _customOpts,
-               boolean wantOutput, String _cmdLineSyntax, String _usageHeader) 
+               boolean _wantOutput, String _cmdLineSyntax, String _usageHeader) 
     {
-        _initialize(args, _optList, _optHandler, _customOpts, wantOutput, 1, _cmdLineSyntax, _usageHeader);
+        _init(_args, _optList, _optHandler, _customOpts, _wantOutput, 1, _cmdLineSyntax, _usageHeader);
     }
     
     /**
      * Constructor.  Use this form when the command will accept more than one DTD argument;
      * for example, dtdcompare.
      */
-    public App(String[] args, String[] _optList, OptionHandler _optHandler, 
+    public App(String[] _args, String[] _optList, OptionHandler _optHandler, 
                HashMap _customOpts,
-               boolean wantOutput, int _numDtds, String _cmdLineSyntax, String _usageHeader) 
+               boolean _wantOutput, int _numDtds, String _cmdLineSyntax, String _usageHeader) 
     {
-        _initialize(args, _optList, _optHandler, _customOpts, wantOutput, _numDtds, _cmdLineSyntax, _usageHeader);
+        _init(_args, _optList, _optHandler, _customOpts, _wantOutput, _numDtds, _cmdLineSyntax, _usageHeader);
     }
     
-    
-    private void _initialize(String[] args, String[] _optList, OptionHandler _optHandler, 
+    /**
+     * Invoked by the constructors to initialize member variables.
+     */
+    private void _init(String[] _args, String[] _optList, OptionHandler _optHandler, 
                              HashMap _customOpts,
-                             boolean wantOutput, int _numDtds, String _cmdLineSyntax, 
+                             boolean _wantOutput, int _numDtds, String _cmdLineSyntax, 
                              String _usageHeader) 
     {
+        args = _args;
         optList = _optList;
         optHandler = _optHandler;
-        
+        customOpts = _customOpts;
+        wantOutput = _wantOutput;
+        numDtds = _numDtds;
+        cmdLineSyntax = _cmdLineSyntax;
+        usageHeader = _usageHeader;
+    }
+    
+    /**
+     * This function does all the work, after the App object has been instantiated.
+     * This must be a separate instance method, rather than being invoked from the 
+     * constructor, because it calls the application class, which might call back to
+     * us.  The easiest way for it to call back to us is via other instance methods.
+     */
+    public void initialize() {
+        // Get our home directory
         String homeStr = System.getProperty("DTDANALYZER_HOME");
         if (homeStr == null) homeStr = ".";
         home = new File(homeStr);
@@ -186,20 +194,16 @@ public class App {
         catch (IOException e) {
             System.err.println(
                 "Warning:  failed to read app.properties file.  This should exist in " +
-                "the DTDANALYZER_HOME directory."
+                "the DtdAnalyzer installation directory."
             );
         }
-        
-        
-        oc = new OptionComparator(optList);
-        cmdLineSyntax = _cmdLineSyntax;
-        usageHeader = _usageHeader;
 
+        // Merge the common and custom options into activeOpts.  Custom ones with the same
+        // name will override the common ones.
         for (int i = 0; i < optList.length; ++i) {
-            // Merge the common and custom options.  Custom ones with the same
-            // name will override the common ones.
             String optName = optList[i];
-            Option opt = (Option) _customOpts.get(optName);
+            //System.err.println("    option " + optName);
+            Option opt = (Option) customOpts.get(optName);
             if (opt == null) opt = (Option) commonOpts.get(optList[i]);
             
             activeOpts.addOption(opt);
@@ -212,65 +216,39 @@ public class App {
         if ( System.getProperty(App.TRANSFORMER_FACTORY_PROPERTY) == null )
             System.setProperty(App.TRANSFORMER_FACTORY_PROPERTY, App.TRANSFORMER_FACTORY_DEFAULT);
 
-
-        // create the command line parser
+        // Initialize all of the dtd specifiers
+        dtdSpecifiers = new DtdSpecifier[numDtds];
+        for (int i = 0; i < numDtds; ++i) {
+            dtdSpecifiers[i] = new DtdSpecifier();
+        }
+        numDtdsFound = 0;
+        numTitlesFound = 0;
+        
+        // Parse the command line arguments
         CommandLineParser clp = new PosixParser();
         try {
-        
-            // Initialize all of the dtd specifiers
-            numDtds = _numDtds;
-            dtdSpecifiers = new DtdSpecifier[numDtds];
-            for (int i = 0; i < numDtds; ++i) {
-                dtdSpecifiers[i] = new DtdSpecifier();
-            }
-            numDtdsFound = 0;
-            numTitlesFound = 0;
-
-
-            // parse the command line arguments
             line = clp.parse( activeOpts, args );
 
-            for (int i = 0; i < optList.length; ++i) {
-                String optName = optList[i];
-                Option opt = activeOpts.getOption(optName);
-                
-                if (line.hasOption(optName)) {
-                    if (!optHandler.handleOption(opt)) {
-                        // The application didn't know what to do with it, so it
-                        // must be a common opt, for us to handle.
-                        handleOption(opt);
-                    }
+            // Loop through the given command-line options, in the order they were given.
+            Option[] lineOpts = line.getOptions();
+            for (int i = 0; i < lineOpts.length; ++i) {
+                Option opt = lineOpts[i];
+                String optName = opt.getLongOpt();
+
+                if (!optHandler.handleOption(opt)) {
+                    // The application didn't know what to do with it, so it
+                    // must be a common opt, for us to handle.
+                    handleOption(opt);
                 }
             }
 
-            
-          /*
-            // Loop through the dtd-specific options -d/-s/-p, and store the info in the
-            // DtdSpecifer objects.
-            Option[] lineOpts = line.getOptions();
-            //int n = 0;
-            for (int i = 0; i < lineOpts.length; ++i) {
-                Option opt = lineOpts[i];
-                //System.out.println("Option " + i + ": " + opt.getArgName() + ", " + (char) opt.getId());
-                int optId = opt.getId();
-                if (optId == 'd' || optId == 's' || optId == 'p') {
-                    if (n + 1 > numDtds) {
-                        usageError("Expected at most " + numDtds + " DTD specifier" +
-                                   (numDtds > 1 ? "s" : "") + "!");
-                    }
-                    dtdSpecifiers[n].idType = optId;
-                    dtdSpecifiers[n].idValue = opt.getValue();
-                    n++;
-                }
-            }
-          */
           
             // Now loop through any left-over arguments, and if we still
             // expect dtd specifiers, then use them up.  If there's one extra, and 
             // wantOutput is true, then we'll use that for the output filename.
             String[] rest = line.getArgs();
             for (int i = 0; i < rest.length; ++i) {
-                //System.out.println("looking at " + rest[i] + ", n is " + n +
+                //System.err.println("looking at " + rest[i] + ", numDtdsFound is " + numDtdsFound +
                 //    ", numDtds is " + numDtds + ", wantOutput is " + wantOutput);
                 if (numDtdsFound < numDtds) {
                     // Use this to initialize a dtd; assume it is a system id.
@@ -292,85 +270,33 @@ public class App {
                 usageError("Expected at least " + numDtds + " DTD specifier" + 
                            (numDtds > 1 ? "s" : "") + "!");
             }
+
             // Default output is to write to standard out
             if (wantOutput && output == null) {
                 output = new StreamResult(System.out);
             }
 
-            
-            // Loop through again, and pick up any title options given
-            /*
-            int n = 0;
-            for (int i = 0; i < lineOpts.length; ++i) {
-                Option opt = lineOpts[i];
-                int optId = opt.getId();
-                if (optId == 't') {
-                    if (n + 1 > numDtds) {
-                        usageError("Too many titles!");
-                    }
-                    dtdSpecifiers[n++].title = opt.getValue();
-                }
-            }*/
-            
             // Validate each dtd specifier object.  This also causes dummy XML documents
             // to be created for -s or -p specifiers.
             for (int i = 0; i < numDtds; ++i) {
                 dtdSpecifiers[i].validate();
             }
 
-            // Check for, and handle, the --catalog option
-            if (line.hasOption("c")) {
-                File catalog = new File(line.getOptionValue("c"));
-                if ( ! catalog.exists() || ! catalog.isFile() ) {
-                    System.err.println("Error: Specified catalog " + catalog.toString() + " is not a file" );
-                    System.exit(1);
-                }
-
-                // Set up catalog resolution
-                PMCBootStrapper bootstrapper = new PMCBootStrapper();
-                CatalogManager catalogManager = new CatalogManager();
-                catalogManager.setIgnoreMissingProperties(true);
-                URL oasisCatalog = catalogManager.getClass().getResource(App.OASIS_DTD);
-                bootstrapper.addMapping(App.OASIS_PUBLIC_ID, oasisCatalog.toString());
-                catalogManager.setBootstrapResolver(bootstrapper);
-                catalogManager.setCatalogFiles(catalog.toString());
-                resolver = new CatalogResolver(catalogManager);
-            }
-
-            // Check for, and handle, the --xsl option
-            try {
-                TransformerFactory f = TransformerFactory.newInstance();
-                if (line.hasOption("x")) {
-                    File xslFile = new File(line.getOptionValue("x"));
-                    if ( ! xslFile.exists() || ! xslFile.isFile() ) {
-                        System.err.println("Error: Specified xsl " + xslFile.toString() + " is not a file" );
-                        System.exit(1);
-                    }
-                    xslt = f.newTransformer(new StreamSource(xslFile));
-                }
-                else {
-                    // If no xsl was specified, use the identity transformer
+            // If no --xslt option was specified, then set the transformer to the
+            // identity transformer
+            if (xslt == null) {
+                try {
+                    // If no xslt was specified, use the identity transformer
+                    TransformerFactory f = TransformerFactory.newInstance();
                     xslt = f.newTransformer();
                     xslt.setOutputProperty(OutputKeys.INDENT, "yes");
                 }
+                catch (TransformerConfigurationException e) {
+                    System.err.println("Error configuring xslt transformer: " + e.getMessage());
+                    System.exit(1);
+                }
             }
-            catch (TransformerConfigurationException e) {
-                System.err.println("Error configuring xslt transformer: " + e.getMessage());
-                System.exit(1);
-            }
-
-            // Check for and store --roots
-            if (line.hasOption("r")) {
-                roots = line.getOptionValue("r").split("\\s");
-            }
-
-            // Check for and deal with the comment processor options
-            if (line.hasOption("m")) {
-                SComment.setCommentProcessor("pandoc");
-            }
-            else if (line.hasOption("docproc")) {
-                SComment.setCommentProcessor(line.getOptionValue("docproc"));
-            }
+            
 
             // Check for and deal with the --param option(s)
             if (line.hasOption("P")) {
@@ -385,44 +311,6 @@ public class App {
                     }
                 }
             }
-
-            // Check for and store all of the dtddocumentor options
-            if (line.hasOption("dir")) {
-                dir = line.getOptionValue("dir");
-            }
-            if (line.hasOption("css")) {
-                css = line.getOptionValue("css");
-            }
-            if (line.hasOption("js")) {
-                js = line.getOptionValue("js");
-            }
-            if (line.hasOption("include")) {
-                include = line.getOptionValue("include");
-            }
-            if (line.hasOption("nosuffixes")) {
-                suffixes = false;
-            }
-            if (line.hasOption("exclude")) {
-                excludeElems = line.getOptionValue("exclude");
-            }
-            if (line.hasOption("exclude-except")) {
-                excludeExcept = line.getOptionValue("exclude-except");
-            }
-            if (line.hasOption("basexslt")) {
-                basexslt = line.getOptionValue("basexslt");
-            }
-            if (line.hasOption("default-minimized")) {
-                defaultMinimized = true;
-            }
-            if (line.hasOption("full")) {
-                full = true;
-            }
-            if (line.hasOption("debug")) {
-                debug = true;
-            }
-            if (line.hasOption("jxml-out")) {
-                jxmlOut = true;
-            }
         }
         catch( ParseException exp ) {
             usageError(exp.getMessage());
@@ -431,10 +319,10 @@ public class App {
 
     /**
      * Here is where we handle any of the common command-line options.  This will
-     * be invoked from the {application}.handleOption() method, if that decides
-     * it doesn't know what to do with it.
+     * be invoked when the application class doesn't know what to do with a given
+     * option.
      */
-    public void handleOption(Option opt) {
+    public boolean handleOption(Option opt) {
         String optName = opt.getLongOpt();
         
         // Handle --help:
@@ -455,7 +343,7 @@ public class App {
 
         // Handle the DTD specifiers
         if (optName.equals("doc") || optName.equals("system") || optName.equals("public")) {
-            System.err.println("Found a DTD specifier option, number " + numDtdsFound);
+            //System.err.println("Found a DTD specifier option, number " + numDtdsFound);
             if (numDtdsFound + 1 > numDtds) {
                 usageError("Expected at most " + numDtds + " DTD specifier" +
                            (numDtds > 1 ? "s" : "") + "!");
@@ -463,16 +351,69 @@ public class App {
             dtdSpecifiers[numDtdsFound].idType = opt.getId();
             dtdSpecifiers[numDtdsFound].idValue = opt.getValue();
             numDtdsFound++;
+            return true;
         }
         
         // Handle the title option(s)
         if (optName.equals("title")) {
+            //System.err.println("Found title #" + numTitlesFound + ": '" + opt.getValue() + "'");
             if (numTitlesFound + 1 > numDtds) {
                 usageError("Too many titles!");
             }
             dtdSpecifiers[numTitlesFound++].title = opt.getValue();
+            return true;
         }
 
+        // Handle the --catalog option
+        if (optName.equals("catalog")) {
+            File catalog = new File(opt.getValue());
+            if ( ! catalog.exists() || ! catalog.isFile() ) {
+                System.err.println("Error: Specified catalog " + catalog.toString() + " is not a file" );
+                System.exit(1);
+            }
+
+            // Set up catalog resolution
+            PMCBootStrapper bootstrapper = new PMCBootStrapper();
+            CatalogManager catalogManager = new CatalogManager();
+            catalogManager.setIgnoreMissingProperties(true);
+            URL oasisCatalog = catalogManager.getClass().getResource(App.OASIS_DTD);
+            bootstrapper.addMapping(App.OASIS_PUBLIC_ID, oasisCatalog.toString());
+            catalogManager.setBootstrapResolver(bootstrapper);
+            catalogManager.setCatalogFiles(catalog.toString());
+            resolver = new CatalogResolver(catalogManager);
+            return true;
+        }
+        
+        // Handle the --roots option.  This option should only be used when there's
+        // one and only one DTD specified on the command line (i.e. not for dtdcompare).
+        if (optName.equals("roots")) {
+            roots = opt.getValue().split("\\s");
+            return true;
+        }
+
+        // Check for and deal with the comment processor options.  
+        // These are here under common options, because right now they are required
+        // for all commands -- see issue #36.  Even after that gets resolved, they
+        // will still be needed for both dtdanalyzer and dtddocumentor, so they
+        // should stay in the common list.
+        if (optName.equals("markdown")) {
+            SComment.setCommentProcessor("pandoc");
+            return true;
+        }
+        if (optName.equals("docproc")) {
+            SComment.setCommentProcessor(opt.getValue());
+            return true;
+        }
+        if (optName.equals("debug")) {
+            debug = true;
+            return true;
+        }
+        
+        System.err.println("Strange, unhandled command line option.  This should never " +
+            "happen; please create an issue on GitHub.");
+        System.exit(1);
+        
+        return false;
     }
 
 
@@ -592,6 +533,14 @@ public class App {
     }
 
     /**
+     * Allows an application class to set the XSLT transformer object.
+     */
+    public void setXslt(Transformer _xslt) {
+        xslt = _xslt;
+    }
+
+
+    /**
      * If --roots was given, this returns the value as an array
      */
     public String[] getRoots() {
@@ -606,87 +555,10 @@ public class App {
     }
 
     /**
-     * If --dir was given, this returns that value, otherwise null.
-     */
-    public String getDir() {
-        return dir;
-    }
-
-    /**
-     * If --css was given, this returns the value, otherwise null.
-     */
-    public String getCss() {
-        return css;
-    }
-
-    /**
-     * If --js was given, this returns the value, otherwise null.
-     */
-    public String getJs() {
-        return js;
-    }
-
-    /**
-     * If --include was given, this returns the value, otherwise null.
-     */
-    public String getInclude() {
-        return include;
-    }
-
-    /**
-     * If --nosuffixes was given, this returns false, otherwise true.
-     */
-    public boolean getSuffixes() {
-        return suffixes;
-    }
-
-    /**
-     * If --exclude was given, this returns the value, otherwise null.
-     */
-    public String getExcludeElems() {
-        return excludeElems;
-    }
-
-    /**
-     * If --exclude-except was given, this returns the value, otherwise null.
-     */
-    public String getExcludeExcept() {
-        return excludeExcept;
-    }
-
-    /**
-     * If --basexslt was given, this returns the value, otherwise null.
-     */
-    public String getBaseXslt() {
-        return basexslt;
-    }
-
-    /**
-     * If --default-minimized was given, this returns true, otherwise false.
-     */
-    public boolean getDefaultMinimized() {
-        return defaultMinimized;
-    }
-
-    /**
-     * If --full was given, this returns true, otherwise false.
-     */
-    public boolean getFull() {
-        return full;
-    }
-
-    /**
      * If --debug was given, this returns true, otherwise false.
      */
     public boolean getDebug() {
         return debug;
-    }
-
-    /**
-     * If --jxml-out was given, this returns true, otherwise false.
-     */
-    public boolean getJxmlOut() {
-        return jxmlOut;
     }
 
     /**
@@ -710,15 +582,28 @@ public class App {
      * can't have options that have the same long option name but mean different things.
      */
     private HashMap initCommonOpts() {
-        HashMap _commonOpts = new HashMap();
+        HashMap _opts = new HashMap();
         
-        _commonOpts.put("help", 
+        _opts.put("help", 
             new Option("h", "help", false, "Get help.")
         );
-        _commonOpts.put("version",
+        _opts.put("version",
             new Option("v", "version", false, "Print version number and exit.")
         );
-        _commonOpts.put("doc",
+        _opts.put("system",
+            OptionBuilder
+                .withLongOpt( "system" )
+                .withDescription("Use the given filename or system identifier to find the DTD. " +
+                    "This could be a relative " +
+                    "pathname, if the DTD exists in a file on your system, or an HTTP URL. " +
+                    "The '-s' switch is optional. " +
+                    "Note that if a catalog is in use, what looks like a filename might " +
+                    "resolve to something else entirely.")
+                .hasArg()
+                .withArgName("system-id")
+                .create('s')
+        );
+        _opts.put("doc",
             OptionBuilder
                 .withLongOpt( "doc" )
                 .withDescription("Specify an XML document used to find the DTD. This could be just a \"stub\" " +
@@ -728,16 +613,7 @@ public class App {
                 .withArgName("xml-file")
                 .create('d')
         );
-        _commonOpts.put("system",
-            OptionBuilder
-                .withLongOpt( "system" )
-                .withDescription("Use the given system identifier to find the DTD. This could be a relative " +
-                    "pathname, if the DTD exists in a file on your system, or an HTTP URL.")
-                .hasArg()
-                .withArgName("system-id")
-                .create('s')
-        );
-        _commonOpts.put("public",
+        _opts.put("public",
             OptionBuilder
                 .withLongOpt( "public" )
                 .withDescription("Use the given public identifier to find the DTD. This would be used in " +
@@ -746,45 +622,33 @@ public class App {
                 .withArgName("public-id")
                 .create('p')
         );
-        _commonOpts.put("catalog",
+        _opts.put("catalog",
             OptionBuilder
                 .withLongOpt( "catalog" )
-                .withDescription("Specify a file to use as the OASIS catalog, to resolve public identifiers.")
+                .withDescription("Specify a file to use as the OASIS catalog, to resolve system and " +
+                    "public identifiers.")
                 .hasArg()
                 .withArgName("catalog-file")
                 .create('c')
         );
-        _commonOpts.put("xslt",
-            OptionBuilder
-                .withLongOpt( "xslt" )
-                .withDescription("An XSLT script to run to post-process the output. This is optional.")
-                .hasArg()
-                .withArgName("xslt")
-                .create('x')
-        );
-        _commonOpts.put("title",
+        _opts.put("title",
             OptionBuilder
                 .withLongOpt( "title" )
-                .withDescription("Specify the title of this DTD. This will be output within a <title> " +
-                    "element under the root <declarations> element of the output XML.")
+                .withDescription("Specify the title of this DTD.")
                 .hasArg()
                 .withArgName("dtd-title")
                 .create('t')
         );
-        _commonOpts.put("roots",
+        _opts.put("roots",
             OptionBuilder
                 .withLongOpt("roots")
                 .withDescription("Specify the set of possible root elements for documents conforming " +
-                    "to this DTD.  These elements will be tagged with a 'root=true' attribute in " +
-                    "the output.  This will also cause the program to find those elements that " +
-                    "are not reachable from this set of possible root elements, and to tag those " +
-                    "with a 'reachable=false' attribute.  The argument to this " +
-                    "should be a space-delimited list of element names. ")
+                    "to this DTD.")
                 .hasArg()
                 .withArgName("roots")
                 .create('r')
         );
-        _commonOpts.put("docproc",
+        _opts.put("docproc",
             OptionBuilder
                 .withLongOpt("docproc")
                 .withDescription("Command to use to process structured comments.  This command should " +
@@ -793,15 +657,16 @@ public class App {
                 .withArgName("cmd")
                 .create()
         );
-        _commonOpts.put("markdown",
+        _opts.put("markdown",
             OptionBuilder
                 .withLongOpt("markdown")
                 .withDescription("Causes structured comments to be processed as Markdown. " +
                     "Requires pandoc to be installed on the system, and accessible to this process. " +
-                    "Same as \"--docproc 'pandoc'\".")
+                    "Same as \"--docproc pandoc\".  If you want to supply your own Markdown " +
+                    "processor, or any other processor, use the --docproc option.")
                 .create('m')
         );
-        _commonOpts.put("param",
+        _opts.put("param",
             OptionBuilder
                 .withLongOpt("param")
                 .hasArgs(2)
@@ -811,112 +676,19 @@ public class App {
                 .withArgName( "param=value" )
                 .create('P')
         );
-        _commonOpts.put("dir",
-            OptionBuilder
-                .withLongOpt("dir")
-                .withDescription("Specify the directory to which to write the output files. " +
-                    "Defaults to \"doc\".")
-                .hasArg()
-                .withArgName("dir")
-                .create()
-        );
-        _commonOpts.put("css",
-            OptionBuilder
-                .withLongOpt("css")
-                .withDescription("Specify a css file to add to each HTML.  " +
-                    "Defaults to dtddoc.css.")
-                .hasArg()
-                .withArgName("file")
-                .create()
-        );
-        _commonOpts.put("js",
-            OptionBuilder
-                .withLongOpt("js")
-                .withDescription("Specify a javascript file to add to each HTML.  " +
-                    "Defaults to expand.js.")
-                .hasArg()
-                .withArgName("file")
-                .create()
-        );
-        _commonOpts.put("include",
-            OptionBuilder
-                .withLongOpt("include")
-                .withDescription("Allows you to specify any number of additional " +
-                    "CSS and/or JS files.  This should be a space-delimited list.")
-                .hasArg()
-                .withArgName("files")
-                .create()
-        );
-        _commonOpts.put("nosuffixes",
-            OptionBuilder
-                .withLongOpt("nosuffixes")
-                .withDescription("If this option is given, it prevents the documentor " +
-                    "from adding suffixes to output filenames.  By default, these are " +
-                    "added to prevent problems on Windows machines when filenames differ " +
-                    "only by case (for example, \"leftarrow.html\" and \"LeftArrow\".html). ")
-                .create()
-        );
-        _commonOpts.put("exclude",
-            OptionBuilder
-                .withLongOpt("exclude")
-                .withDescription("List of elements that should be excluded from the " +
-                    "documentation.  This should be space-delimited.")
-                .hasArg()
-                .withArgName("elems")
-                .create()
-        );
-        _commonOpts.put("exclude-except",
-            OptionBuilder
-                .withLongOpt("exclude-except")
-                .withDescription("List of exceptions to the elements that should " +
-                    "be excluded.")
-                .hasArg()
-                .withArgName("elems")
-                .create()
-        );
-        _commonOpts.put("basexslt",
-            OptionBuilder
-                .withLongOpt("basexslt")
-                .withDescription("Path to the XSLT which will be imported by the output XSLT. " +
-                    "Defaults to \"../../xslt/xml2json.xsl\".")
-                .hasArg()
-                .withArgName("basexslt")
-                .create('b')
-        );
-        _commonOpts.put("default-minimized",
-            OptionBuilder
-                .withLongOpt("default-minimized")
-                .withDescription("If this option is given, then the default output from " +
-                    "the generated stylesheet will minimized, and not pretty.")
-                .create('u')
-        );
-        _commonOpts.put("full",
-            OptionBuilder
-                .withLongOpt("full")
-                .withDescription("If this option is given, then a complete schematron " +
-                    "will be generated from the DTD, as opposed to just extracting the " +
-                    "rules in the annotations.")
-                .create('f')
-        );
+
         /* 
           The 'q' here is a hack to get around some weird behavior that I can't figure out.
           If the 'q' is omitted, this option just doesn't work.
         */
-        _commonOpts.put("debug",
+        _opts.put("debug",
             OptionBuilder
                 .withLongOpt("debug")
                 .withDescription("Turns on debugging.")
                 .create('q')
         );
-        _commonOpts.put("jxml-out",
-            OptionBuilder
-                .withLongOpt("jxml-out")
-                .withDescription("Causes the generated stylesheet to output the JXML " +
-                    "intermediate format instead of JSON.")
-                .create()
-        );
 
-        return _commonOpts;
+        return _opts;
     }
 
    /**
@@ -933,7 +705,7 @@ public class App {
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
         formatter.setSyntaxPrefix("Usage:  ");
-        formatter.setOptionComparator(oc);
+        formatter.setOptionComparator(new OptionComparator(optList));
         formatter.printHelp(new PrintWriter(os, true), 80, cmdLineSyntax, usageHeader, activeOpts,
             2, 2, "");
     }
