@@ -109,7 +109,7 @@ public class App {
     //private String dtdTitle = null;
 
 
-    // DtdDocumentor options, to be passed in as XSLT params.
+    // DtdDocumentor and other options, to be passed in as XSLT params.
 
     private String dir = null;
     private String css = null;
@@ -128,23 +128,27 @@ public class App {
      * Constructor.  The list of options should be in the same order that you want them
      * to be output in the usage message.
      *
-     * @param needOutput - if this is true, then if there's a final argument on the
+     * @param wantOutput - if this is true, and if there's a final unused argument on the
      *   line, then it will be considered to be a filename we should write the output to.
      */
-    public App(String[] args, String[] optList, boolean needOutput, 
+    public App(String[] args, String[] optList, boolean wantOutput, 
                String _cmdLineSyntax, String _usageHeader) 
     {
-        _initialize(args, optList, needOutput, 1, _cmdLineSyntax, _usageHeader);
+        _initialize(args, optList, wantOutput, 1, _cmdLineSyntax, _usageHeader);
     }
     
-    public App(String[] args, String[] optList, boolean needOutput, int _numDtds,
+    /**
+     * Constructor.  Use this form when the command will accept more than one DTD argument;
+     * for example, dtdcompare.
+     */
+    public App(String[] args, String[] optList, boolean wantOutput, int _numDtds,
                String _cmdLineSyntax, String _usageHeader) 
     {
-        _initialize(args, optList, needOutput, _numDtds, _cmdLineSyntax, _usageHeader);
+        _initialize(args, optList, wantOutput, _numDtds, _cmdLineSyntax, _usageHeader);
     }
     
     
-    private void _initialize(String[] args, String[] optList, boolean needOutput,
+    private void _initialize(String[] args, String[] optList, boolean wantOutput,
                              int _numDtds, String _cmdLineSyntax, String _usageHeader) 
     {
         String homeStr = System.getProperty("DTDANALYZER_HOME");
@@ -159,7 +163,10 @@ public class App {
             buildtime = props.getProperty("buildtime");
         } 
         catch (IOException e) {
-            System.err.println("Warning:  failed to read app.properties file.");
+            System.err.println(
+                "Warning:  failed to read app.properties file.  This should exist in " +
+                "the DTDANALYZER_HOME directory."
+            );
         }
         
         initAllOpts();
@@ -186,13 +193,13 @@ public class App {
             line = clp.parse( activeOpts, args );
 
             // Handle --help:
-            if ( line.hasOption( "h" ) ) {
+            if ( line.hasOption("help") ) {
                 printUsage();
                 System.exit(0);
             }
             
             // Handle --version:
-            if ( line.hasOption("v") ) {
+            if ( line.hasOption("version") ) {
                 System.out.println(
                     "DtdAnalyzer utility, version " + version + "\n" +
                     "Built " + buildtime + "\n" +
@@ -229,18 +236,18 @@ public class App {
             
             // Now loop through any left-over arguments, and if we still
             // expect dtd specifiers, then use them up.  If there's one extra, and 
-            // needOutput is true, then we'll use that for the output filename.
+            // wantOutput is true, then we'll use that for the output filename.
             String[] rest = line.getArgs();
             for (int i = 0; i < rest.length; ++i) {
                 //System.out.println("looking at " + rest[i] + ", n is " + n +
-                //    ", numDtds is " + numDtds + ", needOutput is " + needOutput);
+                //    ", numDtds is " + numDtds + ", wantOutput is " + wantOutput);
                 if (n < numDtds) {
                     // Use this to initialize a dtd; assume it is a system id.
                     dtdSpecifiers[n].idType = 's';
                     dtdSpecifiers[n].idValue = rest[i];
                     n++;
                 }
-                else if (needOutput && output == null) {
+                else if (wantOutput && output == null) {
                     // Use this to initialize the output
                     output = new StreamResult(new File(rest[i]));
                 }
@@ -254,7 +261,7 @@ public class App {
                            (numDtds > 1 ? "s" : "") + "!");
             }
             // Default output is to write to standard out
-            if (needOutput && output == null) {
+            if (wantOutput && output == null) {
                 output = new StreamResult(System.out);
             }
 
@@ -390,6 +397,17 @@ public class App {
     }
 
     /**
+     * Here is where we handle any of the common command-line options.  This will
+     * be invoked from the {application}.handleOption() method, if that decides
+     * it doesn't know what to do with it.
+     */
+    public void handleOption(Option opt) {
+    }
+
+
+
+
+    /**
      * Get the home directory.  This is passed in from our startup scripts as the value of
      * the DTDANALYZER_HOME system property.
      */
@@ -486,13 +504,6 @@ public class App {
     public String getDtdTitle(int i) {
         return dtdSpecifiers[i].title;
     }
-
-
-
-
-
-
-
 
     /**
      * If --catalog was given, this will return a valid object, otherwise null.
@@ -608,7 +619,7 @@ public class App {
     }
 
     /**
-     * Get the output file/stream.  This will only be initialized if needOutput was
+     * Get the output file/stream.  This will only be initialized if wantOutput was
      * true when you called the constructor.
      */
     public StreamResult getOutput() {
@@ -628,12 +639,11 @@ public class App {
      * can't have options that have the same long option name but mean different things.
      */
     private void initAllOpts() {
-        allOpts.put("help", new Option("h", "help", false, "Get help"));
+        allOpts.put("help", 
+            new Option("h", "help", false, "Get help.")
+        );
         allOpts.put("version",
-            OptionBuilder
-                .withLongOpt( "version" )
-                .withDescription("Print version number and exit.")
-                .create('v')
+            new Option("v", "version", false, "Print version number and exit.")
         );
         allOpts.put("doc",
             OptionBuilder
@@ -842,6 +852,7 @@ public class App {
     public void printUsage() {
         printUsage(System.out);
     }
+
     /**
      * Outputs the usage message to an output stream (System.out or System.err).
      */

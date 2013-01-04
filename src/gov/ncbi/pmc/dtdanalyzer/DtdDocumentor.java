@@ -21,7 +21,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * demonstration and debugging.
  */
 
-public class DtdDocumentor {
+public class DtdDocumentor implements OptionHandler {
     
     private static App app;
     
@@ -132,5 +132,13 @@ public class DtdDocumentor {
             System.err.println("Could not run the transformation: " + e.getMessage());
             e.printStackTrace(System.out);
         }     
+    }
+
+    /**
+     * This method will be invoked for each of the command-line options that was given.
+     * If it is a custom option, handle it here, otherwise, kick it back to App.
+     */
+    public void handleOption(Option opt) {
+        app.handleOption(opt);
     }
 }

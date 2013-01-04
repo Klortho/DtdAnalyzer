@@ -17,7 +17,7 @@ import javax.xml.parsers.*;
 /**
  * Compares two DTDs
  */
-public class DtdCompare {
+public class DtdCompare implements OptionHandler {
     
     private static App app;
     
@@ -99,4 +99,13 @@ public class DtdCompare {
             e.printStackTrace(System.out);
         }     
     }
+
+    /**
+     * This method will be invoked for each of the command-line options that was given.
+     * If it is a custom option, handle it here, otherwise, kick it back to App.
+     */
+    public void handleOption(Option opt) {
+        app.handleOption(opt);
+    }
+
 }

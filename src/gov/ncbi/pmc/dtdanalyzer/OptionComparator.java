@@ -9,7 +9,7 @@ import org.apache.commons.cli.*;
 
 /**
  * Imposes an order on the output of options in the CLI usage message.
- * The argument to the constructor should be a string consisting of the short option letters,
+ * The argument to the constructor should be a String array of option names,
  * in the order that you want them to appear in the usage message.
  */
 public class OptionComparator implements Comparator {

@@ -19,7 +19,7 @@ import javax.xml.parsers.*;
  * a provided stylesheet. This is a bare-bones application intended for
  * demonstration and debugging.
  */
-public class DtdAnalyzer {
+public class DtdAnalyzer implements OptionHandler {
     
     private static App app;
     
@@ -80,5 +80,13 @@ public class DtdAnalyzer {
             System.err.println("Could not run the transformation: " + e.getMessage());
             e.printStackTrace(System.out);
         }     
+    }
+
+    /**
+     * This method will be invoked for each of the command-line options that was given.
+     * If it is a custom option, handle it here, otherwise, kick it back to App.
+     */
+    public void handleOption(Option opt) {
+        app.handleOption(opt);
     }
 }
