@@ -6,6 +6,7 @@ package gov.ncbi.pmc.dtdanalyzer;
 
 import org.apache.commons.cli.*;
 import java.io.*;
+import java.util.HashMap;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
@@ -19,10 +20,35 @@ import javax.xml.parsers.*;
  * a provided stylesheet. This is a bare-bones application intended for
  * demonstration and debugging.
  */
-public class DtdSchematron implements OptionHandler {
+public class DtdSchematron {
     
     private static App app;
+
+    /**
+     * The list of all of the options that this application can take, in the order
+     * that they will appear in the usage message.
+     */
+    private static String[] optList = {
+        "help", "version", "doc", "system", "public",
+        "full",
+        "catalog", "title", "roots", "docproc", "markdown", "param"
+    };
     
+    /**
+     * The set of options that are unique to this application
+     */
+    private static HashMap customOpts = initCustomOpts();
+
+    /**
+     * This inner class will be invoked for each of the command-line options that was given.
+     * If it is a custom option, handle it here, otherwise, kick it back to App.
+     */
+    private static OptionHandler optHandler = new OptionHandler() {
+        public boolean handleOption(Option opt) {
+            return false;
+        }
+    };
+
     /**
      * Main execution point. Checks arguments, then converts the DTD into XML.
      * This application currently uses Xerces and
@@ -32,12 +58,8 @@ public class DtdSchematron implements OptionHandler {
      */
     public static void main (String[] args) {
 
-        String[] optList = {
-            "help", "version", "doc", "system", "public",
-            "full",
-            "catalog", "title", "roots", "docproc", "markdown", "param"
-        };
-        app = new App(args, optList, true,
+
+        app = new App(args, optList, optHandler, customOpts, true,
             "DtdSchematron [-d <xml-file> | [-s] <system-id> | -p <public-id>] " +
             "[-f] " +
             "[-c <catalog>] [-t <title>] [<out>]",
@@ -87,10 +109,14 @@ public class DtdSchematron implements OptionHandler {
     }
 
     /**
-     * This method will be invoked for each of the command-line options that was given.
-     * If it is a custom option, handle it here, otherwise, kick it back to App.
+     * Initialize any application-specific command line options here.  These can also
+     * override the common options, if, for example, you want to change the usage
+     * message.  You can even override the usage message, but still let the App class
+     * handle the option.
      */
-    public void handleOption(Option opt) {
-        app.handleOption(opt);
+    private static HashMap initCustomOpts() {
+        HashMap _customOpts = new HashMap();
+        
+        return _customOpts;
     }
 }

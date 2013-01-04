@@ -6,6 +6,7 @@ package gov.ncbi.pmc.dtdanalyzer;
 
 import org.apache.commons.cli.*;
 import java.io.*;
+import java.util.HashMap;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
@@ -17,20 +18,41 @@ import javax.xml.parsers.*;
 /**
  * Compares two DTDs
  */
-public class DtdCompare implements OptionHandler {
+public class DtdCompare {
     
     private static App app;
+
+    /**
+     * The list of all of the options that this application can take, in the order
+     * that they will appear in the usage message.
+     */
+    private static String[] optList = {
+        "help", "version", "doc", "system", "public", "catalog", "title", 
+        "param"
+    };
     
+    /**
+     * The set of options that are unique to this application
+     */
+    private static HashMap customOpts = initCustomOpts();
+
+    /**
+     * This inner class will be invoked for each of the command-line options that was given.
+     * If it is a custom option, handle it here, otherwise, kick it back to App.
+     */
+    private static OptionHandler optHandler = new OptionHandler() {
+        public boolean handleOption(Option opt) {
+            return false;
+        }
+    };
+
     /**
      * Main execution point. 
      */
     public static void main (String[] args) {
 
-        String[] optList = {
-            "help", "version", "doc", "system", "public", "catalog", "title", 
-            "param"
-        };
-        app = new App(args, optList, true, 2,  /* this "2" means we want two dtds */
+
+        app = new App(args, optList, optHandler, customOpts, true, 2,  /* this "2" means we want two dtds */
             "dtdcompare [<options>]",
             "\nThis utility compares two DTDs and writes an HTML report. " +
             "Exactly two DTDs should be specified on the command line, with any " +
@@ -101,11 +123,14 @@ public class DtdCompare implements OptionHandler {
     }
 
     /**
-     * This method will be invoked for each of the command-line options that was given.
-     * If it is a custom option, handle it here, otherwise, kick it back to App.
+     * Initialize any application-specific command line options here.  These can also
+     * override the common options, if, for example, you want to change the usage
+     * message.  You can even override the usage message, but still let the App class
+     * handle the option.
      */
-    public void handleOption(Option opt) {
-        app.handleOption(opt);
+    private static HashMap initCustomOpts() {
+        HashMap _customOpts = new HashMap();
+        
+        return _customOpts;
     }
-
 }
