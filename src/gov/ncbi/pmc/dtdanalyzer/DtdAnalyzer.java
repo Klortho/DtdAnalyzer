@@ -31,7 +31,7 @@ public class DtdAnalyzer {
      */
     private static String[] optList = {
         "help", "version", "system", "doc", "public", "catalog", "xslt", "title", 
-        "roots", "docproc", "markdown", "param"
+        "roots", "docproc", "markdown", "param", "debug"
     };
     
     /**
@@ -88,7 +88,8 @@ public class DtdAnalyzer {
         app.initialize();
 
         // This parses the DTD, and corrals the data into a model:
-        ModelBuilder model = new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
+        ModelBuilder model = 
+            new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver(), app.getDebug());
 
         XMLWriter writer = new XMLWriter(model);
 
@@ -138,6 +139,16 @@ public class DtdAnalyzer {
                 .hasArg()
                 .withArgName("xslt")
                 .create('x')
+        );
+        /* 
+          The 'q' here is a hack to get around some weird behavior that I can't figure out.
+          If the 'q' is omitted, this option just doesn't work.
+        */
+        _opts.put("debug",
+            OptionBuilder
+                .withLongOpt("debug")
+                .withDescription("Turns on debugging messages.")
+                .create('q')
         );
 
         return _opts;

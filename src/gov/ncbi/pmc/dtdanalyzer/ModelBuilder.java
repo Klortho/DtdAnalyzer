@@ -31,11 +31,31 @@ public class ModelBuilder {
     private SComments scomments;               // All structured comments
 
     private HashSet _roots;                    // A list of all the root Elements
+    
+    private boolean debug = false;             // True if we should output debugging messages
 
     /**
-     * New version of constructor.  Does a lot more.
+     * Constructor.
      */
-    public ModelBuilder(DtdSpecifier _dtdSpec, String[] _roots, CatalogResolver _resolver) {
+     
+    public ModelBuilder(DtdSpecifier _dtdSpec, String[] _roots, CatalogResolver _resolver)
+    {
+        _init(_dtdSpec, _roots, _resolver, false);
+    }
+
+    /**
+     * Constructor; allows you to set the debug flag
+     */
+    public ModelBuilder(DtdSpecifier _dtdSpec, String[] _roots, CatalogResolver _resolver,
+                        boolean _debug) 
+    {
+        _init(_dtdSpec, _roots, _resolver, _debug);
+    }
+    
+    private void _init(DtdSpecifier _dtdSpec, String[] _roots, CatalogResolver _resolver,
+                       boolean _debug)
+    {
+        debug = _debug;
     
         // Perform set-up and parsing here.  The output of this step is a fully chopped up
         // and recorded representation of the DTD, stored in the DtdEventHandler object.
@@ -225,6 +245,13 @@ public class ModelBuilder {
     }
     
     /**
+     * Sets debug to true.
+     */ 
+    public void setDebug() {
+        debug = true;
+    }
+    
+    /**
      * Tokenizes the content model for an element and builds the context list. All
      * the element names inside the model represent children of the current element.
      * The current element is thus added as a parent to the "context" list of each 
@@ -316,16 +343,22 @@ public class ModelBuilder {
      */
 
     public void findReachable() throws Exception {
+        if (debug) System.err.println("Finding reachable elements.");
         Element r;
         
         // Pop a new reachable element off the queue, and check each of its kids, until done.
         while ((r = (Element) _toCheck.poll()) != null) {
+            if (debug) System.err.println("* <" + r.getName() + "> is reachable.");
             ContentModel cm = r.getContentModel();
             String spec = cm.getSpec();
             
             // If the spec is "any", then we're done -- all elements are reachable
-            if (spec.equals("any")) return;
+            if (spec.equals("any")) {
+                if (debug) System.err.println("  Allows any content, so we're done: everything is reachable.");
+                return;
+            }
             if (spec.equals("mixed") || spec.equals("element")) {
+                if (debug) System.err.println("  Kids not seen before:");
                 Iterator kids = cm.getKidsIter();
                 while (kids.hasNext()) {
                     String kn = (String) kids.next();
@@ -371,6 +404,7 @@ public class ModelBuilder {
     // that still need to be checked.
     private void _putReachable(Element r) {
         if (!_reachable.contains(r)) {
+            if (debug) System.err.println("    <" + r.getName() + ">");
             _reachable.add(r);
             _toCheck.add(r);
         }
@@ -380,6 +414,7 @@ public class ModelBuilder {
     // While doing that, it also adds it to _reachable, since every root is of course
     // reachable.
     private void _putRoot(Element r) {
+        if (debug) System.err.print("Root element:");
         if (!_roots.contains(r)) {
             _roots.add(r);
             _putReachable(r);

@@ -18,9 +18,6 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
- * Creates XML representation of an XML DTD and then transforms it using
- * a provided stylesheet. This is a bare-bones application intended for
- * demonstration and debugging.
  */
 
 public class DtdDocumentor {
@@ -34,7 +31,8 @@ public class DtdDocumentor {
     private static String[] optList = {
         "help", "version", "system", "doc", "public", "dir",
         "catalog", "title", "roots", "docproc", "markdown", "param",
-        "css", "js", "include", "entities", "nosuffixes", "exclude", "exclude-except"
+        "css", "js", "include", "entities", "nosuffixes", "exclude", "exclude-except",
+        "debug"
     };
 
     /**
@@ -83,7 +81,6 @@ public class DtdDocumentor {
                 return true;
             }
             
-
             return false;
         }
     };
@@ -118,7 +115,7 @@ public class DtdDocumentor {
     
         // This parses the DTD, and corrals the data into a model:
         ModelBuilder model = 
-            new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
+            new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver(), app.getDebug());
 
         XMLWriter writer = new XMLWriter(model);
 
@@ -274,6 +271,16 @@ public class DtdDocumentor {
                 .hasArg()
                 .withArgName("elems")
                 .create()
+        );
+        /* 
+          The 'q' here is a hack to get around some weird behavior that I can't figure out.
+          If the 'q' is omitted, this option just doesn't work.
+        */
+        _opts.put("debug",
+            OptionBuilder
+                .withLongOpt("debug")
+                .withDescription("Turns on debugging messages.")
+                .create('q')
         );
         
         return _opts;
