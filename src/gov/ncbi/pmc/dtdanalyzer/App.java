@@ -205,6 +205,12 @@ public class App {
             //System.err.println("    option " + optName);
             Option opt = (Option) customOpts.get(optName);
             if (opt == null) opt = (Option) commonOpts.get(optList[i]);
+            if (opt == null) {
+                System.err.println("Strange, undefined command line option '" + optName +
+                    "'.  This should never " +
+                    "happen; please create an issue on GitHub.");
+                System.exit(1);
+            }
             
             activeOpts.addOption(opt);
         }
