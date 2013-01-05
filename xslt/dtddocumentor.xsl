@@ -29,7 +29,7 @@
 	<xsl:param name="exclude-except" select="' '"/>
 	
   <!-- Controls documentation generation for parameter and general entities -->
-    <xsl:param name="entities" select="'off'"/>  
+  <xsl:param name="entities" select="'off'"/>  
 
 	<xsl:key name="entitiesByLCName" match="entity" use="lower-case(@name)"/>
 

@@ -6,6 +6,7 @@ package gov.ncbi.pmc.dtdanalyzer;
 
 import org.apache.commons.cli.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
@@ -105,11 +106,11 @@ public class Dtd2Xml2Json {
             File xslFile = new File(app.getHome(), "xslt/dtd2xml2json.xsl");
             Transformer xslt = 
                 TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
-            String[] xsltParams = app.getXsltParams();
-            int numXsltParams = xsltParams.length / 2;
+            ArrayList xsltParams = app.getXsltParams();
+            int numXsltParams = xsltParams.size() / 2;
             if (numXsltParams > 0) {
                 for (int i = 0; i < numXsltParams; ++i) {
-                    xslt.setParameter(xsltParams[2*i], xsltParams[2*i+1]);
+                    xslt.setParameter((String) xsltParams.get(2*i), (String) xsltParams.get(2*i+1));
                 }
             }
 

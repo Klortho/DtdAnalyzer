@@ -7,9 +7,11 @@
 package gov.ncbi.pmc.dtdanalyzer;
 
 import org.apache.commons.cli.*;
-import java.util.HashMap;
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
@@ -123,7 +125,7 @@ public class App {
 
     // If --params was given, this holds the keys and values in an array.  Even
     // indeces are keys, odd indeces are values.
-    private String[] xsltParams = new String[0];
+    private ArrayList xsltParams = new ArrayList();
 
     private StreamResult output = null;
 
@@ -304,19 +306,6 @@ public class App {
             }
             
 
-            // Check for and deal with the --param option(s)
-            if (line.hasOption("P")) {
-                xsltParams = line.getOptionValues("P");
-                int numXsltParams = xsltParams.length / 2;
-                //System.err.println("num of params: " + num);
-                for (int i = 0; i < numXsltParams; ++i) {
-                    // parameter name can't be empty
-                    if (xsltParams[i*2].length() == 0) {
-                        System.err.println("XSLT parameter name can't be empty");
-                        System.exit(1);
-                    }
-                }
-            }
         }
         catch( ParseException exp ) {
             usageError(exp.getMessage());
@@ -414,7 +403,18 @@ public class App {
             debug = true;
             return true;
         }
-        
+
+        // Check for and deal with the --param option
+        if (optName.equals("param")) {
+            String[] values = opt.getValues();
+            if (values[0].length() == 0) {
+                System.err.println("XSLT parameter name can't be empty");
+                System.exit(1);
+            }
+            xsltParams.addAll(Arrays.asList(values));
+            return true;
+        }
+
         System.err.println("Strange, unhandled command line option.  This should never " +
             "happen; please create an issue on GitHub.");
         System.exit(1);
@@ -556,7 +556,7 @@ public class App {
     /**
      * If --params was given, this returns the keys and values in an alternating array.
      */
-    public String[] getXsltParams() {
+    public ArrayList getXsltParams() {
         return xsltParams;
     }
 

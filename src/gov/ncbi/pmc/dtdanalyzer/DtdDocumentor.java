@@ -6,6 +6,7 @@ package gov.ncbi.pmc.dtdanalyzer;
 
 import org.apache.commons.cli.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
@@ -33,7 +34,7 @@ public class DtdDocumentor {
     private static String[] optList = {
         "help", "version", "system", "doc", "public", "dir",
         "catalog", "title", "roots", "docproc", "markdown", "param",
-        "css", "js", "include", "nosuffixes", "exclude", "exclude-except"
+        "css", "js", "include", "entities", "nosuffixes", "exclude", "exclude-except"
     };
 
     /**
@@ -65,6 +66,10 @@ public class DtdDocumentor {
                 include = opt.getValue();
                 return true;
             }
+            if (optName.equals("entities")) {
+                entities = true;
+                return true;
+            }
             if (optName.equals("nosuffixes")) {
                 suffixes = false;
                 return true;
@@ -88,6 +93,7 @@ public class DtdDocumentor {
     private static String css = null;
     private static String js = null;
     private static String include = null;
+    private static boolean entities = false;
     private static boolean suffixes = true;
     private static String excludeElems = null;
     private static String excludeExcept = null;
@@ -126,11 +132,11 @@ public class DtdDocumentor {
             File xslFile = new File(app.getHome(), "xslt/dtddocumentor.xsl");
             Transformer xslt = 
                 TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
-            String[] xsltParams = app.getXsltParams();
-            int numXsltParams = xsltParams.length / 2;
+            ArrayList xsltParams = app.getXsltParams();
+            int numXsltParams = xsltParams.size() / 2;
             if (numXsltParams > 0) {
                 for (int i = 0; i < numXsltParams; ++i) {
-                    xslt.setParameter(xsltParams[2*i], xsltParams[2*i+1]);
+                    xslt.setParameter((String) xsltParams.get(2*i), (String) xsltParams.get(2*i+1));
                 }
             }
             
@@ -149,6 +155,7 @@ public class DtdDocumentor {
             
             if (include != null) xslt.setParameter("include-files", include);
             
+            if (entities) xslt.setParameter("entities", "on");
             xslt.setParameter("filesuffixes", suffixes);
             
             if (excludeElems != null) xslt.setParameter("exclude-elems", excludeElems);
@@ -233,6 +240,14 @@ public class DtdDocumentor {
                 .withArgName("files")
                 .create()
         );
+        _opts.put("entities",
+            OptionBuilder
+                .withLongOpt("entities")
+                .withDescription("Causes parameter and general entities to be " +
+                    "included in the documentation.  By default they are not.")
+                .create('e')
+        );
+
         _opts.put("nosuffixes",
             OptionBuilder
                 .withLongOpt("nosuffixes")

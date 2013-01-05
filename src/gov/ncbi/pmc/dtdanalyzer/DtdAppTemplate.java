@@ -7,6 +7,7 @@ package gov.ncbi.pmc.dtdanalyzer;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.Source;
@@ -81,11 +82,11 @@ public class DtdAppTemplate {
             Transformer xslt = app.getXslt();
             
             // Get XSLT parameters, these are from the --params option.
-            String[] xsltParams = app.getXsltParams();
-            int numXsltParams = xsltParams.length / 2;
+            ArrayList xsltParams = app.getXsltParams();
+            int numXsltParams = xsltParams.size() / 2;
             if (numXsltParams > 0) {
                 for (int i = 0; i < numXsltParams; ++i) {
-                    xslt.setParameter(xsltParams[2*i], xsltParams[2*i+1]);
+                    xslt.setParameter((String) xsltParams.get(2*i), (String) xsltParams.get(2*i+1));
                 }
             }
             
