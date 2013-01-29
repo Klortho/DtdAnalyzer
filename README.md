@@ -1,5 +1,5 @@
-###[DtdAnalyzer on Github Pages](http://ncbitools.github.com/DtdAnalyzer/)
+###[DtdAnalyzer Home](http://dtd.nlm.nih.gov/ncbi/dtdanalyzer/)
 
-The [DtdAnalyzer page](http://ncbitools.github.com/DtdAnalyzer/) on
-[Github Pages](http://pages.github.com) offers a quick, easy way to download the most recent version
-of the [DtdAnalyzer](https://github.com/NCBITools/DtdAnalyzer) and view its README file.
+This branch of the DtdAnalyzer repository *was* for the web home of the project
+on GitHub pages, but we have moved the home page to http://dtd.nlm.nih.gov/ncbi/dtdanalyzer/. 
+Please update your bookmarks.
