@@ -527,7 +527,7 @@
 					<xsl:value-of select="@type"/>
 				</h3>
 			</xsl:if>
-			<xsl:copy-of select="* except tag" copy-namespaces="no"/>
+			<xsl:copy-of select="text()|* except tag" copy-namespaces="no"/>
 			<xsl:if test="@type='tags'">
 				<p>
 					<xsl:apply-templates select="tag"/>
