@@ -38,14 +38,14 @@
 
   <xsl:template match="attributes">
     <xsl:if test="attribute[annotations/annotation[@type='schematron']]">
-      <sch:pattern id="attributes">
+      <sch:pattern id="user-attributes">
         <sch:title>User Attribute Checks</sch:title>
         <xsl:apply-templates select="attribute[annotations/annotation[@type='schematron']]"/>
       </sch:pattern>
     </xsl:if>
     <xsl:if
       test="$complete='yes' and attribute[attributeDeclaration[@mode='#REQUIRED']] or attribute[attributeDeclaration[@mode='#FIXED']] or attribute[attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']]">
-      <sch:pattern id="attributes">
+      <sch:pattern id="dtd-attributes">
         <sch:title>DTD Attribute Checks</sch:title>
         <xsl:apply-templates
           select="attribute[attributeDeclaration[@mode='#REQUIRED']] | attribute[attributeDeclaration[@mode='#FIXED']] | attribute[attributeDeclaration[starts-with(@type, '(') and @mode!='#FIXED']]"
