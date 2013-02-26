@@ -17,3 +17,10 @@ xsltproc sample4-2json.xsl sample4.xml > sample4.json
 dtd2xml2json sample5.dtd -b ../../xslt/xml2json.xsl sample5-2json.xsl
 xsltproc sample5-2json.xsl sample5.xml > sample5.json
 
+# Sample 6 will check for duplicate JSON key.  But first, run it without
+# any check:
+dtd2xml2json sample6.dtd -b ../../xslt/xml2json.xsl sample6-2json-nocheck.xsl
+xsltproc sample6-2json-nocheck.xsl sample6.xml > sample6.json
+# Now run it to generate the XSLT that includes the checks:
+dtd2xml2json --check-json sample6.dtd -b ../../xslt/xml2json.xsl sample6-2json-check.xsl
+

@@ -30,6 +30,11 @@
   <!-- Set this to true to cause the generated stylesheet to output
     JXML instead of JSON. -->
   <xsl:param name='jxml-out' select='false()'/>
+
+  <!-- Set this to true to cause the generated stylesheet to do some additional
+    quality checks on the JSON before outputting it. -->
+  <xsl:param name='check-json' select='false()'/>
+  
   
   <xsl:variable name='nl' select='"&#10;"'/>
   
@@ -469,15 +474,26 @@
         <xsl:copy-of select='$dtdJA'/>
       </x:param>
       
-      <!-- 
-        If we're supposed to put out JXML instead of JSON, override the
-        root template to prevent serialization.
-      -->
-      <xsl:if test='$jxml-out'>
-        <x:template match='/'>
-          <x:call-template name='root'/>
-        </x:template>
-      </xsl:if>
+      <xsl:choose>
+        <!-- 
+          If we're supposed to put out JXML instead of JSON, override the
+          root template to prevent serialization.
+        -->
+        <xsl:when test='$jxml-out'>
+          <x:template match='/'>
+            <x:call-template name='root'/>
+          </x:template>
+        </xsl:when>
+        <!--
+          If, on the other hand, we're instructed to do additional quality checks
+          on the output, then override the root template in a different way.
+        -->
+        <xsl:when test='$check-json'>
+          <x:template match="/">
+            <x:call-template name='check-json'/>
+          </x:template>
+        </xsl:when>
+      </xsl:choose>
       
       <!-- Now generate the templates for each element and attribute. -->
       <xsl:for-each-group select="$allItems//item"

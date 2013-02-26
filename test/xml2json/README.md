@@ -16,3 +16,6 @@ to make sure everything worked:
     diff sample2b.ref.json sample2b.json
     diff sample3.ref.json sample3.json
     diff sample4.ref.json sample4.json
+
+The perl script `test-samples.pl` combines the above two steps.
+ 

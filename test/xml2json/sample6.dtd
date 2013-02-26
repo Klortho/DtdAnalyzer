@@ -1,0 +1,16 @@
+<!--
+  Test that invalid JSON is correctly caught by the XSLTs, when the
+  ??? command-line option is given.
+-->
+
+<!ELEMENT Result (DbInfo?)>
+
+<!--~~ <DbInfo>
+~~json <object/>
+~~-->
+<!ELEMENT DbInfo (DbName | MenuName | Description)*>
+
+<!ELEMENT DbName (#PCDATA)>
+<!ELEMENT MenuName (#PCDATA)>
+<!ELEMENT Description (#PCDATA)>
+

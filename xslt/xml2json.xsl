@@ -319,9 +319,6 @@
     </o>
   </xsl:template>
 
-
-  
-
   <!--
     s
     There are separate template here for when we don't know the context
@@ -565,13 +562,7 @@
     </b>
   </xsl:template>
   
-  
-  
-  
-  
-  
-  
-  
+ 
   <!--
     a 
     Delegates either to a-in-o or a-in-a.
@@ -618,12 +609,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
 
-
-
-  
   
   <!--
     a-in-o
@@ -870,6 +856,34 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:value-of select='np:key-simple($indent, @k, $v, position() != last())'/>
+  </xsl:template>
+  
+  <!--=====================================================
+    This last template is used in testing the output for consistency, and
+    is enabled when the 'check-json' command line option is given.  It first 
+    generates the JXML, and then runs it, recursively, through the checker
+    template with mode="check-jxml".
+  -->
+  <xsl:template name='check-json'>
+    <xsl:variable name='jxml-v'>
+      <xsl:call-template name="root"/>
+    </xsl:variable>
+    <xsl:variable name='jxml' select='c:node-set($jxml-v)/*'/>
+    <xsl:for-each select='$jxml'>
+      <xsl:apply-templates mode='check-jxml'/>
+    </xsl:for-each>
+    <xsl:apply-templates select='$jxml' mode='serialize-jxml-array'/>
+  </xsl:template>
+
+  <xsl:template match='*' mode='check-jxml'>
+    <xsl:variable name='k' select='@k'/>
+    <xsl:if test='$k = ""'>
+      <xsl:message terminate="yes">Empty key found in JSON result!</xsl:message>
+    </xsl:if>
+    <xsl:if test='$k != "" and preceding-sibling::*[@k = $k]'>
+      <xsl:message terminate="yes">Duplicate key found in JSON result!</xsl:message>
+    </xsl:if>
+    <xsl:apply-templates select='*' mode='check-jxml'/>
   </xsl:template>
   
   

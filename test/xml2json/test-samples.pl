@@ -15,9 +15,10 @@ my @samples = qw(
     sample1 sample2a sample2b sample2c sample3 sample4 sample5
 );
 # Set this to true if you have jsonlint installed.
-my $test_jsonlint = 0;
+my $test_jsonlint = 1;
 
 my $failpref = "****** Failed: ";
+
 
 
 print "Generating outputs for each of the samples.\n";
@@ -51,3 +52,16 @@ if ($test_jsonlint) {
         }
     }
 }
+
+
+# Test sample6 with --check-json
+print "Testing 6 with JSON checking.\n";
+system('xsltproc sample6-2json-check.xsl sample6.xml > /dev/null 2>\&1');
+if (($? >> 8) == 0) {
+    die "Sample6 failed to fail.  Should have gotten an error result about invalid JSON.\n";
+}
+
+print "okay";
+
+
+

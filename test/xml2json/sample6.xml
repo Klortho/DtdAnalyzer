@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Result SYSTEM "sample6.dtd">
+
+<Result>
+  <DbInfo>
+    <!-- Legal XML, but will produce JSON with duplicate keys -->
+    <DbName>Fleegle</DbName>
+    <DbName>Fleegle</DbName>
+  </DbInfo>
+</Result>

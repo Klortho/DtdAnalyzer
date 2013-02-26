@@ -33,7 +33,7 @@ public class Dtd2Xml2Json {
         "help", "version", "system", "doc", "public", 
         "basexslt", "default-minimized",
         "catalog", "docproc", "markdown", "param",
-        "debug", "jxml-out"
+        "debug", "jxml-out", "check-json"
     };
 
     /**
@@ -65,6 +65,11 @@ public class Dtd2Xml2Json {
                 return true;
             }
 
+            if (optName.equals("check-json")) {
+                checkJson = true;
+                return true;
+            }
+
             return false;
         }
     };
@@ -74,6 +79,7 @@ public class Dtd2Xml2Json {
     private static String basexslt = null;
     private static boolean defaultMinimized = false;
     private static boolean jxmlOut = false;
+    private static boolean checkJson = false;
 
     /**
      * Main execution point. Checks arguments, then converts the DTD into XML.
@@ -127,6 +133,9 @@ public class Dtd2Xml2Json {
             // Get the jxml-out option, if given, and pass that in.
             xslt.setParameter("jxml-out", jxmlOut);
 
+            // Get the check-json option, if given, and pass that in.
+            xslt.setParameter("check-json", checkJson);
+
 
             // Use this constructor because Saxon always 
             // looks for a system id even when a reader is used as the source  
@@ -171,6 +180,16 @@ public class Dtd2Xml2Json {
                 .withLongOpt("jxml-out")
                 .withDescription("Causes the generated stylesheet to output the JXML " +
                     "intermediate format instead of JSON. This is used for debugging.")
+                .create()
+        );
+        _opts.put("check-json",
+            OptionBuilder
+                .withLongOpt("check-json")
+                .withDescription("Causes the generated stylesheet do some additional " +
+                    "quality checks on the generated JSON, at runtime.  This should not be " +
+                    "used to generate your final, production-ready XSLTs! " +
+                    "Specifically, this looks for empty or duplicate object keys, and " +
+                    "causes the XSLT to terminate with an error message, if it finds any." )
                 .create()
         );
         
