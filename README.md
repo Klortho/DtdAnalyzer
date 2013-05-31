@@ -23,9 +23,9 @@ wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
 ##Quick start
 
 * Download the latest release, either as a zip file:
-  [DtdAnalyzer-0.3.zip](http://dtd.ncbi.nlm.nih.gov/ncbi/dtdanalyzer/downloads/DtdAnalyzer-0.3.zip);
+  [DtdAnalyzer-0.3.zip](http://dtd.nlm.nih.gov/ncbi/dtdanalyzer/downloads/DtdAnalyzer-0.3.zip);
   or as a gzipped tar:
-  [DtdAnalyzer-0.3.tar.gz](http://dtd.ncbi.nlm.nih.gov/ncbi/dtdanalyzer/downloads/DtdAnalyzer-0.3.tar.gz).
+  [DtdAnalyzer-0.3.tar.gz](http://dtd.nlm.nih.gov/ncbi/dtdanalyzer/downloads/DtdAnalyzer-0.3.tar.gz).
 
   _**Note:**  Do not use the "Zip" download button on the main GitHub page!
   That button downloads the *source files*, not the pre-built packages.
