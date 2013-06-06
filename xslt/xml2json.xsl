@@ -88,8 +88,18 @@
   
   <!--
     Quote a string to prepare it for insertion into a JSON literal value.
+    There are two versions coded up here: one with EXSLT's replace function, and
+    one (for older versions of libxslt) that uses straight XSLT recursion. 
+    Point the np:json-escape function to the one you want to use.
   -->
-  <f:function name="np:json-escape">
+  <f:function name='np:json-escape'>
+    <xsl:param name='s'/>
+    <f:result>
+      <xsl:value-of select='np:json-escape-with-recursion($s)'/>
+    </f:result>
+  </f:function>
+  
+  <f:function name="np:json-escape-with-replace">
     <xsl:param name="s"/>
     <xsl:variable name="quot">"</xsl:variable>
     <xsl:variable name="bs">\</xsl:variable>
@@ -116,6 +126,66 @@
       <xsl:value-of select="$result"/>
     </f:result>
   </f:function>
+
+  <f:function name="np:json-escape-with-recursion">
+    <xsl:param name="s"/>
+    <xsl:variable name="quot">"</xsl:variable>
+    <xsl:variable name="bs">\</xsl:variable>
+    <xsl:variable name='nl' select='"&#10;"'/>
+    <xsl:variable name='cr' select='"&#13;"'/>
+    <xsl:variable name='tab' select='"&#9;"'/>
+    <f:result>
+      <xsl:call-template name='replace-char'>
+        <xsl:with-param name='s'>
+          <xsl:call-template name="replace-char">
+            <xsl:with-param name='s'>
+              <xsl:call-template name="replace-char">
+                <xsl:with-param name='s'>
+                  <xsl:call-template name="replace-char">
+                    <xsl:with-param name='s'>
+                      <xsl:call-template name="replace-char">
+                        <xsl:with-param name='s' select='$s'/>
+                        <xsl:with-param name="c" select='$bs'/>
+                        <xsl:with-param name="r" select='concat($bs, $bs)'/>
+                      </xsl:call-template>
+                    </xsl:with-param>
+                    <xsl:with-param name="c" select='$quot'/>
+                    <xsl:with-param name="r" select='concat($bs, $quot)'/>
+                  </xsl:call-template>
+                </xsl:with-param>
+                <xsl:with-param name="c" select='$nl'/>
+                <xsl:with-param name="r" select='concat($bs, "n")'/>
+              </xsl:call-template>
+            </xsl:with-param>
+            <xsl:with-param name="c" select='$cr'/>
+            <xsl:with-param name="r" select='concat($bs, "r")'/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="c" select='$tab'/>
+        <xsl:with-param name="r" select='concat($bs, "t")'/>
+      </xsl:call-template>
+    </f:result>
+  </f:function>
+
+  <xsl:template name='replace-char'>
+    <xsl:param name="s"/>
+    <xsl:param name="c"/>
+    <xsl:param name="r"/>
+    
+    <xsl:choose>
+      <xsl:when test='contains($s, $c)'>
+        <xsl:value-of select='concat(substring-before($s, $c), $r)'/>
+        <xsl:call-template name='replace-char'>
+          <xsl:with-param name="s" select="substring-after($s, $c)"/>
+          <xsl:with-param name="c" select='$c'/>
+          <xsl:with-param name="r" select='$r'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select='$s'/>
+      </xsl:otherwise>
+    </xsl:choose>    
+  </xsl:template>
   
   <!-- 
     Convenience function to wrap any string in double-quotes.  This 

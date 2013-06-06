@@ -11,9 +11,11 @@
 use strict;
 use File::Compare;
 
+#    sample1 sample2a sample2b sample2c sample3 sample4 sample5
 my @samples = qw(
-    sample1 sample2a sample2b sample2c sample3 sample4 sample5
+    sample2c
 );
+
 # Set this to true if you have jsonlint installed.
 my $test_jsonlint = 1;
 
