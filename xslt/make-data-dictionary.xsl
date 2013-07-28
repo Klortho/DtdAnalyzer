@@ -365,7 +365,7 @@
          </p>
          <p style="margin-top: 0">
             <xsl:call-template name="make-model-links">
-               <xsl:with-param name="str" select="@model"/>
+               <xsl:with-param name="str" select="content-model/@minified"/>
             </xsl:call-template>
          </p>
 
