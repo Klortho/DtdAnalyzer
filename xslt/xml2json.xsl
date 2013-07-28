@@ -95,7 +95,7 @@
   <f:function name='np:json-escape'>
     <xsl:param name='s'/>
     <f:result>
-      <xsl:value-of select='np:json-escape-with-recursion($s)'/>
+      <xsl:value-of select='np:json-escape-with-replace($s)'/>
     </f:result>
   </f:function>
   
