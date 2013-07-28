@@ -4,23 +4,29 @@
 
 package gov.ncbi.pmc.dtdanalyzer;
 
-import org.apache.commons.cli.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.xml.transform.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
-import org.apache.xml.resolver.tools.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.XMLReaderFactory;
-import javax.xml.parsers.*;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 
 /**
  * Compares two DTDs
  */
 public class DtdCompare {
-    
+
     private static App app;
 
     /**
@@ -28,10 +34,10 @@ public class DtdCompare {
      * that they will appear in the usage message.
      */
     private static String[] optList = {
-        "help", "version", "system", "doc", "public", "catalog", "title", 
+        "help", "version", "system", "doc", "public", "catalog", "title",
         "param"
     };
-    
+
     /**
      * The set of options that are unique to this application
      */
@@ -44,20 +50,20 @@ public class DtdCompare {
     private static OptionHandler optHandler = new OptionHandler() {
         public boolean handleOption(Option opt) {
             String optName = opt.getLongOpt();
-          
+
           /*
             if (optName.equals("...")) {
                 ... = opt.getValue();
                 return true;
             }
           */
-            
+
             return false;
         }
     };
 
     /**
-     * Main execution point. 
+     * Main execution point.
      */
     public static void main (String[] args) {
 
@@ -78,12 +84,14 @@ public class DtdCompare {
         try {
             ModelBuilder model = new ModelBuilder(app.getDtdSpec(1), app.getRoots(), app.getResolver());
             XMLWriter writer = new XMLWriter(model);
-            
+
             f = File.createTempFile("dtdcompare-", ".xml");
-            FileWriter fw = new FileWriter(f);
+            FileOutputStream fos = new FileOutputStream(f);
+            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+            //FileWriter fw = new FileWriter(f);
             StringWriter sw = writer.getBuffer();
-            fw.write(sw.toString());
-            fw.close();
+            osw.write(sw.toString());
+            osw.close();
         }
         catch (IOException ioe) {
             System.err.println("Failed to write DTD 2 results to temp file: " +
@@ -91,11 +99,11 @@ public class DtdCompare {
             System.exit(1);
         }
         //System.out.println("Temp file is " + f.getAbsolutePath());
-        
+
         // Parse DTD 1
         ModelBuilder model = new ModelBuilder(app.getDtdSpec(0), app.getRoots(), app.getResolver());
         XMLWriter writer = new XMLWriter(model);
-        
+
         // Now run the XSLT transformation.  This defaults to the identity transform, if
         // no XSLT was specified.
 
@@ -103,7 +111,7 @@ public class DtdCompare {
             InputStreamReader reader = writer.getXML();
 
             File xslFile = new File(app.getHome(), "xslt/dtdcompare.xsl");
-            Transformer xslt = 
+            Transformer xslt =
                 TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
 
             ArrayList xsltParams = app.getXsltParams();
@@ -113,21 +121,21 @@ public class DtdCompare {
                     xslt.setParameter((String) xsltParams.get(2*i), (String) xsltParams.get(2*i+1));
                 }
             }
-            
+
             // Pass in the dtd2-loc as a parameter
-            xslt.setParameter("dtd2-loc", f.getAbsolutePath());
-            
-            // Use this constructor because Saxon always 
-            // looks for a system id even when a reader is used as the source  
+            xslt.setParameter("dtd2-loc", f.toURI().toString());
+
+            // Use this constructor because Saxon always
+            // looks for a system id even when a reader is used as the source
             // If no string is provided for the sysId, we get a null pointer exception
             Source xmlSource = new StreamSource(reader, "");
             xslt.transform(xmlSource, app.getOutput());
         }
 
-        catch (Exception e){ 
+        catch (Exception e){
             System.err.println("Could not run the transformation: " + e.getMessage());
             e.printStackTrace(System.out);
-        }     
+        }
     }
 
     /**
@@ -150,7 +158,7 @@ public class DtdCompare {
                 .withArgName("dtd-title")
                 .create('t')
         );
-        
+
         return _opts;
     }
 }
