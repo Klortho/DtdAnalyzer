@@ -6,11 +6,11 @@
                 xmlns:f="http://exslt.org/functions"
                 xmlns:c="http://exslt.org/common"
                 extension-element-prefixes="c np str f">
-  
-  
+
+
   <!-- Turn off pretty-printing by setting this to false() -->
   <xsl:param name='pretty' select='true()'/>
-  
+
   <!-- By default, do not convert all names to lowercase -->
   <xsl:param name='lcnames' select='false()'/>
 
@@ -28,8 +28,8 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
-  
-  <!-- $iu = indent unit (four spaces) when pretty-printing; 
+
+  <!-- $iu = indent unit (four spaces) when pretty-printing;
     otherwise empty string -->
   <xsl:variable name='iu'>
     <xsl:choose>
@@ -41,27 +41,27 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
-  
-  
+
+
   <!--================================================
     Utility templates and functions
   -->
-  
-  <!-- 
+
+  <!--
     Convert a string to lowercase
   -->
-  
+
   <xsl:variable name="lo" select="'abcdefghijklmnopqrstuvwxyz'"/>
   <xsl:variable name="hi" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
-  
+
   <f:function name='np:lower-case'>
     <xsl:param name='s'/>
     <f:result>
       <xsl:value-of select="translate($s, $hi, $lo)"/>
     </f:result>
   </f:function>
-  
-  <!-- 
+
+  <!--
     Converts the name of the current context element or attribute
     into lowercase, only if the $lcnames param is true.
   -->
@@ -76,7 +76,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <f:function name="np:translate-name">
     <xsl:param name="s" select='name(.)'/>
     <f:result>
@@ -85,11 +85,11 @@
       </xsl:call-template>
     </f:result>
   </f:function>
-  
+
   <!--
     Quote a string to prepare it for insertion into a JSON literal value.
     There are two versions coded up here: one with EXSLT's replace function, and
-    one (for older versions of libxslt) that uses straight XSLT recursion. 
+    one (for older versions of libxslt) that uses straight XSLT recursion.
     Point the np:json-escape function to the one you want to use.
   -->
   <f:function name='np:json-escape'>
@@ -98,7 +98,7 @@
       <xsl:value-of select='np:json-escape-with-replace($s)'/>
     </f:result>
   </f:function>
-  
+
   <f:function name="np:json-escape-with-replace">
     <xsl:param name="s"/>
     <xsl:variable name="quot">"</xsl:variable>
@@ -106,22 +106,22 @@
     <xsl:variable name='nl' select='"&#10;"'/>
     <xsl:variable name='cr' select='"&#13;"'/>
     <xsl:variable name='tab' select='"&#9;"'/>
-    <xsl:variable name="result" 
+    <xsl:variable name="result"
       select="str:replace(
                 str:replace(
                   str:replace(
                     str:replace(
-                      str:replace($s, 
-                        $bs, concat($bs, $bs) 
+                      str:replace($s,
+                        $bs, concat($bs, $bs)
                       ),
-                      $quot, concat($bs, $quot) 
+                      $quot, concat($bs, $quot)
                     ),
                     $nl, concat($bs, 'n')
                   ),
                   $cr, concat($bs, 'r')
                 ),
                 $tab, concat($bs, 't')
-              )"/> 
+              )"/>
     <f:result>
       <xsl:value-of select="$result"/>
     </f:result>
@@ -171,7 +171,7 @@
     <xsl:param name="s"/>
     <xsl:param name="c"/>
     <xsl:param name="r"/>
-    
+
     <xsl:choose>
       <xsl:when test='contains($s, $c)'>
         <xsl:value-of select='concat(substring-before($s, $c), $r)'/>
@@ -184,11 +184,11 @@
       <xsl:otherwise>
         <xsl:value-of select='$s'/>
       </xsl:otherwise>
-    </xsl:choose>    
+    </xsl:choose>
   </xsl:template>
-  
-  <!-- 
-    Convenience function to wrap any string in double-quotes.  This 
+
+  <!--
+    Convenience function to wrap any string in double-quotes.  This
     reduces the need for a lot of XML character escaping.
   -->
   <f:function name='np:dq'>
@@ -197,10 +197,10 @@
       <xsl:value-of select="concat('&quot;', $s, '&quot;')"/>
     </f:result>
   </f:function>
-  
+
   <!--
-    mkey = member key - this produces a string which is the key in double-quotes, 
-    followed by a colon, space.  It is used whenever outputting a member of a JSON 
+    mkey = member key - this produces a string which is the key in double-quotes,
+    followed by a colon, space.  It is used whenever outputting a member of a JSON
     object.
   -->
   <f:function name='np:mkey'>
@@ -209,8 +209,8 @@
       <xsl:value-of select='concat(np:dq($k), ": ")'/>
     </f:result>
   </f:function>
-  
-  <!-- 
+
+  <!--
     This function takes a boolean indicating whether or not we want a trailing
     comma.  If false, it returns the empty string; if true, a comma.  It's like
     the ternary-operator expression ($trailing-comma ? "," : "").
@@ -223,8 +223,8 @@
       </xsl:if>
     </f:result>
   </f:function>
-  
-  <!-- 
+
+  <!--
     There are five main utility functions for outputing stuff, as illustrated here.
     Trailing commas are included only when the trailing-comma parameter is true.
     Each of these is designed to be invoked at the start of a new line, so each
@@ -249,7 +249,7 @@
       <xsl:value-of select='concat($indent, $value, np:tc($trailing-comma), $nlp)'/>
     </f:result>
   </f:function>
-  
+
   <f:function name='np:key-simple'>
     <xsl:param name='indent'/>
     <xsl:param name='k'/>
@@ -259,7 +259,7 @@
       <xsl:value-of select='concat($indent, np:mkey($k), $value, np:tc($trailing-comma), $nlp)'/>
     </f:result>
   </f:function>
-  
+
   <f:function name='np:start-object'>
     <xsl:param name='indent'/>
     <f:result>
@@ -282,14 +282,14 @@
       <xsl:value-of select='concat($indent, "}", np:tc($trailing-comma), $nlp)'/>
     </f:result>
   </f:function>
-  
+
   <f:function name='np:start-array'>
     <xsl:param name='indent'/>
     <f:result>
       <xsl:value-of select='concat($indent, "[", $nlp)'/>
     </f:result>
   </f:function>
-  
+
   <f:function name='np:key-start-array'>
     <xsl:param name='indent'/>
     <xsl:param name='k'/>
@@ -297,7 +297,7 @@
       <xsl:value-of select='concat($indent, np:mkey($k), "[", $nlp)'/>
     </f:result>
   </f:function>
-  
+
   <f:function name='np:end-array'>
     <xsl:param name='indent'/>
     <xsl:param name='trailing-comma'/>
@@ -305,9 +305,9 @@
       <xsl:value-of select='concat($indent, "]", np:tc($trailing-comma), $nlp)'/>
     </f:result>
   </f:function>
-  
-  <!-- 
-    The following three return the json-escaped values for simple types 
+
+  <!--
+    The following three return the json-escaped values for simple types
   -->
   <f:function name='np:string-value'>
     <xsl:param name='v'/>
@@ -328,7 +328,7 @@
     <xsl:variable name='nv' select='np:lower-case(normalize-space($v))'/>
     <f:result>
       <xsl:choose>
-        <xsl:when test='$nv = "0" or $nv = "no" or $nv = "n" or $nv = "false" or 
+        <xsl:when test='$nv = "0" or $nv = "no" or $nv = "n" or $nv = "false" or
           $nv = "f" or $nv = "off" or $nv = ""'>
           <xsl:text>false</xsl:text>
         </xsl:when>
@@ -338,17 +338,17 @@
       </xsl:choose>
     </f:result>
   </f:function>
-  
+
   <!--============================================================
     Generic templates
   -->
 
-  <!-- 
+  <!--
     Default template for the document root node.  This generates the outermost
     JSON object and the header.
   -->
 
-  <!-- 
+  <!--
     Don't override this template that matches "/" in your custom stylesheets.
     Instead, override the template named "root", which generates jxml.
   -->
@@ -376,10 +376,10 @@
       </xsl:apply-templates>
     </o>
   </xsl:template>
-  
+
   <xsl:template name='header'>
     <xsl:param name='header-strings'/>
-    
+
     <o k='header'>
       <xsl:for-each select='$header-strings/@*'>
         <s k='{name(.)}'>
@@ -407,7 +407,7 @@
       </xsl:choose>
     </xsl:param>
     <xsl:param name='value' select='.'/>
-    
+
     <xsl:choose>
       <xsl:when test='$context = "o"'>
         <s k='{$k}'>
@@ -435,8 +435,8 @@
 
   <!--
     s-in-o
-    This translates the node into a key:value pair.  If it's a text node, then, by 
-    default, the key will be "value".  If it's an attribute or element node, then, 
+    This translates the node into a key:value pair.  If it's a text node, then, by
+    default, the key will be "value".  If it's an attribute or element node, then,
     by default, the key will be the name converted to lowercase (it's up to you
     to make sure they are unique within the object).
   -->
@@ -452,13 +452,13 @@
       </xsl:choose>
     </xsl:param>
     <xsl:param name='value' select='.'/>
-    
+
     <s k='{$k}'>
       <xsl:value-of select='$value'/>
     </s>
   </xsl:template>
-  
-  <!-- 
+
+  <!--
     s-in-a
     For text nodes, attributes, or elements that have simple content, when
     in the context of a JSON array.  This discards the attribute or element name,
@@ -470,7 +470,7 @@
       <xsl:value-of select='$value'/>
     </s>
   </xsl:template>
-  
+
   <!--
     n
     Delegates either to n-in-o or n-in-a.
@@ -488,7 +488,7 @@
       </xsl:choose>
     </xsl:param>
     <xsl:param name='value' select='.'/>
-    
+
     <xsl:choose>
       <xsl:when test='$context = "o"'>
         <n k='{$k}'>
@@ -513,12 +513,12 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
+
+
   <!--
     n-in-o
-    For text nodes, attributes, or elements that have simple 
-    content, when in the context of a JSON object.  
+    For text nodes, attributes, or elements that have simple
+    content, when in the context of a JSON object.
   -->
   <xsl:template name='n-in-o'>
     <xsl:param name='k'>
@@ -532,13 +532,13 @@
       </xsl:choose>
     </xsl:param>
     <xsl:param name='value' select='.'/>
-    
+
     <n k='{$k}'>
       <xsl:value-of select='normalize-space($value)'/>
     </n>
   </xsl:template>
-  
-  <!-- 
+
+  <!--
     n-in-a
     For text nodes, attributes, or elements that have simple content, when
     in the context of a JSON array.  This discards the attribute or element name,
@@ -550,8 +550,8 @@
       <xsl:value-of select='normalize-space($value)'/>
     </n>
   </xsl:template>
-  
-  
+
+
   <!--
     b
     Delegates either to b-in-o or b-in-a.
@@ -569,7 +569,7 @@
       </xsl:choose>
     </xsl:param>
     <xsl:param name='value' select='.'/>
-    
+
     <xsl:choose>
       <xsl:when test='$context = "o"'>
         <b k='{$k}'>
@@ -594,11 +594,11 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!--
     b-in-o
-    For text nodes, attributes, or elements that have simple 
-    content, when in the context of a JSON object.  
+    For text nodes, attributes, or elements that have simple
+    content, when in the context of a JSON object.
   -->
   <xsl:template name='b-in-o'>
     <xsl:param name='k'>
@@ -612,13 +612,13 @@
       </xsl:choose>
     </xsl:param>
     <xsl:param name='value' select='.'/>
-    
+
     <b k='{$k}'>
       <xsl:value-of select='np:boolean-value($value)'/>
     </b>
   </xsl:template>
-  
-  <!-- 
+
+  <!--
     b-in-a
     For text nodes, attributes, or elements that have simple content, when
     in the context of a JSON array.  This discards the attribute or element name,
@@ -626,22 +626,22 @@
   -->
   <xsl:template name='b-in-a'>
     <xsl:param name='value' select='.'/>
-    
+
     <b>
       <xsl:value-of select='np:boolean-value($value)'/>
     </b>
   </xsl:template>
-  
- 
+
+
   <!--
-    a 
+    a
     Delegates either to a-in-o or a-in-a.
   -->
   <xsl:template name='a'>
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='k' select='""'/>
     <xsl:param name='kids' select='*'/>
-    
+
     <xsl:choose>
       <xsl:when test='$context = "o" and $k = ""'>
         <xsl:call-template name='a-in-o'>
@@ -680,7 +680,7 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <!--
     a-in-o
     Call this template for array-type elements.  That is, usually, elements
@@ -692,14 +692,14 @@
   <xsl:template name='a-in-o'>
     <xsl:param name='k' select='np:translate-name()'/>
     <xsl:param name='kids' select='*'/>
-    
+
     <a k='{$k}'>
       <xsl:apply-templates select='$kids'>
         <xsl:with-param name='context' select='"a"'/>
       </xsl:apply-templates>
     </a>
   </xsl:template>
-  
+
   <!--
     a-in-a
     Array-type elements that occur inside other arrays.
@@ -707,24 +707,24 @@
   <xsl:template name='a-in-a'>
     <xsl:param name='k' select='np:translate-name()'/>
     <xsl:param name='kids' select='*'/>
-    
+
     <a>
       <xsl:apply-templates select='$kids'>
         <xsl:with-param name='context' select='"a"'/>
       </xsl:apply-templates>
     </a>
   </xsl:template>
-  
-  
+
+
   <!--
-    o 
+    o
     Delegates either to o-in-o or o-in-a.
   -->
   <xsl:template name='o'>
     <xsl:param name='context' select='"unknown"'/>
     <xsl:param name='k' select='np:translate-name()'/>
     <xsl:param name='kids' select='@*|*'/>
-    
+
     <xsl:choose>
       <xsl:when test='$context = "o"'>
         <o k='{$k}'>
@@ -753,12 +753,12 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
-  <!-- 
+
+
+  <!--
     o-in-o
-    For elements that have attributes and/or heterogenous content.  These are 
-    converted into JSON objects.  
+    For elements that have attributes and/or heterogenous content.  These are
+    converted into JSON objects.
     The key, by default, is taken from this element's name, converted to lowercase.
     By default, this recurses by calling apply-templates on all attributes and
     element children.  So text-node children are discarded.  You can override that
@@ -767,7 +767,7 @@
   <xsl:template name='o-in-o'>
     <xsl:param name='k' select='np:translate-name()'/>
     <xsl:param name='kids' select='@*|*'/>
-    
+
     <o k='{$k}'>
       <xsl:apply-templates select='$kids'>
         <xsl:with-param name='context' select='"o"'/>
@@ -775,10 +775,10 @@
     </o>
   </xsl:template>
 
-  <!-- 
+  <!--
     o-in-a
     For elements that contain heterogenous content.  These are converted
-    into JSON objects.  
+    into JSON objects.
   -->
   <xsl:template name='o-in-a'>
     <xsl:param name='kids' select='@*|*'/>
@@ -788,17 +788,17 @@
       </xsl:apply-templates>
     </o>
   </xsl:template>
-  
-  
-  
 
-  <!-- 
-    Default template for an element or attribute. 
+
+
+
+  <!--
+    Default template for an element or attribute.
     Reports a problem.
   -->
   <xsl:template match='@*|*'>
     <xsl:param name='context' select='"o"'/>
-    
+
     <xsl:message>
       <xsl:text>FIXME:  No template defined for </xsl:text>
       <xsl:choose>
@@ -813,7 +813,7 @@
       <xsl:value-of select='name(.)'/>
       <xsl:value-of select='concat(" (context = ", $context, ")")'/>
     </xsl:message>
-    
+
     <xsl:choose>
       <xsl:when test='$context = "a"'>
         <xsl:call-template name='s-in-a'/>
@@ -823,7 +823,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Default template for text nodes.  Throw them away if they
     are all blanks.  Report a problem otherwise.
     Let's not report a problem and see if that's okay.  See sample5, test45
@@ -831,7 +831,7 @@
   -->
   <xsl:template match="text()" >
     <xsl:param name='context' select='"o"'/>
-    
+
     <xsl:if test='normalize-space(.) != ""'>
     <!--
       <xsl:message>
@@ -849,56 +849,56 @@
       </xsl:choose>
     </xsl:if>
   </xsl:template>
-  
+
   <!--=====================================================
     The following templates serialize jxml into JSON.
     These use mode to also encode the context:  either -object
-    or -array.  I think this will probably give better 
+    or -array.  I think this will probably give better
     performance than passing it down as a parameter.
   -->
   <xsl:template match='o' mode='serialize-jxml-array'>
     <xsl:param name='indent' select='""'/>
-    
+
     <xsl:value-of select='np:start-object($indent)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-object'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='np:end-object($indent, position() != last())'/>    
+    <xsl:value-of select='np:end-object($indent, position() != last())'/>
   </xsl:template>
-  
+
   <xsl:template match='o' mode='serialize-jxml-object'>
     <xsl:param name='indent' select='""'/>
-    
+
     <xsl:value-of select='np:key-start-object($indent, @k)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-object'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='np:end-object($indent, position() != last())'/>    
+    <xsl:value-of select='np:end-object($indent, position() != last())'/>
   </xsl:template>
-  
+
   <xsl:template match='a' mode='serialize-jxml-array'>
     <xsl:param name='indent' select='""'/>
-    
+
     <xsl:value-of select='np:start-array($indent)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-array'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='np:end-array($indent, position() != last())'/>    
+    <xsl:value-of select='np:end-array($indent, position() != last())'/>
   </xsl:template>
-  
+
   <xsl:template match='a' mode='serialize-jxml-object'>
     <xsl:param name='indent' select='""'/>
-    
+
     <xsl:value-of select='np:key-start-array($indent, @k)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-array'>
       <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='np:end-array($indent, position() != last())'/>    
+    <xsl:value-of select='np:end-array($indent, position() != last())'/>
   </xsl:template>
-  
+
   <xsl:template match='s|n|b' mode='serialize-jxml-array'>
     <xsl:param name='indent' select='""'/>
-    
+
     <xsl:variable name='v'>
       <xsl:choose>
         <xsl:when test='name(.) = "n" or name(.) = "b"'>
@@ -914,7 +914,7 @@
 
   <xsl:template match='s|n|b' mode='serialize-jxml-object'>
     <xsl:param name='indent' select='""'/>
-    
+
     <xsl:variable name='v'>
       <xsl:choose>
         <xsl:when test='name(.) = "n" or name(.) = "b"'>
@@ -927,10 +927,10 @@
     </xsl:variable>
     <xsl:value-of select='np:key-simple($indent, @k, $v, position() != last())'/>
   </xsl:template>
-  
+
   <!--=====================================================
     This last template is used in testing the output for consistency, and
-    is enabled when the 'check-json' command line option is given.  It first 
+    is enabled when the 'check-json' command line option is given.  It first
     generates the JXML, and then runs it, recursively, through the checker
     template with mode="check-jxml".
   -->
@@ -955,6 +955,6 @@
     </xsl:if>
     <xsl:apply-templates select='*' mode='check-jxml'/>
   </xsl:template>
-  
-  
+
+
 </xsl:stylesheet>
