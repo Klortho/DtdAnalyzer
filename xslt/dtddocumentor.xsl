@@ -1,667 +1,799 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:pmc="http://www.ncbi.nlm.nih.gov/pmc/ns" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
+<!--
+  This stylesheet builds the DTD documentation for the DtdAnalyzer.
+  Input is XML that's produced as output from the dtdanalyzer stage.
+  Output is a set of XHTML files that land in $docDir (default is "doc"):
+    - index.html
+    - toc.html - the navigation panel on the left
+    - entries
+        - elem-*.html
+        - attr-*.html
 
-	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+  This applies templates through the entire input document twice, each time with
+  a different mode:
+    - toc:  when building the toc.html page.
+    - pages:  when building the index.html and all the entry pages.
+-->
+
+<xsl:stylesheet xmlns:pmc="http://www.ncbi.nlm.nih.gov/pmc/ns" 
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+                version="2.0">
+
+  <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
   <!-- Current date and time, for stamping onto each output page -->
-	<xsl:param name="date" select="format-date(current-date(),'[MNn] [D], [Y]')"/>
-	<xsl:param name="time" select="format-time(current-time(),'[h]:[m] P')"/>
-  
+  <xsl:param name="date" select="format-date(current-date(),'[MNn] [D], [Y]')"/>
+  <xsl:param name="time" select="format-time(current-time(),'[h]:[m] P')"/>
+
   <!-- The directory to which to write the results -->
-	<xsl:param name="dir" select="'doc'"/>
-  
+  <xsl:param name="docDir" select="'doc'"/>
+
   <!-- CSS file to include -->
-	<xsl:param name="css" select="'dtddoc.css'"/>
-  
+  <xsl:param name="css" select="'http://dtd.nlm.nih.gov/ncbi/jatsdoc/0.1/jatsdoc.css'"/>
+
   <!-- JS file to include -->
-  <xsl:param name='js' select='"expand.js"'/>
+  <xsl:param name='js' select='"http://dtd.nlm.nih.gov/ncbi/jatsdoc/0.1/jatsdoc.js"'/>
 
   <!-- Allows user to add more CSS and JS files, if they want.  -->
   <xsl:param name="include-files"/>
-  
+
   <!-- This should be 1 if we are supposed to create suffixes for filenames that otherwise
     would differ only by case. -->
-	<xsl:param name="filesuffixes" select="1"/>
+  <xsl:param name="filesuffixes" select="1"/>
 
-  <!-- Exclude all the elements that match the regular expression $exclude-elems, 
+  <!-- Exclude all the elements that match the regular expression $exclude-elems,
     except those that match the regular expression $exclude-except. -->
-	<xsl:param name="exclude-elems" select="' '"/>
-	<xsl:param name="exclude-except" select="' '"/>
-	
+  <xsl:param name="exclude-elems" select="' '"/>
+  <xsl:param name="exclude-except" select="' '"/>
+
   <!-- Controls documentation generation for parameter and general entities -->
-  <xsl:param name="entities" select="'off'"/>  
+  <xsl:param name="entities" select="'off'"/>
 
-	<xsl:key name="entitiesByLCName" match="entity" use="lower-case(@name)"/>
+  <xsl:key name="entitiesByLCName" match="entity" use="lower-case(@name)"/>
 
-	<xsl:variable name="title">
-		<xsl:choose>
-			<xsl:when test="/declarations/title">
-				<xsl:value-of select="/declarations/title"/>
-				<xsl:text> Documentation</xsl:text>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:text>Documentation for </xsl:text>
-				<xsl:value-of select="/declarations/dtd/@relSysId"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:variable>
-
-	<xsl:template match="/">
-		<xsl:apply-templates select="declarations" mode="build-page"/>
-		<xsl:apply-templates select="declarations/*[not(title)]"/>
-		<xsl:for-each-group select="//annotation[@type='tags']/tag" group-by=".">
-			<xsl:apply-templates select="current-group()[1]" mode="build-page"/>
-		</xsl:for-each-group>
-	</xsl:template>
-
-	<!-- ========================= -->
-	<!-- Exclude unwanted elements -->
-	<!-- ========================= -->
-
-	<xsl:template match="elements">
-		<xsl:apply-templates select="element[pmc:included(@name) and not(@reachable='false')]" mode="build-page"/>
-	</xsl:template>
-
-	<xsl:template match="attributes">
-		<xsl:for-each select="attribute">
-			<!-- Checks to see if only excluded elements are in attributeDeclarations. Excludes attributes if so. -->
-			<xsl:variable name="notexcluded">
-				<xsl:for-each select="attributeDeclaration">
-					<xsl:choose>
-						<xsl:when test="not(pmc:included(@element)) or @element=//element[@reachable='false']/@name">0</xsl:when>
-						<xsl:otherwise>1</xsl:otherwise>
-					</xsl:choose>
-				</xsl:for-each>
-			</xsl:variable>
-			<xsl:if test="contains($notexcluded, '1')">
-				<xsl:apply-templates select="self::attribute" mode="build-page"/>
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:template>
-
-	<xsl:template match="parameterEntities | generalEntities">
-		<xsl:if test="$entities='on'">
-			<xsl:apply-templates select="entity" mode="build-page"/>
-		</xsl:if>
-	</xsl:template>
-
-	<xsl:template match="dtd">
-		<xsl:apply-templates select="self::node()" mode="build-page"/>
-	</xsl:template>
+  <xsl:variable name="title">
+    <xsl:choose>
+      <xsl:when test="/declarations/title">
+        <xsl:value-of select="/declarations/title"/>
+        <xsl:text> Documentation</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>Documentation for </xsl:text>
+        <xsl:value-of select="/declarations/dtd/@relSysId"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
 
-	<!-- ========================= -->
-	<!-- Build Page -->
-	<!-- ========================= -->
+  <!--================================================================
+    Root template:  start here 
+  -->
+  
+  <xsl:template match="/">
+    <!-- Build the toc.html page -->
+    <xsl:apply-templates mode="toc"/>
+    
+    <!-- Build index.html and all of the entry pages -->
+    <xsl:apply-templates select='declarations/*[not(title)]' mode="pages"/>
 
-	<xsl:template match="element | attribute | entity | tag | dtd | declarations" mode="build-page">
-		<xsl:variable name="file">
-			<xsl:value-of select="concat($dir, '/')"/>
-			<xsl:if test="self::element or self::attribute">
-				<xsl:call-template name="docFilename">
-					<xsl:with-param name="name" select="@name"/>
-					<xsl:with-param name="type" select="self::node()/name()"/>
-				</xsl:call-template>
-			</xsl:if>
-			<xsl:if test="self::entity">
-				<xsl:call-template name="docFilename">
-					<xsl:with-param name="name" select="@name"/>
-					<xsl:with-param name="type" select="parent::node()/name()"/>
-					<xsl:with-param name="index">
-						<xsl:call-template name="makeIndex"/>
-					</xsl:with-param>
-				</xsl:call-template>
-			</xsl:if>
-			<xsl:if test="self::tag">
-				<xsl:value-of select="concat('tag-', translate(., ':', '-'), '.html')"/>
-			</xsl:if>
-			<xsl:if test="self::dtd">
-				<xsl:value-of select="'index.html'"/>
-			</xsl:if>
-			<xsl:if test="self::declarations">
-				<xsl:value-of select="'sidebar.html'"/>
-			</xsl:if>
-		</xsl:variable>
+    <!-- Build entry pages for each tag --> 
+    <xsl:for-each-group select="//annotation[@type='tags']/tag" group-by=".">
+      <xsl:apply-templates select="current-group()[1]" mode="pages"/>
+    </xsl:for-each-group>
 
-		<xsl:result-document href="{$file}">
-			<html>
-				<head>
-					<!-- Sidebar gets <base target="_parent"/> so that links will open in the parent window. -->
-					<xsl:if test="self::declarations">
-						<base target="_parent"/>
-					</xsl:if>
-					<!-- Other pages get <title> -->
-					<xsl:if test="not(self::declarations)">
-						<title>
-							<xsl:copy-of select="$title"/>
-							<xsl:text>: </xsl:text>
-							<xsl:value-of select="@name"/>
-							<xsl:text> </xsl:text>
-							<xsl:value-of select="self::node()/name()"/>
-						</title>
-					</xsl:if>
-
-					<!-- Default Stylesheet -->
-					<xsl:if test="$css != ''">
-						<link rel="stylesheet" type="text/css" href="{$css}"/>
-					</xsl:if>
-
-					<!-- Links to other stylesheets, google fonts, javascript, etc. added here -->
-					<xsl:if test="$include-files">
-						<xsl:for-each select="tokenize($include-files, ' ')">
-							<xsl:if test="contains(., '.js')">
-								<script type="text/javascript" src="{.}">
-									// <![CDATA[//]]>
-								</script>
-							</xsl:if>
-							<xsl:if test="contains(., '.css')">
-								<link rel="stylesheet" type="text/css" href="{.}"/>
-							</xsl:if>
-						</xsl:for-each>
-					</xsl:if>
-					<!-- Default javascript (includes jquery) -->
-					<script type="text/javascript" 
-					  src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js">
-						// <![CDATA[//]]>
-					</script>
-				  <xsl:if test='$js != ""'>
-  					<script type="text/javascript" src="{$js}">
-  						// <![CDATA[//]]>
-  					</script>
-				  </xsl:if>
-				</head>
-				<xsl:choose>
-					<xsl:when test="self::declarations">
-						<xsl:apply-templates select="self::node()" mode="content"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<body>
-							<div id="wrapper">
-								<div id="head">
-									<a href="index.html">
-										<h1><xsl:copy-of select="$title"/></h1>
-									</a>
-								</div>
-								<iframe id="nav" src="sidebar.html">
-									<p>Sidebar</p>
-								</iframe>
-								<div id="content">
-									<div class="inner">
-										<xsl:apply-templates select="self::node()" mode="content"/>
-									</div>
-								</div>
-								<div id="foot">
-									<p class="right">
-										<xsl:text>Made with </xsl:text>
-										<em>dtddocumentor</em>
-										<xsl:text> from </xsl:text>
-										<a href="http://ncbitools.github.com/DtdAnalyzer/">DtdAnalyzer</a>
-									</p>
-									<p>
-										<xsl:text>Updated on: </xsl:text>
-										<xsl:value-of select="$date"/>
-										<xsl:text> at </xsl:text>
-										<xsl:value-of select="$time"/>
-									</p>
-								</div>
-							</div>
-						</body>
-					</xsl:otherwise>
-				</xsl:choose>
-			</html>
-		</xsl:result-document>
-	</xsl:template>
+  </xsl:template>
 
 
-	<!-- ========================= -->
-	<!-- Sidebar -->
-	<!-- ========================= -->
+  <!--===================================================================================
+    Build the toc.html, which is the navigation panel on the left.
+    These use mode='toc'
+  -->
 
-	<xsl:template match="declarations" mode="content">
-		<body class="sidebar">
-			<div class="inner">
-				<xsl:if test="elements">
-					<p class="sidebar-outer">Elements</p>
-					<ul class="sidebar-inner">
-						<xsl:apply-templates select="elements" mode="sidebar"/>
-					</ul>
-				</xsl:if>
-				<xsl:if test="attributes">
-					<p class="sidebar-outer">Attributes</p>
-					<ul class="sidebar-inner">
-						<xsl:apply-templates select="attributes" mode="sidebar"/>
-					</ul>
-				</xsl:if>
-				<xsl:if test="parameterEntities and $entities='on'">
-					<p class="sidebar-outer">Parameter Entities</p>
-					<ul class="sidebar-inner">
-						<xsl:apply-templates select="parameterEntities" mode="sidebar"/>
-					</ul>
-				</xsl:if>
-				<xsl:if test="generalEntities and $entities='on'">
-					<p class="sidebar-outer">General Entities</p>
-					<ul class="sidebar-inner">
-						<xsl:apply-templates select="generalEntities" mode="sidebar"/>
-					</ul>
-				</xsl:if>
-				<xsl:if test="//annotation[@type='tags']">
-					<p class="sidebar-outer taglist">Tags</p>
-					<ul class="sidebar-inner">
-						<xsl:for-each select="distinct-values(//annotation[@type='tags']/tag)">
-							<li>
-								<a href="tag-{.}.html">
-									<xsl:value-of select="."/>
-								</a>
-							</li>
-						</xsl:for-each>
-					</ul>
-				</xsl:if>
-			</div>
-		</body>
-	</xsl:template>
+  <!-- 
+    Matches the top-level element while we're building the toc.  This will
+    create the toc.html file. 
+  -->
+  <xsl:template match="declarations" mode='toc'>
+    <xsl:variable name="file" select="concat($docDir, '/toc.html')"/>
 
-	<xsl:template match="elements" mode="sidebar">
-		<xsl:for-each select="element[pmc:included(@name) and not(@reachable='false')]">
-			<xsl:sort select="@name" order="ascending"/>
-			<xsl:call-template name="list-link">
-				<xsl:with-param name="name" select="@name"/>
-				<xsl:with-param name="type" select="'element'"/>
-			</xsl:call-template>
-		</xsl:for-each>
-	</xsl:template>
+    <xsl:result-document href="{$file}">
+      <ul id="categories">
+        <!-- elements, attributes, param-entities, general-entities -->
+        <xsl:apply-templates mode="toc"/>
 
-	<xsl:template match="attributes" mode="sidebar">
-		<xsl:for-each select="attribute">
-			<xsl:sort select="@name" order="ascending"/>
-			<xsl:variable name="notexcluded">
-				<!-- Checks to see if only excluded elements are in attributeDeclarations. Excludes attributes if so. -->
-				<xsl:for-each select="attributeDeclaration">
-					<xsl:choose>
-						<xsl:when test="not(pmc:included(@element)) or @element=//element[@reachable='false']/@name">0</xsl:when>
-						<xsl:otherwise>1</xsl:otherwise>
-					</xsl:choose>
-				</xsl:for-each>
-			</xsl:variable>
-			<xsl:if test="contains($notexcluded, '1')">
-				<xsl:call-template name="list-link">
-					<xsl:with-param name="name" select="@name"/>
-					<xsl:with-param name="type" select="'attribute'"/>
-				</xsl:call-template>
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:template>
+        <!-- tags, if any exist -->
+        <xsl:if test="//annotation[@type='tags']">
+          <li class="top-cat has-kids" data-slug="tags">
+            <span class="top-cat-name">Tags</span>
+            <ul class="entries">
+              <xsl:for-each select="distinct-values(//annotation[@type='tags']/tag)">
+                <xsl:call-template name='navLink'>
+                  <xsl:with-param name="name" select="string(.)"/>
+                  <xsl:with-param name="type" select="'tag'"/>
+                </xsl:call-template>
+              </xsl:for-each>
+            </ul>
+          </li>
+        </xsl:if>
+      </ul>
+    </xsl:result-document>
+  </xsl:template>
+  
+  <!-- Discard these, they aren't used in the toc.html -->
+  <xsl:template match='title|dtd' mode='toc'/>
 
-	<xsl:template match="parameterEntities" mode="sidebar">
-		<xsl:for-each select="entity">
-			<xsl:sort select="lower-case(@name)" order="ascending"/>
-			<xsl:call-template name="list-link">
-				<xsl:with-param name="name" select="@name"/>
-				<xsl:with-param name="type" select="'parameterEntities'"/>
-				<xsl:with-param name="index">
-					<xsl:call-template name="makeIndex"/>
-				</xsl:with-param>
-			</xsl:call-template>
-		</xsl:for-each>
-	</xsl:template>
+  <xsl:template match="elements" mode="toc">
+    <li class="top-cat has-kids">
+      <span class="top-cat-name">Elements</span>
+      <ul class="entries">
+        <xsl:for-each select="element[pmc:included(@name) and not(@reachable='false')]">
+          <xsl:sort select="@name" order="ascending"/>
+          <xsl:call-template name="navLink">
+            <xsl:with-param name="name" select="@name"/>
+            <xsl:with-param name="type" select="'elem'"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </ul>
+    </li>
+  </xsl:template>
 
-	<xsl:template match="generalEntities" mode="sidebar">
-		<xsl:for-each select="entity">
-			<xsl:sort select="lower-case(@name)" order="ascending"/>
-			<xsl:call-template name="list-link">
-				<xsl:with-param name="name" select="@name"/>
-				<xsl:with-param name="type" select="'generalEntities'"/>
-				<xsl:with-param name="index">
-					<xsl:call-template name="makeIndex"/>
-				</xsl:with-param>
-			</xsl:call-template>
-		</xsl:for-each>
-	</xsl:template>
+  <xsl:template match="attributes" mode="toc">
+    <li class="top-cat has-kids">
+      <span class="top-cat-name">Attributes</span>
+      <ul class="entries">
+        <xsl:for-each select="attribute">
+          <xsl:sort select="@name" order="ascending"/>
+          <xsl:variable name="notexcluded">
+            <!-- Checks to see if only excluded elements are in attributeDeclarations. Excludes attributes if so. -->
+            <xsl:for-each select="attributeDeclaration">
+              <xsl:choose>
+                <xsl:when test="not(pmc:included(@element)) or @element=//element[@reachable='false']/@name">0</xsl:when>
+                <xsl:otherwise>1</xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:if test="contains($notexcluded, '1')">
+            <xsl:call-template name="navLink">
+              <xsl:with-param name="name" select="@name"/>
+              <xsl:with-param name="type" select="'attr'"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:for-each>
+      </ul>
+    </li>
+  </xsl:template>
+  
+  <xsl:template match="parameterEntities" mode="toc">
+    <xsl:if test="$entities='on'">
+      <li class="top-cat has-kids">
+        <span class="top-cat-name">Parameter Entities</span>
+        <ul class="entries">
+          <xsl:for-each select="entity">
+            <xsl:sort select="lower-case(@name)" order="ascending"/>
+            <xsl:call-template name="navLink">
+              <xsl:with-param name="name" select="@name"/>
+              <xsl:with-param name="type" select="'pe'"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </ul>
+      </li>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="generalEntities" mode="toc">
+    <xsl:if test="$entities='on'">
+      <li class="top-cat has-kids">
+        <span class="top-cat-name">General Entities</span>
+        <ul class="entries">
+          <xsl:for-each select="entity">
+            <xsl:sort select="lower-case(@name)" order="ascending"/>
+            <xsl:call-template name="navLink">
+              <xsl:with-param name="name" select="@name"/>
+              <xsl:with-param name="type" select="'ge'"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </ul>
+      </li>
+    </xsl:if>
+  </xsl:template>
 
+  <!--
+    navLink - creates one link in the navigation panel corresponding to an entry
+    (an element, attribute, entity, etc.)  $type should be one of "elem", "attr",
+    "pe", or "ge".
+  -->
+  <xsl:template name="navLink">
+    <xsl:param name="name"/>
+    <xsl:param name="type"/>
+    
+    <xsl:variable name='slug'>
+      <xsl:call-template name='makeSlug'>
+        <xsl:with-param name="name" select='$name'/>
+        <xsl:with-param name="type" select='$type'/>
+      </xsl:call-template>
+    </xsl:variable>
+        
+    <li class='entry' data-slug='{$slug}'>
+      <span class="title">
+        <xsl:call-template name="makeLabel">
+          <xsl:with-param name="name" select='$name'/>
+          <xsl:with-param name="type" select='$type'/>
+        </xsl:call-template>
+      </span>
+    </li>
+  </xsl:template>
+  
+  
 
+  <!--==============================================================================
+    Build index.html page
+  -->
 
-	<!-- ========================= -->
-	<!-- Page Content -->
-	<!-- ========================= -->
+  <xsl:template match="dtd" mode="pages">
+    <xsl:variable name="file" select="concat($docDir, '/index.html')"/>
+    
+    <xsl:result-document href="{$file}">
+      <html>
+        <head>
+          <title>
+            <xsl:copy-of select="$title"/>
+          </title>
+          
+          <xsl:if test="$css != ''">
+            <link rel="stylesheet" type="text/css" href="{$css}"/>
+          </xsl:if>
+          
+          <!-- Links to other stylesheets, google fonts, javascript, etc. added here -->
+          <xsl:if test="$include-files">
+            <xsl:for-each select="tokenize($include-files, ' ')">
+              <xsl:choose>
+                <xsl:when test="contains(., '.js')">
+                  <script type="text/javascript" src="{.}">
+                    // <![CDATA[//]]>
+                  </script>
+                </xsl:when>
+                <xsl:when test="contains(., '.css')">
+                  <link rel="stylesheet" type="text/css" href="{.}"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:if>
+          
+          <xsl:if test='$js != ""'>
+            <script type="text/javascript" src="{$js}">
+              // <![CDATA[//]]>
+            </script>
+          </xsl:if>
+        </head>
+        
+        <body>
+          <!-- Boilerplate content for the jatsdoc library -->
+          <div id='sidebar'>
+            <div id='search'>
+              <input autocomplete='off'
+                     autofocus='autofocus'
+                     autosave='searchdoc'
+                     id='search-field'
+                     placeholder='Search'
+                     results='0'
+                     type='search' />
+            </div>
+            <div id='sidebar-content'>
+              <ul id='categories'>
+                <li class='loader'>Loading...</li>
+              </ul>
+              <ul class='entries' id='results'>
+                <li class='not-found'>Nothing found.</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div id="content">
+            <div id='header'>
+              <ul id='signatures-nav'>
+                <li>
+                  <xsl:copy-of select="$title"/>
+                </li>
+              </ul>
+              <ul id='navigation'>
+                <li>
+                  <a href='.'>
+                    <span>Home</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            
+            <div id='entry'>
+              <div id='entry-wrapper'>
+                <h1>
+                  <xsl:copy-of select="$title"/>
+                </h1>
+                <xsl:apply-templates select="annotations/*"/>
+              </div>
 
+              <div id='footer'>
+                <h2>
+                  <xsl:copy-of select="$title"/>
+                </h2>
+                <p class='ack'>Rendered with 
+                  <a href='http://github.com/Klortho/jatsdoc'>jatsdoc</a>.
+                </p>
+                
+                <!-- Reconcile these.  "pubdate" is in the JATS tag library.  -->
+                <p>Generated by the 
+                  <a href="http://dtd.nlm.nih.gov/ncbi/dtdanalyzer/">DtdAnalyzer</a>
+                  on <xsl:value-of select="$date"/> at <xsl:value-of select="$time"/>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    </xsl:result-document>
+  </xsl:template>
+  
+  <!--==============================================================================
+    Build entry pages
+  -->
 
-	<!-- ===== Element Page ===== -->
+  <!--
+    Exclude unwanted elements, attributes, and entities
+  -->
 
-	<xsl:template match="element" mode="content">
-		<h2>
-			<span class="pagetitle">
-				<xsl:if test="@root='true'">
-					<xsl:text>Root </xsl:text>
-				</xsl:if>
-				<xsl:text>Element: </xsl:text>
-			</span>
-			<xsl:value-of select="@name"/>
-		</h2>
-		<xsl:apply-templates select="annotations/annotation[@type='notes']"/>
-		<xsl:variable name="e-name">
-			<xsl:value-of select="@name"/>
-		</xsl:variable>
-		<xsl:if test="../../attributes/attribute[attributeDeclaration/@element=$e-name]">
-			<h3>Attributes</h3>
-			<ul class="attributes">
-				<xsl:for-each select="../../attributes/attribute[attributeDeclaration/@element=$e-name]">
-					<xsl:sort select="@name"/>
-					<xsl:call-template name="list-link">
-						<xsl:with-param name="name" select="@name"/>
-						<xsl:with-param name="type" select="'attribute'"/>
-					</xsl:call-template>
-				</xsl:for-each>
-			</ul>
-		</xsl:if>
-		<xsl:if test="content-model/@spec != 'empty'">
-			<h3>Content Model</h3>
-			<p class="content-model">
-				<xsl:value-of select="content-model/@spaced"/>
-			</p>
-			<xsl:apply-templates select="annotations/annotation[@type='model']"/>
-			<xsl:if test="content-model//child[pmc:included(.)]">
-				<h4>May Contain:</h4>
-				<ul class="children">
-					<xsl:if test="content-model/@spec='mixed' or content-model/@spec='text'">
-						<li>PCDATA</li>
-					</xsl:if>
-					<xsl:for-each select="content-model//child[pmc:included(.)]">
-						<xsl:sort select="."/>
-						<xsl:call-template name="list-link">
-							<xsl:with-param name="name" select="."/>
-							<xsl:with-param name="type" select="'element'"/>
-						</xsl:call-template>
-					</xsl:for-each>
-				</ul>
-			</xsl:if>			
-		</xsl:if>
-		<xsl:apply-templates select="annotations/annotation[@type='tags']"/>
-		<xsl:apply-templates select="annotations/annotation[@type='example']"/>
-		<xsl:if test="context/parent[pmc:included(@name)][@name=//element[not(@reachable='false')]/@name]">
-			<h3>May be contained in:</h3>
-			<ul class="parents">
-				<xsl:for-each select="context/parent[pmc:included(@name)][@name=//element[not(@reachable='false')]/@name]">
-					<xsl:sort select="@name"/>
-					<xsl:call-template name="list-link">
-						<xsl:with-param name="name" select="@name"/>
-						<xsl:with-param name="type" select="'element'"/>
-					</xsl:call-template>
-				</xsl:for-each>
-			</ul>
-		</xsl:if>
-	</xsl:template>
-
-
-	<!-- ===== Attribute Page ===== -->
-
-	<xsl:template match="attribute" mode="content">
-		<h2>
-			<span class="pagetitle">Attribute: </span>
-			<xsl:value-of select="@name"/>
-		</h2>
-		<xsl:apply-templates select="annotations/annotation[@type='notes']"/>
-		<xsl:choose>
-			<xsl:when test="count(distinct-values(attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]/@type)) > 1">
-				<table class="attvaltable">
-					<tr>
-						<th>Value</th>
-						<th>In Elements</th>
-					</tr>
-					<xsl:for-each-group select="attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]" group-by="@type">
-						<xsl:sort select="count(current-group()/@element)" order="ascending"/>
-						<tr class="attvalue">
-							<td>
-								<xsl:value-of select="current-grouping-key()"/>
-							</td>
-							<td>
-								<xsl:for-each select="current-group()">
-									<xsl:value-of select="concat('&lt;', @element, '&gt;')"/>
-									<xsl:text> </xsl:text>
-								</xsl:for-each>
-							</td>
-						</tr>
-					</xsl:for-each-group>
-				</table>
-			</xsl:when>
-			<xsl:otherwise>
-				<p class="bold">Value: <span class="attvalue">
-						<xsl:value-of select="attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)][1]/@type"/>
-					</span>
-				</p>
-			</xsl:otherwise>
-		</xsl:choose>
-		<xsl:apply-templates select="annotations/annotation[@type='model']"/>
-		<xsl:apply-templates select="annotations/annotation[@type='tags']"/>
-		<xsl:apply-templates select="annotations/annotation[@type='example']"/>
-		<h3>May be in elements:</h3>
-		<ul class="parents">
-			<xsl:for-each select="attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]">
-				<xsl:sort select="@element"/>
-				<xsl:call-template name="list-link">
-					<xsl:with-param name="name" select="@element"/>
-					<xsl:with-param name="type" select="'element'"/>
-				</xsl:call-template>
-			</xsl:for-each>
-		</ul>
-	</xsl:template>
-
-
-	<!-- ===== Entity Page ===== -->
-
-	<xsl:template match="entity" mode="content">
-		<h2>
-			<span class="pagetitle">Entity: </span>
-			<xsl:value-of select="@name"/>
-		</h2>
-		<xsl:apply-templates select="annotations/annotation[@type='notes']"/>
-		<xsl:if test="value != ''">
-			<h3>Content Model</h3>
-			<p class="content-model">
-				<pre><xsl:value-of select="value"/></pre>
-			</p>
-			<xsl:apply-templates select="annotations/annotation[@type='model']"/>
-		</xsl:if>
-		<xsl:apply-templates select="annotations/annotation[@type='tags']"/>
-		<xsl:apply-templates select="annotations/annotation[@type='example']"/>
-	</xsl:template>
-
-
-	<!-- ===== Tag Page ===== -->
-
-	<xsl:template match="tag" mode="content">
-		<xsl:variable name="tag">
-			<xsl:value-of select="."/>
-		</xsl:variable>
-		<h2>
-			<span class="pagetitle">Tag: </span>
-			<xsl:value-of select="$tag"/>
-		</h2>
-		<h3>
-			<xsl:text>Tagged with "</xsl:text>
-			<xsl:value-of select="$tag"/>
-			<xsl:text>"</xsl:text>
-		</h3>
-		<ul class="tags">
-			<xsl:for-each-group select="//*[annotations[annotation[tag=$tag]]][not(self::element and (@reachable='false' or not(pmc:included(@name)))) and
-				not(self::attribute and ( @element and not(pmc:included(@element)) or @element=//element[@reachable='false']/@name))]" group-by="parent::node()/name()">
-				<h4 class="notetitle">
-					<xsl:value-of select="if (current-grouping-key()='parameterEntities') then 'parameter entities' else
-						if(current-grouping-key()='generalEntities') then 'general entities' else current-grouping-key()"/>
-				</h4>
-				<ul class="tags">
-					<xsl:for-each select="current-group()">
-						<xsl:sort select="translate(@name, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" order="ascending"/>
-						<xsl:call-template name="list-link">
-							<xsl:with-param name="name">
-								<xsl:value-of select="@name"/>
-							</xsl:with-param>
-							<xsl:with-param name="type" select="if(self::entity) then parent::node()/name() else self::node()/name()"/>
-						</xsl:call-template>
-					</xsl:for-each>
-				</ul>
-			</xsl:for-each-group>
-		</ul>
-	</xsl:template>
+  <xsl:template match="elements" mode='pages'>
+    <xsl:apply-templates select="element[pmc:included(@name) and not(@reachable='false')]" mode="pages"/>
+  </xsl:template>
+  
+  <xsl:template match="attributes" mode="pages">
+    <xsl:for-each select="attribute">
+      <!-- Checks to see if only excluded elements are in attributeDeclarations. Excludes attributes if so. -->
+      <xsl:variable name="notexcluded">
+        <xsl:for-each select="attributeDeclaration">
+          <xsl:choose>
+            <xsl:when test="not(pmc:included(@element)) or @element=//element[@reachable='false']/@name">0</xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:if test="contains($notexcluded, '1')">
+        <xsl:apply-templates select="self::attribute" mode="pages"/>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template match="parameterEntities | generalEntities" mode="pages">
+    <xsl:if test="$entities='on'">
+      <xsl:apply-templates select="entity" mode="pages"/>
+    </xsl:if>
+  </xsl:template>
+  
 
 
-	<!-- ===== Index Page ===== -->
+  <!-- This builds a page. -->
+  <xsl:template match="element | attribute | entity | tag" mode="pages">
+    <xsl:variable name='type'>
+      <xsl:choose>
+        <xsl:when test="self::element">
+          <xsl:text>elem</xsl:text>
+        </xsl:when>
+        <xsl:when test="self::attribute">
+          <xsl:text>attr</xsl:text>
+        </xsl:when>
+        <xsl:when test='self::entity and parent::parameterEntities'>
+          <xsl:text>pe</xsl:text>
+        </xsl:when>
+        <xsl:when test='self::entity and parent::generalEntities'>
+          <xsl:text>ge</xsl:text>
+        </xsl:when>
+        <xsl:when test='self::tag'>
+          <xsl:text>tag</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
 
-	<xsl:template match="dtd" mode="content">
-		<h2>
-			<span class="pagetitle">
-				<xsl:text> Documentation: </xsl:text>
-			</span>
-			<xsl:value-of select="@relSysId"/>
-		</h2>
-		<xsl:apply-templates select="annotations/*"/>
-	</xsl:template>
+    <xsl:variable name='name'>
+      <xsl:choose>
+        <xsl:when test="$type != 'tag'">
+          <xsl:value-of select="@name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="string(.)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
+    <xsl:variable name="filename">
+      <xsl:value-of select='concat($docDir, "/entries/")'/>
+      <xsl:call-template name='makeSlug'>
+        <xsl:with-param name="name" select='$name'/>
+        <xsl:with-param name="type" select='$type'/>
+      </xsl:call-template>
+      <xsl:text>.html</xsl:text>
+    </xsl:variable>
 
-	<!-- ========================= -->
-	<!-- General Templates-->
-	<!-- ========================= -->
-
-	<xsl:template match="annotation[not(@type='schematron')]">
-		<div class="{@type}">
-			<xsl:if test="@type='example' or @type='tags'">
-				<h3 class="notetitle">
-					<xsl:value-of select="@type"/>
-				</h3>
-			</xsl:if>
-			<xsl:copy-of select="text()|* except tag" copy-namespaces="no"/>
-			<xsl:if test="@type='tags'">
-				<p>
-					<xsl:apply-templates select="tag"/>
-				</p>
-			</xsl:if>
-		</div>
-	</xsl:template>
-	
-	<xsl:template match="annotation[@type='schematron']"/>
-
-	<xsl:template match="tag">
-		<a href="tag-{.}.html" class="tag">
-			<xsl:value-of select="."/>
-		</a>
-		<xsl:if test="following-sibling::tag">
-			<xsl:text>, </xsl:text>
-		</xsl:if>
-	</xsl:template>
-
-
-	<xsl:template name="list-link">
-		<xsl:param name="name"/>
-		<xsl:param name="type"/>
-		<xsl:param name="index"/>
-
-		<xsl:variable name="href">
-			<xsl:call-template name="docFilename">
-				<xsl:with-param name="name" select="$name"/>
-				<xsl:with-param name="type" select="$type"/>
-				<xsl:with-param name="index" select="$index"/>
-			</xsl:call-template>
-		</xsl:variable>
-
-		<li>
-			<a href="{$href}">
-				<xsl:choose>
-					<xsl:when test="$type='element'">
-						<xsl:value-of select="concat('&lt;', $name, '&gt;')"/>
-					</xsl:when>
-					<xsl:when test="$type='attribute'">
-						<xsl:value-of select="concat('@', $name)"/>
-					</xsl:when>
-					<xsl:when test="$type='parameterEntities'">
-						<xsl:value-of select="concat('%', $name)"/>
-					</xsl:when>
-					<xsl:when test="$type='generalEntities'">
-						<xsl:value-of select="concat('&amp;', $name)"/>
-					</xsl:when>
-				</xsl:choose>
-			</a>
-		</li>
-	</xsl:template>
+    <xsl:result-document href="{$filename}">
+      <div id="entry-wrapper">
+        <xsl:apply-templates select="self::node()" mode="content">
+          <xsl:with-param name="type" select='$type'/>
+        </xsl:apply-templates>
+      </div>
+    </xsl:result-document>
+  </xsl:template>
+  
+  
+  
+  <!-- ====================================================== 
+    Page Content
+  -->
 
 
-	<!-- ===== 	docFilename Template  ===== -->
-	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		Notes: Constructs the filename for the documentation page 
-		for a thing, given its name and its type. This same 
-		template is used both to contruct the output filename 
-		when the file is written, and to make the hyperlink to it 
-		in the navigation panel.
-		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<xsl:template name="docFilename">
-		<xsl:param name="name"/>
-		<xsl:param name="type"/>
-		<xsl:param name="index"/>
+  <!-- Element Page -->
 
-		<xsl:choose>
-			<xsl:when test="$type='element'">
-				<xsl:text>el-</xsl:text>
-				<xsl:value-of select="translate($name, ':', '-')"/>
-			</xsl:when>
-			<xsl:when test="$type='attribute'">
-				<xsl:text>att-</xsl:text>
-				<xsl:value-of select="translate($name, ':', '-')"/>
-			</xsl:when>
-			<xsl:when test="$type='parameterEntities'">
-				<xsl:text>pe-</xsl:text>
-				<xsl:value-of select="$name"/>
-				<xsl:if test="$index != ''">
-					<xsl:value-of select="concat('-', $index)"/>
-				</xsl:if>
-			</xsl:when>
-			<xsl:when test="$type='generalEntities'">
-				<xsl:text>ge-</xsl:text>
-				<xsl:value-of select="$name"/>
-				<xsl:if test="$index != ''">
-					<xsl:value-of select="concat('-', $index)"/>
-				</xsl:if>
-			</xsl:when>
-		</xsl:choose>
-		<xsl:text>.html</xsl:text>
-	</xsl:template>
+  <xsl:template match="element" mode="content">
+    <h1>
+      <xsl:call-template name="makeLabel">
+        <xsl:with-param name="name" select='@name'/>
+        <xsl:with-param name="type" select='"elem"'/>
+      </xsl:call-template>
+      <xsl:if test="@root='true'">
+        <xsl:text> (root)</xsl:text>
+      </xsl:if>
+    </h1>
+    
+    <xsl:apply-templates select="annotations/annotation[@type='notes']"/>
+    
+    <xsl:variable name="e-name">
+      <xsl:value-of select="@name"/>
+    </xsl:variable>
+    <xsl:if test="../../attributes/attribute[attributeDeclaration/@element=$e-name]">
+      <h2>Attributes</h2>
+      <ul class="attributes">
+        <xsl:for-each select="../../attributes/attribute[attributeDeclaration/@element=$e-name]">
+          <xsl:sort select="@name"/>
+          <li>
+            <xsl:call-template name="makeLink">
+              <xsl:with-param name="name" select="@name"/>
+              <xsl:with-param name="type" select="'attr'"/>
+            </xsl:call-template>
+          </li>
+        </xsl:for-each>
+      </ul>
+    </xsl:if>
+    
+    <xsl:if test="content-model/@spec != 'empty'">
+      <h2>Content Model</h2>
+      <pre class="contentdesc">
+        <xsl:value-of select="content-model/@spaced"/>
+      </pre>
+      
+      <xsl:apply-templates select="annotations/annotation[@type='model']"/>
+      <xsl:if test="content-model//child[pmc:included(.)]">
+        <p>May Contain:</p>
+        <ul class="children">
+          <xsl:if test="content-model/@spec='mixed' or content-model/@spec='text'">
+            <li>PCDATA</li>
+          </xsl:if>
+          <xsl:for-each select="content-model//child[pmc:included(.)]">
+            <xsl:sort select="."/>
+            <li>
+              <xsl:call-template name="makeLink">
+                <xsl:with-param name="name" select="."/>
+                <xsl:with-param name="type" select="'elem'"/>
+              </xsl:call-template>
+            </li>
+          </xsl:for-each>
+        </ul>
+      </xsl:if>
+    </xsl:if>
+    
+    <xsl:apply-templates select="annotations/annotation[@type='tags']"/>
+    <xsl:apply-templates select="annotations/annotation[@type='example']"/>
+    
+    <xsl:if test="context/parent[pmc:included(@name)][@name=//element[not(@reachable='false')]/@name]">
+      <h2>May be contained in:</h2>
+      <ul class="parents">
+        <xsl:for-each select="context/parent[pmc:included(@name)][@name=//element[not(@reachable='false')]/@name]">
+          <xsl:sort select="@name"/>
+          <li>
+            <xsl:call-template name="makeLink">
+              <xsl:with-param name="name" select="@name"/>
+              <xsl:with-param name="type" select="'elem'"/>
+            </xsl:call-template>
+          </li>
+        </xsl:for-each>
+      </ul>
+    </xsl:if>
+  </xsl:template>
 
-	<!-- ===== 	makeIndex Template  ===== -->
-	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		Notes: This template computes an index number, when 
-		necessary, to append to a filename. The context should 
-		be an <entity> element. If there are other entities 
-		that have the same name as this one, ignoring case, 
-		then we'll need to append a suffix ("-1", "-2", etc.) 
-		to the filenames for those. Because computing the suffix 
-		is time-consuming, use the key to find out if there are 
-		others with such clashing names.
-		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<xsl:template name="makeIndex">
-		<xsl:choose>
-			<xsl:when test="$filesuffixes">
-				<xsl:variable name="lcname" select="lower-case(@name)"/>
-				<xsl:choose>
-					<xsl:when test="count(key('entitiesByLCName', $lcname)) > 1">
-						<!-- 
-						  This preceding-sibling expression is relatively slow, and was causing
-						  performance problems when running against JATS-type DTDs (which have hundreds
-						  of entities, and the sidebar was included in every page.
-						  But now that the sidebar is in a separate iframe, that doesn't matter.
-						  There must be a better XSLT 2.0 way to do this, but I don't know it [cfm]. 
-						-->
-						<xsl:value-of select="count(preceding-sibling::entity[lower-case(@name) = $lcname])"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:text/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:text/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
 
-	<xsl:function name="pmc:included" as="xs:boolean">
-		<xsl:param name="elemName" as="xs:string"/>
-		<xsl:value-of select="not(matches($elemName, $exclude-elems)) or matches($elemName, $exclude-except)"/>
-	</xsl:function>
+  <!-- Attribute Page -->
+
+  <xsl:template match="attribute" mode="content">
+    <h1>
+      <xsl:call-template name="makeLabel">
+        <xsl:with-param name="name" select='@name'/>
+        <xsl:with-param name="type" select='"attr"'/>
+      </xsl:call-template>
+    </h1>
+    
+    <xsl:apply-templates select="annotations/annotation[@type='notes']"/>
+    
+    <xsl:choose>
+      <xsl:when test="count(distinct-values(attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]/@type)) > 1">
+        <table class="attrtable">
+          <tr>
+            <th>Value</th>
+            <th>In Elements</th>
+          </tr>
+          <xsl:for-each-group select="attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]" group-by="@type">
+            <xsl:sort select="count(current-group()/@element)" order="ascending"/>
+            <tr class="attvalue">
+              <td>
+                <xsl:value-of select="current-grouping-key()"/>
+              </td>
+              <td>
+                <xsl:for-each select="current-group()">
+                  <xsl:value-of select="concat('&lt;', @element, '&gt;')"/>
+                  <xsl:text> </xsl:text>
+                </xsl:for-each>
+              </td>
+            </tr>
+          </xsl:for-each-group>
+        </table>
+      </xsl:when>
+      <xsl:otherwise>
+        <p class="bold">Value: <span class="attvalue">
+            <xsl:value-of select="attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)][1]/@type"/>
+          </span>
+        </p>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    <xsl:apply-templates select="annotations/annotation[@type='model']"/>
+    <xsl:apply-templates select="annotations/annotation[@type='tags']"/>
+    <xsl:apply-templates select="annotations/annotation[@type='example']"/>
+    
+    <h2>May be in elements</h2>
+    <ul class="parents">
+      <xsl:for-each select="attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]">
+        <xsl:sort select="@element"/>
+        <li>
+          <xsl:call-template name="makeLink">
+            <xsl:with-param name="name" select="@element"/>
+            <xsl:with-param name="type" select="'elem'"/>
+          </xsl:call-template>
+        </li>
+      </xsl:for-each>
+    </ul>
+  </xsl:template>
+
+
+  <!-- Entity Page -->
+
+  <xsl:template match="entity" mode="content">
+    <xsl:param name="type"/>
+    <h1>
+      <xsl:call-template name="makeLabel">
+        <xsl:with-param name="name" select='@name'/>
+        <xsl:with-param name="type" select='$type'/>
+      </xsl:call-template>
+    </h1>
+    
+    <xsl:apply-templates select="annotations/annotation[@type='notes']"/>
+    
+    <xsl:if test="value != ''">
+      <h2>Content Model</h2>
+      <p class="content-model">
+        <pre><xsl:value-of select="value"/></pre>
+      </p>
+      <xsl:apply-templates select="annotations/annotation[@type='model']"/>
+    </xsl:if>
+    
+    <xsl:apply-templates select="annotations/annotation[@type='tags']"/>
+    <xsl:apply-templates select="annotations/annotation[@type='example']"/>
+  </xsl:template>
+
+
+  <!-- Tag Page -->
+
+  <xsl:template match="tag" mode="content">
+    <xsl:variable name="name" select='string(.)'/>
+    
+    <h1>Tag: <xsl:value-of select="$name"/></h1>
+    
+    <h2>
+      <xsl:text>Tagged with "</xsl:text>
+      <xsl:value-of select="$name"/>
+      <xsl:text>"</xsl:text>
+    </h2>
+    <ul class="tags">
+      <xsl:for-each-group select="//*[annotations[annotation[tag=$name]]][not(self::element and (@reachable='false' or not(pmc:included(@name)))) and
+        not(self::attribute and ( @element and not(pmc:included(@element)) or @element=//element[@reachable='false']/@name))]" group-by="parent::node()/name()">
+        <h4 class="notetitle">
+          <xsl:value-of select="if (current-grouping-key()='parameterEntities') then 'parameter entities' else
+            if(current-grouping-key()='generalEntities') then 'general entities' else current-grouping-key()"/>
+        </h4>
+        <ul class="tags">
+          <xsl:for-each select="current-group()">
+            <xsl:sort select="translate(@name, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" order="ascending"/>
+            <xsl:call-template name="makeLink">
+              <xsl:with-param name="name" select='@name'/>
+              <!-- FIXME -->
+              <xsl:with-param name="type" select="if(self::entity) then parent::node()/name() else self::node()/name()"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </ul>
+      </xsl:for-each-group>
+    </ul>
+  </xsl:template>
+
+
+  <!-- Named templates for making links inside content.  -->
+  
+  <xsl:template name="makeLink">
+    <xsl:param name='name'/>
+    <xsl:param name='type'/>
+    <a href='#p=attr-{$name}'>
+      <xsl:call-template name="makeLabel">
+        <xsl:with-param name="name" select='$name'/>
+        <xsl:with-param name="type" select='$type'/>
+      </xsl:call-template>
+    </a>
+  </xsl:template>
+  
+  <xsl:template match="annotation[not(@type='schematron')]">
+    <div class="{@type}">
+      <xsl:if test="@type='example' or @type='tags'">
+        <h3 class="notetitle">
+          <xsl:value-of select="@type"/>
+        </h3>
+      </xsl:if>
+      <xsl:copy-of select="text()|* except tag" copy-namespaces="no"/>
+      <xsl:if test="@type='tags'">
+        <p>
+          <xsl:apply-templates select="tag"/>
+        </p>
+      </xsl:if>
+    </div>
+  </xsl:template>
+  
+  <xsl:template match="annotation[@type='schematron']"/>
+  
+  <xsl:template match="tag">
+    <a href="tag-{.}.html" class="tag">
+      <xsl:value-of select="."/>
+    </a>
+    <xsl:if test="following-sibling::tag">
+      <xsl:text>, </xsl:text>
+    </xsl:if>
+  </xsl:template>
+  
+  
+  
+
+  <!-- ================================================================= 
+    General Templates
+  -->
+
+
+  <!-- 
+    makeSlug 
+    Constructs the base part of the filename for the documentation page for a thing (element, 
+    attribute, etc.), given its name and its type.  This same template is used:
+      * to contruct the slug used in the navigation panel (toc.html),
+      * to create the output filename when the file is written, and
+      * to create inter-page links
+      
+    $type should be one of "elem", "attr", "pe", "ge", or "tag".
+  -->
+  <xsl:template name="makeSlug">
+    <xsl:param name="name"/>
+    <xsl:param name="type"/>
+    <xsl:variable name='index'>
+      <xsl:call-template name='makeIndex'>
+        <xsl:with-param name="name" select='$name'/>
+        <xsl:with-param name="type" select='$type'/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:value-of select='concat($type, "-")'/>
+    <xsl:choose>
+      <xsl:when test="$type='elem' or $type='attr'">
+        <xsl:value-of select="translate($name, ':', '-')"/>
+      </xsl:when>
+      <xsl:when test="$type='pe' or $type='ge'">
+        <xsl:value-of select="$name"/>
+        <xsl:if test="$index != ''">
+          <xsl:value-of select="concat('-', $index)"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test="$type='tag'">
+        <xsl:value-of select="translate($name, ':', '-')"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--
+    makeLabel - the label is what the human sees when there's a link to an attribute,
+    element, etc.  It includes the "@", angle-bracket, "&" decorations.
+  -->
+  <xsl:template name='makeLabel'>
+    <xsl:param name='name'/>
+    <xsl:param name='type'/>
+    <xsl:choose>
+      <xsl:when test="$type='elem'">
+        <xsl:value-of select="concat('&lt;', $name, '&gt;')"/>
+      </xsl:when>
+      <xsl:when test="$type='attr'">
+        <xsl:value-of select="concat('@', $name)"/>
+      </xsl:when>
+      <xsl:when test="$type='pe'">
+        <xsl:value-of select="concat('%', $name, ';')"/>
+      </xsl:when>
+      <xsl:when test="$type='ge'">
+        <xsl:value-of select="concat('&amp;', $name, ';')"/>
+      </xsl:when>
+      <xsl:when test='$type="tag"'>
+        <xsl:value-of select='$name'/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- 
+    makeIndex
+    This template computes an index number suffix, when necessary, to append to a slug for a parameter
+    or general entity.  If there are other entities that have the same name 
+    as this one, ignoring case, then we'll need to append a suffix ("-1", "-2", etc.) to the 
+    filenames for those. Because computing the suffix is time-consuming, use the key to find out 
+    if there are others with such clashing names.
+  -->
+  <xsl:template name="makeIndex">
+    <xsl:param name='name'/>
+    <xsl:param name='type'/>
+
+    <xsl:if test='$filesuffixes and ($type = "pe" or $type = "ge")'>
+      <!-- Use xsl:for-each to change the context to the <entity> element called out by this name and type. -->
+      <xsl:choose>
+        <xsl:when test='$type="pe"'>
+          <xsl:for-each select='/declarations/parameterEntities/entity[@name=$name]'>
+            <xsl:call-template name='entityIndex'>
+              <xsl:with-param name="name" select='$name'/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test='$type="ge"'>
+          <xsl:for-each select='/declarations/generalEntities/entity[@name=$name]'>
+            <xsl:call-template name='entityIndex'>
+              <xsl:with-param name="name" select='$name'/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name='entityIndex'>
+    <xsl:param name='name'/>
+
+    <xsl:variable name="lcname" select="lower-case($name)"/>
+    <xsl:if test="count(key('entitiesByLCName', $lcname)) > 1">
+      <!--
+        This preceding-sibling expression is relatively slow, and was causing
+        performance problems when running against JATS-type DTDs (which have hundreds
+        of entities, and the sidebar was included in every page.
+        But now that the sidebar is in a separate iframe, that doesn't matter.
+        There must be a better XSLT 2.0 way to do this, but I don't know it [cfm].
+      -->
+      <xsl:value-of select="count(preceding-sibling::entity[lower-case(@name) = $lcname])"/>
+    </xsl:if>
+  </xsl:template>
+
+
+  <xsl:function name="pmc:included" as="xs:boolean">
+    <xsl:param name="elemName" as="xs:string"/>
+    <xsl:value-of select="not(matches($elemName, $exclude-elems)) or matches($elemName, $exclude-except)"/>
+  </xsl:function>
 
 </xsl:stylesheet>

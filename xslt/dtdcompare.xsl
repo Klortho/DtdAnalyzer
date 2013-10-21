@@ -26,7 +26,7 @@
         templates to dtd2 -->
    <xsl:variable name="dtd1" select="/"/>
    <xsl:variable name="dtd2" select="document($dtd2-loc)"/>
-  
+
    <xsl:variable name='dtd1-title'>
      <xsl:choose>
        <xsl:when test='$dtd1-name != "unknown"'>
@@ -53,7 +53,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
-  
+
    <!-- ============================================================================== -->
    <!-- Start building HTML here   -->
    <!-- ============================================================================== -->
