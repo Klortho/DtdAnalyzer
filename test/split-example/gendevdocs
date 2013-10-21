@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Generate development version of docs
+rm -rf doc.save
+mv doc doc.save
+rm -rf devdoc
+dtddocumentor -e -m -dir devdoc \
+  --css="/assets/jatsdoc.css" \
+  --js="/assets/jatsdoc.js" \
+  split-example.dtd
+mv doc devdoc
+mv doc.save doc

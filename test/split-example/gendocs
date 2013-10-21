@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Generate production version of docs
+rm -rf doc
+dtddocumentor -e -m \
+  --css="http://jatspan.org/jatsdoc-dev/jatsdoc.css" \
+  --js="http://jatspan.org/jatsdoc-dev/jatsdoc.js" \
+  split-example.dtd
