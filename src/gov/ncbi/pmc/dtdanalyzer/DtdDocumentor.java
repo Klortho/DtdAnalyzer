@@ -21,7 +21,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 
 public class DtdDocumentor {
-    
+
     private static App app;
 
     /**
@@ -80,7 +80,7 @@ public class DtdDocumentor {
                 excludeExcept = opt.getValue();
                 return true;
             }
-            
+
             return false;
         }
     };
@@ -112,9 +112,9 @@ public class DtdDocumentor {
             "is a summary of arguments; the complete list is below."
         );
         app.initialize();
-    
+
         // This parses the DTD, and corrals the data into a model:
-        ModelBuilder model = 
+        ModelBuilder model =
             new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver(), app.getDebug());
 
         XMLWriter writer = new XMLWriter(model);
@@ -125,9 +125,9 @@ public class DtdDocumentor {
 
         try {
             InputStreamReader reader = writer.getXML();
-            
+
             File xslFile = new File(app.getHome(), "xslt/dtddocumentor.xsl");
-            Transformer xslt = 
+            Transformer xslt =
                 TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
             ArrayList xsltParams = app.getXsltParams();
             int numXsltParams = xsltParams.size() / 2;
@@ -136,60 +136,39 @@ public class DtdDocumentor {
                     xslt.setParameter((String) xsltParams.get(2*i), (String) xsltParams.get(2*i+1));
                 }
             }
-            
+
             // Now get the dir, css, etc. options and pass those in as params
             if (dir == null) dir = "doc";
             xslt.setParameter("dir", dir);
-            
-            // We set the defaults for css and js here, which should match the default in the 
-            // stylesheet.  The reason is that the Java code needs to know what the filename is, so
-            // that it can copy it into the destination directory
-            if (css == null) css = "dtddoc.css";
-            xslt.setParameter("css", css);
-            
-            if (js == null) js = "expand.js";
-            xslt.setParameter("js", js);
-            
+
+            // Set css and js if they were given
+            if (css != null) xslt.setParameter("css", css);
+            if (js != null) xslt.setParameter("js", js);
+
             if (include != null) xslt.setParameter("include-files", include);
-            
+
             if (entities) xslt.setParameter("entities", "on");
             xslt.setParameter("filesuffixes", suffixes);
-            
+
             if (excludeElems != null) xslt.setParameter("exclude-elems", excludeElems);
-            
+
             if (excludeExcept != null) xslt.setParameter("exclude-except", excludeExcept);
-            
-            // Use this constructor because Saxon always 
-            // looks for a system id even when a reader is used as the source  
+
+            // Use this constructor because Saxon always
+            // looks for a system id even when a reader is used as the source
             // If no string is provided for the sysId, we get a null pointer exception
             Source xmlSource = new StreamSource(reader, "");
             Result r = new StreamResult(new NullOutputStream());
             xslt.transform(xmlSource, r);
-            
-            // Copy the css and js files in, if they exist in our etc/dtddoc directory,
-            // and don't exist already in the target directory.
-            File destDir = new File(dir);
-            File srcFile;
-            File destFile;
-            srcFile = new File(app.getHome(), "etc/dtddoc/" + css);
-            destFile = new File(destDir, css);
-            if (srcFile.exists() && !destFile.exists()) {
-                FileUtils.copyFile(srcFile, destFile);
-            }
-            srcFile = new File(app.getHome(), "etc/dtddoc/" + js);
-            destFile = new File(destDir, js);
-            if (srcFile.exists() && !destFile.exists()) {
-                FileUtils.copyFile(srcFile, destFile);
-            }
-            
+
 
             System.out.println("Done, documention is in the " + dir + " directory.");
         }
 
-        catch (Exception e){ 
+        catch (Exception e){
             System.err.println("Could not run the transformation: " + e.getMessage());
             e.printStackTrace(System.out);
-        }     
+        }
     }
 
     /**
@@ -214,7 +193,8 @@ public class DtdDocumentor {
             OptionBuilder
                 .withLongOpt("css")
                 .withDescription("Specify a CSS file that is included in a <link> element within " +
-                    " each HTML output page.  Defaults to dtddoc.css.")
+                    " each HTML output page.  Defaults to " +
+                    "http://dtd.nlm.nih.gov/ncbi/jatsdoc/0.1/jatsdoc.css.")
                 .hasArg()
                 .withArgName("file")
                 .create()
@@ -223,7 +203,8 @@ public class DtdDocumentor {
             OptionBuilder
                 .withLongOpt("js")
                 .withDescription("Specify a Javascript file that is invoked from each HTML " +
-                    "output page.  Defaults to expand.js.")
+                    "output page.  Defaults to " +
+                    "http://dtd.nlm.nih.gov/ncbi/jatsdoc/0.1/jatsdoc.js.")
                 .hasArg()
                 .withArgName("file")
                 .create()
@@ -272,7 +253,7 @@ public class DtdDocumentor {
                 .withArgName("elems")
                 .create()
         );
-        /* 
+        /*
           The 'q' here is a hack to get around some weird behavior that I can't figure out.
           If the 'q' is omitted, this option just doesn't work.
         */
@@ -282,7 +263,7 @@ public class DtdDocumentor {
                 .withDescription("Turns on debugging messages.")
                 .create('q')
         );
-        
+
         return _opts;
     }
 }
