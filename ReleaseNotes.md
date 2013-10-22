@@ -1,16 +1,12 @@
 # DtdAnalyzer Release Notes
 
-## DtdAnalyzer v0.3-dev
+## DtdAnalyzer v0.4 - 2013-10-21
 
-### Features
+### Changes
 
-### Enhancements
-
-### Bug fixes
-
-### Performance
-
-### Other
+* dtddocumentor now uses the [jatsdoc](https://github.com/Klortho/jatsdoc)
+  documentation library
+* Miscellaneous bug fixes
 
 ## DtdAnalyzer v0.3 - 2013-1-1
 
