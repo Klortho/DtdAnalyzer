@@ -56,6 +56,18 @@ elements that look suspiciously like HTML.
 <!ENTITY % inline.ent PUBLIC "-//NLM//external ent dummy public id 1//EN" "core/inline.ent">
 %inline.ent;
 
+<!--~~ %InLine.ent;
+This is an entity that differs from another only in case.  When we generate documentation for
+a Windows machine, we add a suffix to the "slug" and the filename, because the Windows filesystem
+is case-insensitive.  This is the default behavior.  To turn it of (if you know, for example,
+that the documentation will be deployed to a Unix computer) use -nosuffixes.
+~~-->
+
+<!ENTITY % InLine.ent PUBLIC "-//NLM//external ent dummy public id 3//EN" "InLine.ent">
+%InLine.ent;
+
+
+
 <!--~~ %banana.ent;
 In the split DTD, we bring in the banana.ent module in order to get all the 
 slippery things assocatied with bananas.

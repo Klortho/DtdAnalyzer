@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# Generate development version of docs
-rm -rf doc.save
-mv doc doc.save
+# Generate development version of docs from scratch.
+# These are intended for use within the development version of jatsdoc.
+# See https://github.com/Klortho/jatsdoc/tree/master#development
+# In particular, you will need to create a softlink from the root of
+# your jatsdoc development tree, named 'docs', to the 'devdoc' directory
+# here.
+
 rm -rf devdoc
 dtddocumentor -e -m -dir devdoc \
   --css="/assets/jatsdoc.css" \
   --js="/assets/jatsdoc.js" \
   split-example.dtd
-mv doc devdoc
-mv doc.save doc

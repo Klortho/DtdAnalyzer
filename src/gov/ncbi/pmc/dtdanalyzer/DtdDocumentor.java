@@ -139,7 +139,7 @@ public class DtdDocumentor {
 
             // Now get the dir, css, etc. options and pass those in as params
             if (dir == null) dir = "doc";
-            xslt.setParameter("dir", dir);
+            xslt.setParameter("docDir", dir);
 
             // Set css and js if they were given
             if (css != null) xslt.setParameter("css", css);

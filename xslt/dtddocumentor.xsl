@@ -20,7 +20,9 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" 
                 version="2.0">
 
-  <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+  <xsl:output method="html" 
+              encoding="UTF-8" 
+              indent="yes"/>
 
   <!-- Current date and time, for stamping onto each output page -->
   <xsl:param name="date" select="format-date(current-date(),'[MNn] [D], [Y]')"/>
@@ -104,7 +106,7 @@
 
         <!-- tags, if any exist -->
         <xsl:if test="//annotation[@type='tags']">
-          <li class="top-cat has-kids" data-slug="tags">
+          <li class="top-cat has-kids">
             <span class="top-cat-name">Tags</span>
             <ul class="entries">
               <xsl:for-each select="distinct-values(//annotation[@type='tags']/tag)">
@@ -234,6 +236,8 @@
     <xsl:variable name="file" select="concat($docDir, '/index.html')"/>
     
     <xsl:result-document href="{$file}">
+      <!-- We require the HTML5 doctype, otherwise scrolling is messed up.  -->
+      <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
       <html>
         <head>
           <title>
@@ -521,7 +525,8 @@
     <xsl:apply-templates select="annotations/annotation[@type='notes']"/>
     
     <xsl:choose>
-      <xsl:when test="count(distinct-values(attributeDeclaration[not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]/@type)) > 1">
+      <xsl:when test="count(distinct-values(attributeDeclaration[
+                        not(not(pmc:included(@element)) or @element=//element[@reachable='false']/@name)]/@type)) > 1">
         <table class="attrtable">
           <tr>
             <th>Value</th>
@@ -635,7 +640,14 @@
   <xsl:template name="makeLink">
     <xsl:param name='name'/>
     <xsl:param name='type'/>
-    <a href='#p=attr-{$name}'>
+    <a>
+      <xsl:attribute name='href'>
+        <xsl:text>#p=</xsl:text>
+        <xsl:call-template name="makeSlug">
+          <xsl:with-param name='name' select='$name'/>
+          <xsl:with-param name="type" select='$type'/>
+        </xsl:call-template>
+      </xsl:attribute>
       <xsl:call-template name="makeLabel">
         <xsl:with-param name="name" select='$name'/>
         <xsl:with-param name="type" select='$type'/>
@@ -650,7 +662,7 @@
           <xsl:value-of select="@type"/>
         </h3>
       </xsl:if>
-      <xsl:copy-of select="text()|* except tag" copy-namespaces="no"/>
+      <xsl:apply-templates select="text()|* except tag" mode='content'/>
       <xsl:if test="@type='tags'">
         <p>
           <xsl:apply-templates select="tag"/>
@@ -658,18 +670,46 @@
       </xsl:if>
     </div>
   </xsl:template>
+
+  <xsl:template match='@*|node()' mode='content'>
+    <xsl:copy>
+      <xsl:apply-templates select='@*|node()' mode='content'/>
+    </xsl:copy>
+  </xsl:template>
+
+  <!-- We have to intercept the <a> hyperlinks to other pages that were created by Java,
+    because Java doesn't know about the index suffixes that we might have added. -->
+  <xsl:template match='a[starts-with(@href, "#p=")]' mode='content'>
+    <xsl:variable name='orig-slug' select='substring-after(@href, "#p=")'/>
+    <xsl:variable name='name' select='substring-after($orig-slug, "-")'/>
+    <xsl:variable name='type' select='substring-before($orig-slug, "-")'/>
+    
+    <!-- Redo the hyperlink with a new href, but preserve other attributes and content -->
+    <a>
+      <xsl:apply-templates select='@* except @href' mode='content'/>
+      <xsl:attribute name='href'>
+        <xsl:text>#p=</xsl:text>
+        <xsl:call-template name="makeSlug">
+          <xsl:with-param name='name' select='$name'/>
+          <xsl:with-param name="type" select='$type'/>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:apply-templates select='node()' mode='content'/>
+    </a>
+  </xsl:template>
   
+
   <xsl:template match="annotation[@type='schematron']"/>
   
   <xsl:template match="tag">
-    <a href="tag-{.}.html" class="tag">
-      <xsl:value-of select="."/>
-    </a>
+    <xsl:call-template name="makeLink">
+      <xsl:with-param name="name" select='.'/>
+      <xsl:with-param name="type" select='"tag"'/>
+    </xsl:call-template>
     <xsl:if test="following-sibling::tag">
       <xsl:text>, </xsl:text>
     </xsl:if>
   </xsl:template>
-  
   
   
 

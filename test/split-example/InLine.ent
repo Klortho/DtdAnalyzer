@@ -1,0 +1,13 @@
+<!--~~ InLine.ent
+This module differs from %inline.ent; only in case.
+~~-->
+
+
+<!ENTITY % more_inline "a | u | o" >
+
+
+<!ELEMENT a (#PCDATA|%inline;)* >
+
+<!ELEMENT u (#PCDATA|%inline;)* >
+
+<!ELEMENT o (#PCDATA|%inline;)* >

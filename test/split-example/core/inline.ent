@@ -4,7 +4,7 @@ This module defines the elements that can be used inline in a description.
 
 <!--~~ %inline;
 Example parameter entity.  This is a list of elements that can be included inline
-within a &lt;banana> element.
+within a `<banana> element.
 ~~-->
 
 <!ENTITY % inline "em | strong | i | img" >

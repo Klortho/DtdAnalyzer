@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Generate production version of docs
+# Generate "production" version of docs for the split example, from scratch.
+# Uses the default values for css and js.
+
 rm -rf doc
-dtddocumentor -e -m \
-  --css="http://jatspan.org/jatsdoc-dev/jatsdoc.css" \
-  --js="http://jatspan.org/jatsdoc-dev/jatsdoc.js" \
-  split-example.dtd
+dtddocumentor -e -m split-example.dtd
