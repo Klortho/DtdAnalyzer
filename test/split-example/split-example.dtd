@@ -33,6 +33,9 @@ Four bananas make a bunch and so do many more.
 root rock-group mess-of-fun
 
 ~~ examples
+Here is an example of how the XML might look.  Note that because this block is indented four
+spaces, it will appear as a code block (per Markdown).
+
     <split>
       <banana instrument='guitar'>Fleegle</banana>
       <banana instrument='drums'>Bingo</banana>

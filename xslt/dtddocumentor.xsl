@@ -493,7 +493,7 @@
     </xsl:if>
     
     <xsl:apply-templates select="annotations/annotation[@type='tags']"/>
-    <xsl:apply-templates select="annotations/annotation[@type='example']"/>
+    <xsl:apply-templates select="annotations/annotation[@type='examples']"/>
     
     <xsl:if test="context/parent[pmc:included(@name)][@name=//element[not(@reachable='false')]/@name]">
       <h2>May be contained in:</h2>
@@ -558,7 +558,7 @@
     
     <xsl:apply-templates select="annotations/annotation[@type='model']"/>
     <xsl:apply-templates select="annotations/annotation[@type='tags']"/>
-    <xsl:apply-templates select="annotations/annotation[@type='example']"/>
+    <xsl:apply-templates select="annotations/annotation[@type='examples']"/>
     
     <h2>May be in elements</h2>
     <ul class="parents">
@@ -597,7 +597,7 @@
     </xsl:if>
     
     <xsl:apply-templates select="annotations/annotation[@type='tags']"/>
-    <xsl:apply-templates select="annotations/annotation[@type='example']"/>
+    <xsl:apply-templates select="annotations/annotation[@type='examples']"/>
   </xsl:template>
 
 
@@ -657,10 +657,11 @@
   
   <xsl:template match="annotation[not(@type='schematron')]">
     <div class="{@type}">
-      <xsl:if test="@type='example' or @type='tags'">
-        <h3 class="notetitle">
-          <xsl:value-of select="@type"/>
-        </h3>
+      <xsl:if test="@type='examples'">
+        <h2 class="notetitle">Examples</h2>
+      </xsl:if>
+      <xsl:if test="@type='tags'">
+        <h2 class="notetitle">Tags</h2>
       </xsl:if>
       <xsl:apply-templates select="text()|* except tag" mode='content'/>
       <xsl:if test="@type='tags'">
