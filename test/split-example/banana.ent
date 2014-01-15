@@ -12,7 +12,7 @@ This specifies one banana.  One banana doesn't make a bunch.
   </assert>
 ~~-->
 
-<!ELEMENT banana (#PCDATA|%inline;)* >
+<!ELEMENT banana (#PCDATA)* >
 <!ATTLIST banana 
           name CDATA #REQUIRED>
 

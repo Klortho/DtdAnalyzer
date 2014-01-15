@@ -14,6 +14,22 @@ Here is how you make links to other documentation pages:
 * Attribute:  \@instrument -> @instrument
 * Parameter entity:  \%banana.ent; -> %banana.ent;
 * General entity:  \&fleegle-pic; -> &fleegle-pic;
+* Check this out: \&lt;
+
+Here is some quoted markup:
+
+```xml
+<?processing-instruction foo="bar"?>
+<!-\- comment comment comment -\->
+<splits>fun</splits>
+```
+
+Here is an example, written in XHTML, that has color and emphasis:
+
+<pre>&lt;split>
+  <span color='style: color: red;'>&lt;banana instrument='guitar'>Fleegle&lt;/banana></span>
+  <strong><em>&lt;banana instrument='drums'>Bingo&lt;/banana></em></strong>
+&lt;/split></pre>
 
 ~~-->
 
@@ -72,7 +88,7 @@ that the documentation will be deployed to a Unix computer) use -nosuffixes.
 
 
 <!--~~ %banana.ent;
-In the split DTD, we bring in the banana.ent module in order to get all the 
+In the split DTD, we bring in the banana.ent module in order to get all the
 slippery things assocatied with bananas.
 ~~-->
 

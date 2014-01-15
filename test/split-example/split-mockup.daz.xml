@@ -1,251 +1,324 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <declarations>
-  <dtd relSysId="split-example.dtd" 
-    systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/split-example/split-example.dtd"
-    publicId="-//NLM//external dtd dummy public id//EN">
-    <annotations>
-      <annotation type='note'>
-        <p>
-          This is a sample DTD to illustrate and to test various features of the
-          DtdAnalyzer.
-        </p>
-        <p>
-          This is the main ".dtd" module of this DTD.  These notes will be inserted into
-          the main index.html page of the documenation.  Note that since this is the main
-          module, we should use the "!dtd" annotations, and not any "!module" annotations
-          here.
-        </p>
-      </annotation>
-    </annotations>
-  </dtd>
-  
-  <elements>
-    <element name="split" dtdOrder="1">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/split-example.dtd"
-        publicId="-//NLM//external dtd dummy public id//EN" lineNumber="39"/>
-      <content-model spec="element" minified="(banana)*" spaced="( banana )*">
-        <choice q="*">
-          <child>banana</child>
-        </choice>
-      </content-model>
+   <title>Banana Split Example DTD</title>
+   <dtd relSysId="split-example.dtd"
+        systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/split-example.dtd">
       <annotations>
-        <annotation type='note'>
-          <p>Specifies the main ingredients of a banana split.
-            Remember the following:</p>
-          <ul>
-            <li>One banana</li>
-            <li>Two banana</li>
-            <li>Three banana</li>
-            <li>Four</li>
-          </ul>
-        </annotation>
-        <annotation type='model'>
-          <p>Four bananas make a bunch and so do many more.</p>
-        </annotation>
-        <annotation type='tags'>
-          <tag>root</tag>
-          <tag>rock-group</tag>
-          <tag>mess-of-fun</tag>
-        </annotation>
-        <annotation type='example'>
-          <pre><code>&lt;split&gt;
+         <annotation type="notes">
+            <p>This is a sample DTD to illustrate and to test various features of the DtdAnalyzer.</p>
+            <p>This is the main ".dtd" module of this DTD. These notes will be inserted into the main index.html page of the documenation. Note that since this is the main module, we should use the "!dtd" annotations, and not any "!module" annotations here.</p>
+            <p>Here is how you make links to other documentation pages:</p>
+            <ul>
+               <li>Element tags must be preceded with a backtick: `&lt;split&gt; -&gt; <a href="#p=elem-split">&lt;split&gt;</a>.</li>
+               <li>Attribute: @instrument -&gt; <a href="#p=attr-instrument">@instrument</a>
+               </li>
+               <li>Parameter entity: %banana.ent; -&gt; <a href="#p=pe-banana.ent">%banana.ent;</a>
+               </li>
+               <li>General entity: &amp;fleegle-pic; -&gt; <a href="#p=ge-fleegle-pic">&amp;fleegle-pic;</a>
+               </li>
+            </ul>
+         </annotation>
+      </annotations>
+   </dtd>
+   <elements>
+      <element name="split" dtdOrder="1" root="true">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/split-example.dtd"
+                     lineNumber="52"/>
+         <content-model spec="element" minified="(banana)*" spaced="( banana )*">
+            <choice q="*">
+               <child>banana</child>
+            </choice>
+         </content-model>
+         <annotations>
+            <annotation type="tags">
+               <tag>root</tag>
+               <tag>rock-group</tag>
+               <tag>mess-of-fun</tag>
+            </annotation>
+            <annotation type="model">
+               <p>Four bananas make a bunch and so do many more.</p>
+            </annotation>
+            <annotation type="schematron">
+               <report test="count(banana) &lt; 4">
+    You need four bananas to make a bunch.  Many more is okay, too.
+  </report>
+            </annotation>
+            <annotation type="examples">
+               <p>Here is an example of how the XML might look. Note that because this block is indented four spaces, it will appear as a code block (per Markdown).</p>
+               <pre>
+                  <code>&lt;split&gt;
   &lt;banana instrument='guitar'&gt;Fleegle&lt;/banana&gt;
   &lt;banana instrument='drums'&gt;Bingo&lt;/banana&gt;
   &lt;banana instrument='bass'&gt;Drooper&lt;/banana&gt;
   &lt;banana instrument='keyboard'&gt;Snorky&lt;/banana&gt;
-&lt;/split&gt;</code></pre>
-        </annotation>
-        <annotation type='schematron'>
-          <report test='count(banana) &lt; 4'>
-            You need four bananas to make a bunch.  Many more is okay, too.
-          </report>
-        </annotation>
-      </annotations>
-    </element>
-    <element name="i" dtdOrder="4">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
-        publicId="-//NLM//external ent dummy public id 1//EN" lineNumber="17"/>
-      <content-model spec="mixed" minified="(#PCDATA|em|strong|i|img)*"
-        spaced="( #PCDATA | em | strong | i | img )">
-        <child>em</child>
-        <child>strong</child>
-        <child>i</child>
-        <child>img</child>
-      </content-model>
-      <context>
-        <parent name="i"/>
-        <parent name="banana"/>
-        <parent name="em"/>
-        <parent name="strong"/>
-      </context>
-    </element>
-    <element name="banana" dtdOrder="6">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/banana.ent"
-        publicId="-//NLM//external ent dummy public id 2//EN" lineNumber="15"/>
-      <content-model spec="mixed" minified="(#PCDATA|em|strong|i|img)*"
-        spaced="( #PCDATA | em | strong | i | img )">
-        <child>em</child>
-        <child>strong</child>
-        <child>i</child>
-        <child>img</child>
-      </content-model>
-      <context>
-        <parent name="split"/>
-      </context>
-      <annotations>
-        <annotation type='note'>
-          <p>This specifies one banana.  One banana doesn't make a bunch.</p>
-        </annotation>
-        <annotation type='schematron'>
-          <assert test="@instrument != 'drums' or . = 'Bingo'">
-            If he plays the drums, he must be Bingo!
-          </assert>
-        </annotation>
-      </annotations>
-    </element>
-    <element name="em" dtdOrder="2">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
-        publicId="-//NLM//external ent dummy public id 1//EN" lineNumber="13"/>
-      <content-model spec="mixed" minified="(#PCDATA|em|strong|i|img)*"
-        spaced="( #PCDATA | em | strong | i | img )">
-        <child>em</child>
-        <child>strong</child>
-        <child>i</child>
-        <child>img</child>
-      </content-model>
-      <context>
-        <parent name="i"/>
-        <parent name="banana"/>
-        <parent name="em"/>
-        <parent name="strong"/>
-      </context>
-    </element>
-    <element name="img" dtdOrder="5">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
-        publicId="-//NLM//external ent dummy public id 1//EN" lineNumber="19"/>
-      <content-model spec="empty" minified="EMPTY" spaced="EMPTY"/>
-      <context>
-        <parent name="i"/>
-        <parent name="banana"/>
-        <parent name="em"/>
-        <parent name="strong"/>
-      </context>
-    </element>
-    <element name="strong" dtdOrder="3">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
-        publicId="-//NLM//external ent dummy public id 1//EN" lineNumber="15"/>
-      <content-model spec="mixed" minified="(#PCDATA|em|strong|i|img)*"
-        spaced="( #PCDATA | em | strong | i | img )">
-        <child>em</child>
-        <child>strong</child>
-        <child>i</child>
-        <child>img</child>
-      </content-model>
-      <context>
-        <parent name="i"/>
-        <parent name="banana"/>
-        <parent name="em"/>
-        <parent name="strong"/>
-      </context>
-    </element>
-  </elements>
-  
-  <attributes>
-    <attribute name="src">
-      <attributeDeclaration element="img" type="CDATA" mode="#REQUIRED">
-        <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
-          publicId="-//NLM//external ent dummy public id 1//EN" lineNumber="20"/>
-      </attributeDeclaration>
-    </attribute>
-    <attribute name="name">
-      <attributeDeclaration element="banana" type="CDATA" mode="#REQUIRED">
-        <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/banana.ent"
-          publicId="-//NLM//external ent dummy public id 2//EN" lineNumber="17"/>
-      </attributeDeclaration>
-    </attribute>
-    <attribute name="instrument">
-      <attributeDeclaration element="banana" type="CDATA" mode="#IMPLIED">
-        <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/banana.ent"
-          publicId="-//NLM//external ent dummy public id 2//EN" lineNumber="30"/>
-      </attributeDeclaration>
-      <annotations>
-        <annotation type='note'>
-          <p>Describes a banana's instrument.</p>
-        </annotation>
-        <annotation type='schematron'>
-          <assert test="not(parent::banana) or
-            . = 'guitar' or . = 'drums' or . = 'bass' or . = 'keyboards'">
-            Bananas can only play guitar, drums, bass, or keyboards.
-          </assert>
-        </annotation>
-      </annotations>
-    </attribute>
-  </attributes>
-  
-  <parameterEntities>
-    <entity name="banana.ent"
-      relSysId='banana.ent'
-      systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/banana.ent"
-      publicId="-//NLM//external ent dummy public id 2//EN">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/split-example.dtd"
-        publicId="-//NLM//external dtd dummy public id//EN" lineNumber="45"/>
-      <annotations level='reference'>
-        <annotation type='note'>
-          <p>In the split DTD, we bring in the banana.ent module in order to get all the 
-            slippery things assocatied with bananas.</p>
-        </annotation>
-      </annotations>
-      <annotations level='module'>
-        <annotation type='note'>
-          <p>This module defines the &lt;banana> element, and all the slippery things associated
-            with it.</p>
-        </annotation>
-      </annotations>
-    </entity>
-    
-    <entity name="inline.ent"
-      relSysId='inline.ent'
-      systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
-      publicId="-//NLM//external ent dummy public id 1//EN">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/split-example.dtd"
-        publicId="-//NLM//external dtd dummy public id//EN" lineNumber="42"/>
-      <annotations level='reference'>
-        <annotation type='note'>
-          <p>This entity declares some "core" things, that really just happen to be a few
-            elements that look suspiciously like HTML.</p>
-        </annotation>
-      </annotations>
-      <annotations level='module'>
-        <annotation type='note'>
-          <p>This module defines the elements that can be used inline in a description.</p>
-        </annotation>
-      </annotations>
-    </entity>
-    
-    <entity name="inline">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/inline.ent"
-        publicId="-//NLM//external ent dummy public id 1//EN" lineNumber="10"/>
-      <value>em | strong | i | img</value>
-      <annotations>
-        <annotation type='note'>
-          <p>Example parameter entity.  This is a list of elements that can be included inline
-            within a &lt;banana> element.</p>
-        </annotation>
-      </annotations>
-    </entity>
-  </parameterEntities>
-
-  <generalEntities>
-    <entity name="fleegle-pic"
-      systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/fleegle-pic.ent">
-      <declaredIn systemId="file:///home/maloneyc/git/NCBITools/DtdAnalyzer/test/banana.ent"
-        publicId="-//NLM//external ent dummy public id 2//EN" lineNumber="34"/>
-      <annotations>
-        <annotation type='note'>
-          <p>This is a picture of Fleegle.</p>
-        </annotation>
-      </annotations>
-    </entity>
-  </generalEntities>
+&lt;/split&gt;</code>
+               </pre>
+            </annotation>
+            <annotation type="notes">
+               <p>Specifies the main ingredients of a banana split. Remember the following:</p>
+               <ul>
+                  <li>One banana,</li>
+                  <li>Two banana,</li>
+                  <li>Three banana,</li>
+                  <li>Four.</li>
+               </ul>
+            </annotation>
+         </annotations>
+      </element>
+      <element name="a" dtdOrder="6" reachable="false">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/InLine.ent"
+                     publicId="-//NLM//external ent dummy public id 3//EN"
+                     lineNumber="9"/>
+         <content-model spec="mixed"
+                        minified="(#PCDATA|em|strong|i|img)*"
+                        spaced="( #PCDATA | em | strong | i | img )*">
+            <child>em</child>
+            <child>strong</child>
+            <child>i</child>
+            <child>img</child>
+         </content-model>
+      </element>
+      <element name="o" dtdOrder="8" reachable="false">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/InLine.ent"
+                     publicId="-//NLM//external ent dummy public id 3//EN"
+                     lineNumber="13"/>
+         <content-model spec="mixed"
+                        minified="(#PCDATA|em|strong|i|img)*"
+                        spaced="( #PCDATA | em | strong | i | img )*">
+            <child>em</child>
+            <child>strong</child>
+            <child>i</child>
+            <child>img</child>
+         </content-model>
+      </element>
+      <element name="i" dtdOrder="4" reachable="false">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/core/inline.ent"
+                     publicId="-//NLM//external ent dummy public id 1//EN"
+                     lineNumber="17"/>
+         <content-model spec="mixed"
+                        minified="(#PCDATA|em|strong|i|img)*"
+                        spaced="( #PCDATA | em | strong | i | img )*">
+            <child>em</child>
+            <child>strong</child>
+            <child>i</child>
+            <child>img</child>
+         </content-model>
+         <context>
+            <parent name="a"/>
+            <parent name="o"/>
+            <parent name="i"/>
+            <parent name="u"/>
+            <parent name="em"/>
+            <parent name="strong"/>
+         </context>
+      </element>
+      <element name="banana" dtdOrder="9">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/banana.ent"
+                     publicId="-//NLM//external ent dummy public id 2//EN"
+                     lineNumber="15"/>
+         <content-model spec="mixed" minified="(#PCDATA)*" spaced="( #PCDATA | )*"/>
+         <context>
+            <parent name="split"/>
+         </context>
+         <annotations>
+            <annotation type="schematron">
+               <assert test="@instrument != 'drums' or @name = 'Bingo'">
+    If he plays the drums, he must be Bingo!
+  </assert>
+            </annotation>
+            <annotation type="notes">
+               <p>This specifies one banana. One banana doesn't make a bunch.</p>
+            </annotation>
+         </annotations>
+      </element>
+      <element name="u" dtdOrder="7" reachable="false">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/InLine.ent"
+                     publicId="-//NLM//external ent dummy public id 3//EN"
+                     lineNumber="11"/>
+         <content-model spec="mixed"
+                        minified="(#PCDATA|em|strong|i|img)*"
+                        spaced="( #PCDATA | em | strong | i | img )*">
+            <child>em</child>
+            <child>strong</child>
+            <child>i</child>
+            <child>img</child>
+         </content-model>
+      </element>
+      <element name="em" dtdOrder="2" reachable="false">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/core/inline.ent"
+                     publicId="-//NLM//external ent dummy public id 1//EN"
+                     lineNumber="13"/>
+         <content-model spec="mixed"
+                        minified="(#PCDATA|em|strong|i|img)*"
+                        spaced="( #PCDATA | em | strong | i | img )*">
+            <child>em</child>
+            <child>strong</child>
+            <child>i</child>
+            <child>img</child>
+         </content-model>
+         <context>
+            <parent name="a"/>
+            <parent name="o"/>
+            <parent name="i"/>
+            <parent name="u"/>
+            <parent name="em"/>
+            <parent name="strong"/>
+         </context>
+      </element>
+      <element name="img" dtdOrder="5" reachable="false">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/core/inline.ent"
+                     publicId="-//NLM//external ent dummy public id 1//EN"
+                     lineNumber="19"/>
+         <content-model spec="empty" minified="EMPTY" spaced="EMPTY"/>
+         <context>
+            <parent name="a"/>
+            <parent name="o"/>
+            <parent name="i"/>
+            <parent name="u"/>
+            <parent name="em"/>
+            <parent name="strong"/>
+         </context>
+      </element>
+      <element name="strong" dtdOrder="3" reachable="false">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/core/inline.ent"
+                     publicId="-//NLM//external ent dummy public id 1//EN"
+                     lineNumber="15"/>
+         <content-model spec="mixed"
+                        minified="(#PCDATA|em|strong|i|img)*"
+                        spaced="( #PCDATA | em | strong | i | img )*">
+            <child>em</child>
+            <child>strong</child>
+            <child>i</child>
+            <child>img</child>
+         </content-model>
+         <context>
+            <parent name="a"/>
+            <parent name="o"/>
+            <parent name="i"/>
+            <parent name="u"/>
+            <parent name="em"/>
+            <parent name="strong"/>
+         </context>
+      </element>
+   </elements>
+   <attributes>
+      <attribute name="src">
+         <attributeDeclaration element="img" type="CDATA" mode="#REQUIRED">
+            <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/core/inline.ent"
+                        publicId="-//NLM//external ent dummy public id 1//EN"
+                        lineNumber="20"/>
+         </attributeDeclaration>
+      </attribute>
+      <attribute name="name">
+         <attributeDeclaration element="banana" type="CDATA" mode="#REQUIRED">
+            <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/banana.ent"
+                        publicId="-//NLM//external ent dummy public id 2//EN"
+                        lineNumber="17"/>
+         </attributeDeclaration>
+      </attribute>
+      <attribute name="instrument">
+         <attributeDeclaration element="banana" type="CDATA" mode="#IMPLIED">
+            <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/banana.ent"
+                        publicId="-//NLM//external ent dummy public id 2//EN"
+                        lineNumber="30"/>
+         </attributeDeclaration>
+         <annotations>
+            <annotation type="schematron">
+               <assert test="not(parent::banana) or                 . = 'guitar' or . = 'drums' or . = 'bass' or . = 'keyboards'">
+    Bananas can only play guitar, drums, bass, or keyboards.
+  </assert>
+            </annotation>
+            <annotation type="notes">
+               <p>Describes a banana's instrument.</p>
+            </annotation>
+         </annotations>
+      </attribute>
+   </attributes>
+   <parameterEntities>
+      <entity name="banana.ent"
+              systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/banana.ent"
+              relSysId="banana.ent"
+              included="true"
+              publicId="-//NLM//external ent dummy public id 2//EN">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/split-example.dtd"
+                     lineNumber="79"/>
+         <annotations level="reference">
+            <annotation type="notes">
+               <p>In the split DTD, we bring in the banana.ent module in order to get all the slippery things assocatied with bananas.</p>
+            </annotation>
+         </annotations>
+         <annotations level="module">
+            <annotation type="notes">
+               <p>This module defines the <a href="#p=elem-banana">&lt;banana&gt;</a> element, and all the slippery things associated with it.</p>
+            </annotation>
+         </annotations>
+      </entity>
+      <entity name="inline.ent"
+              systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/core/inline.ent"
+              relSysId="core/inline.ent"
+              included="true"
+              publicId="-//NLM//external ent dummy public id 1//EN">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/split-example.dtd"
+                     lineNumber="59"/>
+         <annotations level="reference">
+            <annotation type="notes">
+               <p>This entity declares some "core" things, that really just happen to be a few elements that look suspiciously like HTML.</p>
+            </annotation>
+         </annotations>
+         <annotations level="module">
+            <annotation type="notes">
+               <p>This module defines the elements that can be used inline in a description.</p>
+            </annotation>
+         </annotations>
+      </entity>
+      <entity name="inline">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/core/inline.ent"
+                     publicId="-//NLM//external ent dummy public id 1//EN"
+                     lineNumber="10"/>
+         <value>em | strong | i | img</value>
+         <annotations level="reference">
+            <annotation type="notes">
+               <p>Example parameter entity. This is a list of elements that can be included inline within a <a href="#p=elem-banana">&lt;banana&gt;</a> element.</p>
+            </annotation>
+         </annotations>
+      </entity>
+      <entity name="InLine.ent"
+              systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/InLine.ent"
+              relSysId="InLine.ent"
+              included="true"
+              publicId="-//NLM//external ent dummy public id 3//EN">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/split-example.dtd"
+                     lineNumber="69"/>
+         <annotations level="reference">
+            <annotation type="notes">
+               <p>This is an entity that differs from another only in case. When we generate documentation for a Windows machine, we add a suffix to the "slug" and the filename, because the Windows filesystem is case-insensitive. This is the default behavior. To turn it of (if you know, for example, that the documentation will be deployed to a Unix computer) use -nosuffixes.</p>
+            </annotation>
+         </annotations>
+         <annotations level="module">
+            <annotation type="notes">
+               <p>This module differs from <a href="#p=pe-inline.ent">%inline.ent;</a> only in case.</p>
+            </annotation>
+         </annotations>
+      </entity>
+      <entity name="more_inline">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/InLine.ent"
+                     publicId="-//NLM//external ent dummy public id 3//EN"
+                     lineNumber="6"/>
+         <value>a | u | o</value>
+      </entity>
+   </parameterEntities>
+   <generalEntities>
+      <entity name="fleegle-pic"
+              systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/fleegle-pic.ent"
+              relSysId="fleegle-pic.ent">
+         <declaredIn systemId="file:///home/klortho/git/NCBITools/DtdAnalyzer/test/split-example/banana.ent"
+                     publicId="-//NLM//external ent dummy public id 2//EN"
+                     lineNumber="35"/>
+         <annotations>
+            <annotation type="notes">
+               <p>This is a picture of Fleegle.</p>
+            </annotation>
+         </annotations>
+      </entity>
+   </generalEntities>
 </declarations>
-
