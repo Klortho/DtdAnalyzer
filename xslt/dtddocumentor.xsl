@@ -679,24 +679,40 @@
   </xsl:template>
 
   <!-- We have to intercept the <a> hyperlinks to other pages that were created by Java,
-    because Java doesn't know about the index suffixes that we might have added. -->
+    because Java doesn't know about the index suffixes that we might have added.
+    Also, if entities is off and this is a hyperlink to an entity page, or if the hyperlink 
+    points to a page that doesn't exist in the docs, then undo it.
+  -->
   <xsl:template match='a[starts-with(@href, "#p=")]' mode='content'>
     <xsl:variable name='orig-slug' select='substring-after(@href, "#p=")'/>
     <xsl:variable name='name' select='substring-after($orig-slug, "-")'/>
     <xsl:variable name='type' select='substring-before($orig-slug, "-")'/>
     
-    <!-- Redo the hyperlink with a new href, but preserve other attributes and content -->
-    <a>
-      <xsl:apply-templates select='@* except @href' mode='content'/>
-      <xsl:attribute name='href'>
-        <xsl:text>#p=</xsl:text>
-        <xsl:call-template name="makeSlug">
-          <xsl:with-param name='name' select='$name'/>
-          <xsl:with-param name="type" select='$type'/>
-        </xsl:call-template>
-      </xsl:attribute>
-      <xsl:apply-templates select='node()' mode='content'/>
-    </a>
+    <xsl:choose>
+      <xsl:when test='$entities = "off" and
+                      (starts-with($orig-slug, "ge") or starts-with($orig-slug, "pe"))'>
+        <xsl:apply-templates select='node()' mode='content'/>
+      </xsl:when>
+
+      <xsl:otherwise>
+        
+        <!-- Redo the hyperlink with a new href, but preserve other attributes and content -->
+        <a>
+          <xsl:apply-templates select='@* except @href' mode='content'/>
+          <xsl:attribute name='href'>
+            <xsl:text>#p=</xsl:text>
+            <xsl:call-template name="makeSlug">
+              <xsl:with-param name='name' select='$name'/>
+              <xsl:with-param name="type" select='$type'/>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:apply-templates select='node()' mode='content'/>
+        </a>
+
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    
   </xsl:template>
   
 

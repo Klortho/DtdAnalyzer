@@ -202,7 +202,8 @@ public class SComment {
     }
 
     // Here's the regular expression for a hyperlink to another element in the documentation
-    // It will match `<banana>, but not \`<banana>
+    // It will match `<banana>, but not \`<banana> (using zero-width negative lookbehind
+    // assertion)
     private static Pattern elemLink = Pattern.compile("(?<!\\\\)\\`\\<(\\S+?)>");
 
     // The pattern for an attribute
@@ -211,7 +212,8 @@ public class SComment {
 
     // Patterns for entities are simpler, since they are closed by a ";"
     private static Pattern paramEntLink = Pattern.compile("(?<!\\\\)%(\\S+?);");
-    private static Pattern genEntLink = Pattern.compile("(?<!\\\\)&(\\S+?);");
+    private static Pattern genEntLink = Pattern.compile("(?<!\\\\)&(?!(#|fdft;|gt;|amp;|apos;|quot;))(\\S+?);");
+    //private static Pattern genEntLink = Pattern.compile("(?<!\\\\)&(\\S+?);");
 
     // This pattern is used in HTML-style annotations, and removes the backslashes that
     // the user may have put in to disable auto-linking.  (In Markdown mode, pandoc
@@ -234,7 +236,7 @@ public class SComment {
         m = paramEntLink.matcher(s);
         s = m.replaceAll("<a href='#p=pe-$1'>%$1;</a>");
         m = genEntLink.matcher(s);
-        s = m.replaceAll("<a href='#p=ge-$1'>&$1;</a>");
+        s = m.replaceAll("<a href='#p=ge-$1'>&$2;</a>");
         m = elemLink.matcher(s);
         s = m.replaceAll("<a href='#p=elem-$1'>&lt;$1&gt;</a>");
 
