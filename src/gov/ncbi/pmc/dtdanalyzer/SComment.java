@@ -231,6 +231,8 @@ public class SComment {
         Matcher m;
 
         // Preprocess links
+        // FIXME: right now these are preprocessed for both XML and Markdown annotations.
+        // Is that what we want?  See #45. 
         m = attrLink.matcher(s);
         s = m.replaceAll("<a href='#p=attr-$1'>@$1</a>");
         m = paramEntLink.matcher(s);
