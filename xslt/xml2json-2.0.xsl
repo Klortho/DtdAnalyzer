@@ -895,7 +895,10 @@
 
     <xsl:variable name='v'>
       <xsl:choose>
-        <xsl:when test='. = "" or (name(.) != "n" and name(.) != "b")'>
+        <xsl:when test="name(.) = 'n'">
+          <xsl:value-of select='np:number-value(.)'/>
+        </xsl:when>
+        <xsl:when test='. = "" or name(.) != "b"'>
           <xsl:value-of select='np:dq(np:json-escape(.))'/>
         </xsl:when>
         <xsl:otherwise>
@@ -911,7 +914,10 @@
 
     <xsl:variable name='v'>
       <xsl:choose>
-        <xsl:when test='. = "" or (name(.) != "n" and name(.) != "b")'>
+        <xsl:when test="name(.) = 'n'">
+          <xsl:value-of select='np:number-value(.)'/>
+        </xsl:when>
+        <xsl:when test='. = "" or name(.) != "b"'>
           <xsl:value-of select='np:dq(np:json-escape(.))'/>
         </xsl:when>
         <xsl:otherwise>
