@@ -486,12 +486,12 @@
     <xsl:choose>
       <xsl:when test='$context = "o"'>
         <n k='{$k}'>
-          <xsl:value-of select='normalize-space($value)'/>
+          <xsl:value-of select='np:number-value($value)'/>
         </n>
       </xsl:when>
       <xsl:when test='$context = "a"'>
         <n>
-          <xsl:value-of select='normalize-space($value)'/>
+          <xsl:value-of select='np:number-value($value)'/>
         </n>
       </xsl:when>
       <xsl:otherwise>
@@ -528,7 +528,7 @@
     <xsl:param name='value' select='.'/>
 
     <n k='{$k}'>
-      <xsl:value-of select='normalize-space($value)'/>
+      <xsl:value-of select='np:number-value($value)'/>
     </n>
   </xsl:template>
 
@@ -541,7 +541,7 @@
   <xsl:template name='n-in-a'>
     <xsl:param name='value' select='.'/>
     <n>
-      <xsl:value-of select='normalize-space($value)'/>
+      <xsl:value-of select='np:number-value($value)'/>
     </n>
   </xsl:template>
 
