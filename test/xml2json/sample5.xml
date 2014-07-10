@@ -57,6 +57,7 @@
           test08-a6="  y "
           test08-a10="  0.1  "
           test08-a11="-5  "
+          test08-a12=" 01 "
     >
     <test08-c1>child element test08-c1</test08-c1>
     <test08-c2>child element test08-c2</test08-c2>

@@ -135,9 +135,11 @@ Test an array kid with various grandkids.
       <boolean key='9'> true </boolean>
     </array>
     <array key='snorky'>
-      <number key='a10' select='@test08-a10'/>
-      <number name='@test08-a11' select='@test08-a11'/>
-      <number key='12'> 22</number>
+      <number select='@test08-a10'/>
+      <number select='@test08-a11'/>
+      <number select='@test08-a12'/>
+      <number> 22</number>
+      <number> 01  </number>
     </array>
   </object>
 ~~-->
@@ -150,7 +152,8 @@ Test an array kid with various grandkids.
                  test08-a5 CDATA #IMPLIED
                  test08-a6 CDATA #IMPLIED
                  test08-a10 CDATA #IMPLIED
-                 test08-a11 CDATA #IMPLIED>
+                 test08-a11 CDATA #IMPLIED
+                 test08-a12 CDATA #IMPLIED>
 
 <!--~~ <test09>
 Test an object with text kids.

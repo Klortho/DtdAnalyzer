@@ -316,10 +316,32 @@
     </f:result>
   </f:function>
 
+  <f:function name='np:strip-leading-zeros'>
+    <xsl:param name='n'/>
+    <f:result>
+      <xsl:choose>
+        <xsl:when test="starts-with($n, '0')">
+          <xsl:value-of select="np:strip-leading-zeros(substring($n, 2))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$n"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </f:result>
+  </f:function>
+
   <f:function name='np:number-value'>
     <xsl:param name='v'/>
+    <xsl:variable name='nsv' select='normalize-space($v)'/>
     <f:result>
-      <xsl:value-of select='normalize-space($v)'/>
+      <xsl:choose>
+        <xsl:when test='starts-with($nsv, "0") and not(starts-with($nsv, "0."))'>
+          <xsl:value-of select='np:strip-leading-zeros($nsv)'/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select='$nsv'/>
+        </xsl:otherwise>
+      </xsl:choose>
     </f:result>
   </f:function>
 
@@ -492,12 +514,12 @@
     <xsl:choose>
       <xsl:when test='$context = "o"'>
         <n k='{$k}'>
-          <xsl:value-of select='normalize-space($value)'/>
+          <xsl:value-of select='np:number-value($value)'/>
         </n>
       </xsl:when>
       <xsl:when test='$context = "a"'>
         <n>
-          <xsl:value-of select='normalize-space($value)'/>
+          <xsl:value-of select='np:number-value($value)'/>
         </n>
       </xsl:when>
       <xsl:otherwise>
@@ -534,7 +556,7 @@
     <xsl:param name='value' select='.'/>
 
     <n k='{$k}'>
-      <xsl:value-of select='normalize-space($value)'/>
+      <xsl:value-of select='np:number-value($value)'/>
     </n>
   </xsl:template>
 
@@ -547,7 +569,7 @@
   <xsl:template name='n-in-a'>
     <xsl:param name='value' select='.'/>
     <n>
-      <xsl:value-of select='normalize-space($value)'/>
+      <xsl:value-of select='np:number-value($value)'/>
     </n>
   </xsl:template>
 

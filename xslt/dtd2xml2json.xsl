@@ -8,6 +8,7 @@
               exclude-result-prefixes="xsl xs x xd c"
               version="2.0">
 
+  <xsl:import href="xml2json-2.0.xsl"/>
   <xsl:namespace-alias stylesheet-prefix="x" result-prefix="xsl"/>
   <xsl:output encoding="UTF-8" method="xml" indent="yes" />
 
@@ -47,7 +48,6 @@
     FIXME:  we should import xml2json.xsl, so we don't have to copy this.  But that's
     an XSLT 1.0 stylesheet, and the EXSLT function extension doesn't work right.  But,
     the functions could both be rewritten to invoke a shared template.
-  -->
   <xsl:function name='np:boolean-value'>
     <xsl:param name='v'/>
     <xsl:variable name='nv' select='lower-case(normalize-space($v))'/>
@@ -62,6 +62,44 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
+
+  <xsl:function name='np:strip-leading-zeros'>
+    <xsl:param name='n'/>
+
+    <xsl:choose>
+      <xsl:when test="starts-with($n, '0')">
+        <xsl:value-of select="np:strip-leading-zeros(substring($n, 2))"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$n"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+  
+  <xsl:function name='np:number-value'>
+    <xsl:param name='v'/>
+    <xsl:variable name='nsv' select='normalize-space($v)'/>
+    <xsl:choose>
+      <xsl:when test='starts-with($nsv, "0") and not(starts-with($nsv, "0."))'>
+        <xsl:value-of select='np:strip-leading-zeros($nsv)'/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select='$nsv'/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+  
+
+  -->
+
+
+
+
+
+
+
+
+
 
   <!--=================================================================================
     Preliminaries - set a bunch of variables
@@ -796,7 +834,7 @@
               <xsl:value-of select='.'/>
             </xsl:when>
             <xsl:when test='$jsontype = "n"'>
-              <xsl:value-of select='normalize-space(.)'/>
+              <xsl:value-of select='np:number-value(.)'/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select='np:boolean-value(.)'/>
@@ -809,7 +847,7 @@
               <x:value-of select='{@s}'/>
             </xsl:when>
             <xsl:when test='$jsontype = "n"'>
-              <x:value-of select='normalize-space({@s})'/>
+              <x:value-of select='np:number-value({@s})'/>
             </xsl:when>
             <xsl:otherwise>
               <x:value-of select='np:boolean-value({@s})'/>
@@ -822,7 +860,7 @@
               <x:value-of select='.'/>
             </xsl:when>
             <xsl:when test='$jsontype = "n"'>
-              <x:value-of select='normalize-space(.)'/>
+              <x:value-of select='np:number-value(.)'/>
             </xsl:when>
             <xsl:otherwise>
               <x:value-of select='np:boolean-value(.)'/>
