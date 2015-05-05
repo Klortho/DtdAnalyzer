@@ -6,8 +6,14 @@ case "`uname`" in
 esac
 
 # Figure out DTDANALYZER_HOME, which is the directory in which this script
-# resides.  Note that this resolves symlinks (HT Gerrit Imsieke).
-DTDANALYZER_HOME="$( cd -P "$(dirname $( readlink -f "${BASH_SOURCE[0]}" ))" && pwd )"
+# resides.  Note that this resolves symlinks (HT Gerrit Imsieke). First check
+# if greadlink exists (Mac OS X) and if so, use that.
+if hash greadlink 2>/dev/null; then
+    READLINK=greadlink
+else
+    READLINK=readlink
+fi
+DTDANALYZER_HOME="$( cd -P "$(dirname $( $READLINK -f "${BASH_SOURCE[0]}" ))" && pwd )"
 
 # Add the build directory to the classpath.  This script is used both by
 # developers and users.  For developers, the .class files in the build
