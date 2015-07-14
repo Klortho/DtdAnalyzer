@@ -6,6 +6,7 @@ DtdAnalyzer provides a set of tools:
   of an XML DTD
 * **dtddocumentor** - generates pretty HTML documentation, including annotations (if
   present) from specially-formatted comments of the DTD
+* **dtdflatten** - flattens a multi-file DTD into one big file
 * **dtdcompare** - compares two DTDs and generate a report of differences
 * **dtd2xml2json** - generates XSLT to convert instance documents into JSON format.
 * **dtdschematron** - generates a schematron file from the DTD, including extra

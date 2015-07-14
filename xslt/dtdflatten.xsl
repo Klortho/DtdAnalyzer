@@ -13,13 +13,10 @@
               indent="yes"
               encoding='UTF-8'/>
 
-  <xsl:param name="write-ents" select='"yes"'/>
 
   <xsl:template match="declarations">
     <xsl:apply-templates select="elements"/>
-    <xsl:if test="$write-ents='yes'">
-      <xsl:apply-templates select="generalEntities"/>
-    </xsl:if>
+    <xsl:apply-templates select="generalEntities"/>
   </xsl:template>
 
   <xsl:template match="elements">
@@ -108,7 +105,7 @@
     <xsl:value-of select="string-join(
       for $i in string-to-codepoints($s) return concat('&amp;#x', f:int-to-hex($i), ';'),
       ''
-      )" />
+    )" />
   </xsl:function>
   
   <!--
@@ -120,7 +117,7 @@
       if ($i lt 16)
       then substring("0123456789ABCDEF", $i + 1, 1)
       else concat(f:int-to-hex($i idiv 16), f:int-to-hex($i mod 16))
-      '/>
+    '/>
   </xsl:function>
   
 </xsl:stylesheet>

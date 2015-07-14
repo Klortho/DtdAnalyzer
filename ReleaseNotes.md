@@ -1,16 +1,12 @@
 # DtdAnalyzer Release Notes
 
-## DtdAnalyzer v0.4-dev
-
-### Features
+## DtdAnalyzer v0.5 - 2015-07-14
 
 ### Enhancements
 
-### Bug fixes
+* Added dtdflatten utility
 
-### Performance
 
-### Other
 
 ## DtdAnalyzer v0.4 - 2013-10-21
 
