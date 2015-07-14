@@ -55,9 +55,14 @@
   </patternset>
 
   <property name="execfiles"
-    value="dtd2xml2json dtdanalyzer dtdcompare dtddocumentor dtdschematron
-           script/getlibs.sh script/setenv.sh
-           test/xml2json/make-samples.sh test/xml2json/test-samples.pl"/>
+    value="
+      dtd2xml2json dtdanalyzer dtdcompare dtddocumentor dtdschematron dtdflatten
+      script/getlibs.sh 
+      script/setenv.sh
+      test/xml2json/make-samples.sh 
+      test/xml2json/test-samples.pl
+      test/dtdflatten/test.pl
+    "/>
 
   <target name="clean" description="Deletes all generated artifacts">
     <delete dir="${build}" failonerror="false"/>
