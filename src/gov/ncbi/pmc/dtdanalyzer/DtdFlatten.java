@@ -1,24 +1,25 @@
 /*
- * DtdSchematron.java
+ * DtdFlatten.java
  */
 
 package gov.ncbi.pmc.dtdanalyzer;
 
-import org.apache.commons.cli.*;
-import java.io.*;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.*;
 import org.apache.xml.resolver.tools.*;
-import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
- * Creates a Schematron from a DTD.
+ * Creates a flattened version of a DTD.
  */
-public class DtdSchematron {
+public class DtdFlatten {
     
     private static App app;
 
@@ -28,7 +29,6 @@ public class DtdSchematron {
      */
     private static String[] optList = {
         "help", "version", "system", "doc", "public",
-        "full",
         "catalog", "title", "roots", "docproc", "markdown", "param"
     };
     
@@ -55,7 +55,7 @@ public class DtdSchematron {
     };
 
 
-    // DtdSchematron-specific command line option values
+    // DtdFlatten-specific command line option values
     private static boolean full = false;
 
 
@@ -70,9 +70,9 @@ public class DtdSchematron {
 
 
         app = new App(args, optList, optHandler, customOpts, true,
-            "dtdschematron {[-s] <system-id> | -d <xml-file> | -p <public-id>} " +
-            "[-f] [-c <catalog>] [-t <title>] [<out>]",
-            "\nThis generates a schematron file from a DTD."
+            "dtdflatten {[-s] <system-id> | -d <xml-file> | -p <public-id>} " +
+            "[-c <catalog>] [-t <title>] [<out>]",
+            "\nThis generates a flattened version of a DTD."
         );
         app.initialize();
     
@@ -81,13 +81,12 @@ public class DtdSchematron {
             new ModelBuilder(app.getDtdSpec(), app.getRoots(), app.getResolver());
         XMLWriter writer = new XMLWriter(model);
 
-        // Now run the XSLT transformation.  This will be the dtdschematron.xsl
-        // stylesheet
+        // Now run the XSLT transformation. 
 
         try {
             InputStreamReader reader = writer.getXML();
 
-            File xslFile = new File(app.getHome(), "xslt/dtdschematron.xsl");
+            File xslFile = new File(app.getHome(), "xslt/dtdflatten.xsl");
             Transformer xslt = 
                 TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
             ArrayList xsltParams = app.getXsltParams();
@@ -123,15 +122,6 @@ public class DtdSchematron {
     private static HashMap initCustomOpts() {
         HashMap _opts = new HashMap();
         
-        _opts.put("full",
-            OptionBuilder
-                .withLongOpt("full")
-                .withDescription("If this option is given, then a complete schematron " +
-                    "will be generated from the DTD, as opposed to just extracting the " +
-                    "rules in the annotations.")
-                .create('f')
-        );
-
         return _opts;
     }
 }

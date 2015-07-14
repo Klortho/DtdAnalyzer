@@ -24,8 +24,10 @@ my $failpref = "****** Failed: ";
 
 
 print "Generating outputs for each of the samples.\n";
-system "make-samples.sh";
+system "make-samples.sh"
+    or die "make-samples.sh failed: $?";
 
+exit 0;
 
 
 print "Testing that each expected output exists.\n";

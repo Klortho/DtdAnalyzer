@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!DOCTYPE article SYSTEM "archiving-1.0-flat.dtd">
+<article dtd-version="1.0" xml:lang="en" 
+         xmlns:mml="http://www.w3.org/1998/Math/MathML"
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <front>
+    <article-meta/>
+  </front>
+  <body>
+    <p>lt:  &lt;
+      amp: &amp;
+      gt: &gt;
+      yopf:  &yopf;
+      uparraw: &uparrow;
+      nvlt: &nvlt;
+    </p>
+  </body>
+</article>

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 rm *-2json.xsl
 
 dtd2xml2json sample1.dtd -b ../../xslt/xml2json.xsl sample1-2json.xsl
