@@ -44,11 +44,17 @@ wiki](https://github.com/NCBITools/DtdAnalyzer/wiki).
   set PATH=%PATH%;-path-to-dtdanalyzer-package-
   ```
 
-  On Unix:
+  On Mac OS X or Unix:
 
   ```
   export PATH=$PATH:-path-to-dtdanalyzer-package-
   ```
+
+* ***Note for Mac OS X:*** This software depends on a utility called `greadlink`, which
+  might not be installed on your system. To see whether or not it is, enter
+  `which greadlink` at a terminal prompt.  If it is not installed, then the easiest way
+  to get it is with [Homebrew](http://brew.sh/). Install Homebrew, if necessary, and
+  then enter `brew install coreutils`.
 
 * Try the following command (which analyzes the
   [Journal Archiving and Interchange](http://jats.nlm.nih.gov/archiving/1.0/dtd.html)

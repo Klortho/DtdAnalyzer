@@ -75,11 +75,19 @@
           </li>
           <li><p>Unzip that file on your machine.</p></li>
           <li><p>Open up a Windows command or a bash shell window.  Add the path to the package root
-        to your PATH environment variable.</p>
+            to your PATH environment variable.</p>
             <p>On Windows:</p>
             <pre><code>set PATH=%PATH%;-path-to-dtdanalyzer-package-</code></pre>
-            <p>On Unix:</p>
+            <p>On Mac OS X or Unix:</p>
             <pre><code>export PATH=$PATH:-path-to-dtdanalyzer-package-</code></pre>
+          </li>
+          <li><p><strong>Note for Mac OS X:</strong>
+            This software depends on a utility called <code>greadlink</code>, which
+            might not be installed on your system. To see whether or not it is, enter
+            <code>which greadlink</code> at a terminal prompt.  If it is not installed, 
+            then the easiest way to get it is with 
+            <a href='http://brew.sh/'>Homebrew</a>. Install Homebrew, if necessary, and
+            then enter <code>brew install coreutils</code>.</p>
           </li>
           <li><p>Try the following command, which analyzes the <a
           href="http://jats.nlm.nih.gov/archiving/1.0/dtd.html">Journal Archiving
