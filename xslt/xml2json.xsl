@@ -9,7 +9,7 @@
 
 
   <!-- Turn off pretty-printing by setting this to false() -->
-  <xsl:param name='pretty' select='true()'/>
+  <xsl:param name='pretty' select='false()'/>
 
   <!-- By default, do not convert all names to lowercase -->
   <xsl:param name='lcnames' select='false()'/>
@@ -17,30 +17,7 @@
   <!-- $nl == the newline character -->
   <xsl:variable name='nl' select='"&#10;"'/>
 
-  <!-- $nlp == newline when pretty-printing; otherwise empty string  -->
-  <xsl:variable name='nlp'>
-    <xsl:choose>
-      <xsl:when test='$pretty'>
-        <xsl:value-of select='$nl'/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select='""'/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
 
-  <!-- $iu = indent unit (four spaces) when pretty-printing;
-    otherwise empty string -->
-  <xsl:variable name='iu'>
-    <xsl:choose>
-      <xsl:when test='$pretty'>
-        <xsl:value-of select='"    "'/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select='""'/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
 
 
   <!--================================================
@@ -88,84 +65,28 @@
 
   <!--
     Quote a string to prepare it for insertion into a JSON literal value.
-    There are two versions coded up here: one with EXSLT's replace function, and
-    one (for older versions of libxslt) that uses straight XSLT recursion.
-    Point the np:json-escape function to the one you want to use.
   -->
-  <f:function name='np:json-escape'>
-    <xsl:param name='s'/>
-    <f:result>
-      <xsl:value-of select='np:json-escape-with-replace($s)'/>
-    </f:result>
-  </f:function>
-
-  <f:function name="np:json-escape-with-replace">
+  <xsl:template name='json-escape-with-replace'>
     <xsl:param name="s"/>
-    <xsl:variable name="quot">"</xsl:variable>
-    <xsl:variable name="bs">\</xsl:variable>
-    <xsl:variable name='nl' select='"&#10;"'/>
-    <xsl:variable name='cr' select='"&#13;"'/>
-    <xsl:variable name='tab' select='"&#9;"'/>
-    <xsl:variable name="result"
+    <xsl:text>&quot;</xsl:text>
+    <xsl:value-of
       select="str:replace(
                 str:replace(
                   str:replace(
                     str:replace(
                       str:replace($s,
-                        $bs, concat($bs, $bs)
+                        '\', '\\'
                       ),
-                      $quot, concat($bs, $quot)
+                      '&quot;', '\&quot;'
                     ),
-                    $nl, concat($bs, 'n')
+                    '&#10;', '\n'
                   ),
-                  $cr, concat($bs, 'r')
+                  '&#13;', '\r'
                 ),
-                $tab, concat($bs, 't')
+                '&#9;', '\t'
               )"/>
-    <f:result>
-      <xsl:value-of select="$result"/>
-    </f:result>
-  </f:function>
-
-  <f:function name="np:json-escape-with-recursion">
-    <xsl:param name="s"/>
-    <xsl:variable name="quot">"</xsl:variable>
-    <xsl:variable name="bs">\</xsl:variable>
-    <xsl:variable name='nl' select='"&#10;"'/>
-    <xsl:variable name='cr' select='"&#13;"'/>
-    <xsl:variable name='tab' select='"&#9;"'/>
-    <f:result>
-      <xsl:call-template name='replace-char'>
-        <xsl:with-param name='s'>
-          <xsl:call-template name="replace-char">
-            <xsl:with-param name='s'>
-              <xsl:call-template name="replace-char">
-                <xsl:with-param name='s'>
-                  <xsl:call-template name="replace-char">
-                    <xsl:with-param name='s'>
-                      <xsl:call-template name="replace-char">
-                        <xsl:with-param name='s' select='$s'/>
-                        <xsl:with-param name="c" select='$bs'/>
-                        <xsl:with-param name="r" select='concat($bs, $bs)'/>
-                      </xsl:call-template>
-                    </xsl:with-param>
-                    <xsl:with-param name="c" select='$quot'/>
-                    <xsl:with-param name="r" select='concat($bs, $quot)'/>
-                  </xsl:call-template>
-                </xsl:with-param>
-                <xsl:with-param name="c" select='$nl'/>
-                <xsl:with-param name="r" select='concat($bs, "n")'/>
-              </xsl:call-template>
-            </xsl:with-param>
-            <xsl:with-param name="c" select='$cr'/>
-            <xsl:with-param name="r" select='concat($bs, "r")'/>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="c" select='$tab'/>
-        <xsl:with-param name="r" select='concat($bs, "t")'/>
-      </xsl:call-template>
-    </f:result>
-  </f:function>
+    <xsl:text>&quot;</xsl:text>
+  </xsl:template>
 
   <xsl:template name='replace-char'>
     <xsl:param name="s"/>
@@ -188,17 +109,6 @@
   </xsl:template>
 
   <!--
-    Convenience function to wrap any string in double-quotes.  This
-    reduces the need for a lot of XML character escaping.
-  -->
-  <f:function name='np:dq'>
-    <xsl:param name='s'/>
-    <f:result>
-      <xsl:value-of select="concat('&quot;', $s, '&quot;')"/>
-    </f:result>
-  </f:function>
-
-  <!--
     mkey = member key - this produces a string which is the key in double-quotes,
     followed by a colon, space.  It is used whenever outputting a member of a JSON
     object.
@@ -206,7 +116,7 @@
   <f:function name='np:mkey'>
     <xsl:param name='k'/>
     <f:result>
-      <xsl:value-of select='concat(np:dq($k), ": ")'/>
+      <xsl:value-of select="concat('&quot;', $k, '&quot;: ')"/>
     </f:result>
   </f:function>
 
@@ -242,67 +152,10 @@
       end-array(i, tc)          ],\n
   -->
   <f:function name='np:simple'>
-    <xsl:param name='indent'/>
     <xsl:param name='value'/>
     <xsl:param name='trailing-comma'/>
     <f:result>
-      <xsl:value-of select='concat($indent, $value, np:tc($trailing-comma), $nlp)'/>
-    </f:result>
-  </f:function>
-
-  <f:function name='np:key-simple'>
-    <xsl:param name='indent'/>
-    <xsl:param name='k'/>
-    <xsl:param name='value'/>
-    <xsl:param name='trailing-comma'/>
-    <f:result>
-      <xsl:value-of select='concat($indent, np:mkey($k), $value, np:tc($trailing-comma), $nlp)'/>
-    </f:result>
-  </f:function>
-
-  <f:function name='np:start-object'>
-    <xsl:param name='indent'/>
-    <f:result>
-      <xsl:value-of select='concat($indent, "{", $nlp)'/>
-    </f:result>
-  </f:function>
-
-  <f:function name='np:key-start-object'>
-    <xsl:param name='indent'/>
-    <xsl:param name='k'/>
-    <f:result>
-      <xsl:value-of select='concat($indent, np:mkey($k), "{", $nlp)'/>
-    </f:result>
-  </f:function>
-
-  <f:function name='np:end-object'>
-    <xsl:param name='indent'/>
-    <xsl:param name='trailing-comma'/>
-    <f:result>
-      <xsl:value-of select='concat($indent, "}", np:tc($trailing-comma), $nlp)'/>
-    </f:result>
-  </f:function>
-
-  <f:function name='np:start-array'>
-    <xsl:param name='indent'/>
-    <f:result>
-      <xsl:value-of select='concat($indent, "[", $nlp)'/>
-    </f:result>
-  </f:function>
-
-  <f:function name='np:key-start-array'>
-    <xsl:param name='indent'/>
-    <xsl:param name='k'/>
-    <f:result>
-      <xsl:value-of select='concat($indent, np:mkey($k), "[", $nlp)'/>
-    </f:result>
-  </f:function>
-
-  <f:function name='np:end-array'>
-    <xsl:param name='indent'/>
-    <xsl:param name='trailing-comma'/>
-    <f:result>
-      <xsl:value-of select='concat($indent, "]", np:tc($trailing-comma), $nlp)'/>
+      <xsl:value-of select='concat($value, np:tc($trailing-comma))'/>
     </f:result>
   </f:function>
 
@@ -312,7 +165,9 @@
   <f:function name='np:string-value'>
     <xsl:param name='v'/>
     <f:result>
-      <xsl:value-of select='np:dq(np:json-escape($v))'/>
+      <xsl:call-template name='json-escape-with-replace'>
+        <xsl:with-param name="s" select='$v'/>
+      </xsl:call-template>
     </f:result>
   </f:function>
 
@@ -378,6 +233,7 @@
     <xsl:variable name='jxml'>
       <xsl:call-template name='root'/>
     </xsl:variable>
+    <!--<xsl:copy-of select='$jxml'/>-->
     <xsl:variable name='jxml-ns' select='c:node-set($jxml)'/>
     <xsl:apply-templates select='$jxml-ns/*' mode='serialize-jxml-array'/>
   </xsl:template>
@@ -879,75 +735,77 @@
     performance than passing it down as a parameter.
   -->
   <xsl:template match='o' mode='serialize-jxml-array'>
-    <xsl:param name='indent' select='""'/>
-
-    <xsl:value-of select='np:start-object($indent)'/>
+    <xsl:value-of select='"{"'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-object'>
-      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='np:end-object($indent, position() != last())'/>
+    <xsl:value-of select='"}"'/>
+    <xsl:if test='position() != last()'>
+      <xsl:text>,</xsl:text>
+    </xsl:if>    
   </xsl:template>
 
   <xsl:template match='o' mode='serialize-jxml-object'>
-    <xsl:param name='indent' select='""'/>
-
-    <xsl:value-of select='np:key-start-object($indent, @k)'/>
+    <xsl:value-of select='concat(np:mkey(@k), "{")'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-object'>
-      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='np:end-object($indent, position() != last())'/>
+    <xsl:value-of select='"}"'/>
+    <xsl:if test='position() != last()'>
+      <xsl:text>,</xsl:text>
+    </xsl:if>    
   </xsl:template>
 
   <xsl:template match='a' mode='serialize-jxml-array'>
-    <xsl:param name='indent' select='""'/>
-
-    <xsl:value-of select='np:start-array($indent)'/>
+    <xsl:value-of select='"["'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-array'>
-      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='np:end-array($indent, position() != last())'/>
+    <xsl:value-of select='"]"'/>
+    <xsl:if test='position() != last()'>
+      <xsl:text>,</xsl:text>
+    </xsl:if>    
   </xsl:template>
 
   <xsl:template match='a' mode='serialize-jxml-object'>
-    <xsl:param name='indent' select='""'/>
-
-    <xsl:value-of select='np:key-start-array($indent, @k)'/>
+    <xsl:value-of select='concat(np:mkey(@k), "[")'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-array'>
-      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='np:end-array($indent, position() != last())'/>
+    <xsl:value-of select='"]"'/>
+    <xsl:if test='position() != last()'>
+      <xsl:text>,</xsl:text>
+    </xsl:if>    
   </xsl:template>
 
   <xsl:template match='s|n|b' mode='serialize-jxml-array'>
-    <xsl:param name='indent' select='""'/>
-
     <xsl:variable name='v'>
       <xsl:choose>
         <xsl:when test='. = "" or (name(.) != "n" and name(.) != "b")'>
-          <xsl:value-of select='np:dq(np:json-escape(.))'/>
+          <xsl:call-template name='json-escape-with-replace'>
+            <xsl:with-param name="s" select='.'/>
+          </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select='.'/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:value-of select='np:simple($indent, $v, position() != last())'/>
+    <xsl:value-of select='np:simple($v, position() != last())'/>
   </xsl:template>
 
+  <!-- FIXME: THIS TAKES TOO LONG -->
   <xsl:template match='s|n|b' mode='serialize-jxml-object'>
-    <xsl:param name='indent' select='""'/>
-
-    <xsl:variable name='v'>
-      <xsl:choose>
-        <xsl:when test='. = "" or (name(.) != "n" and name(.) != "b")'>
-          <xsl:value-of select='np:dq(np:json-escape(.))'/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select='.'/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:value-of select='np:key-simple($indent, @k, $v, position() != last())'/>
+    <xsl:value-of select="concat('&quot;', @k, '&quot;: ')"/>
+    <xsl:choose>
+      <xsl:when test='. = "" or (name(.) != "n" and name(.) != "b")'>
+        <xsl:call-template name='json-escape-with-replace'>
+          <xsl:with-param name="s" select='.'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select='.'/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test='position() != last()'>
+      <xsl:text>,</xsl:text>
+    </xsl:if>    
   </xsl:template>
 
   <!--=====================================================
