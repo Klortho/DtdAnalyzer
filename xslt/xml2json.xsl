@@ -8,9 +8,6 @@
                 extension-element-prefixes="c np str f">
 
 
-  <!-- Turn off pretty-printing by setting this to false() -->
-  <xsl:param name='pretty' select='false()'/>
-
   <!-- By default, do not convert all names to lowercase -->
   <xsl:param name='lcnames' select='false()'/>
 
