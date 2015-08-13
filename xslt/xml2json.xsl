@@ -7,6 +7,8 @@
                 xmlns:c="http://exslt.org/common"
                 extension-element-prefixes="c np str f">
 
+  <!-- Turn off pretty-printing by setting this to false() -->
+  <xsl:param name='pretty' select='true()'/>
 
   <!-- By default, do not convert all names to lowercase -->
   <xsl:param name='lcnames' select='false()'/>
@@ -14,6 +16,31 @@
   <!-- $nl == the newline character -->
   <xsl:variable name='nl' select='"&#10;"'/>
 
+
+  <!-- $nlp == newline when pretty-printing; otherwise empty string  -->
+  <xsl:variable name='nlp'>
+    <xsl:choose>
+      <xsl:when test='$pretty'>
+        <xsl:value-of select='$nl'/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select='""'/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- $iu = indent unit (four spaces) when pretty-printing;
+       otherwise empty string -->
+  <xsl:variable name='iu'>
+    <xsl:choose>
+      <xsl:when test='$pretty'>
+        <xsl:value-of select='"    "'/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select='""'/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
 
 
@@ -131,30 +158,6 @@
     </f:result>
   </f:function>
 
-  <!--
-    There are five main utility functions for outputing stuff, as illustrated here.
-    Trailing commas are included only when the trailing-comma parameter is true.
-    Each of these is designed to be invoked at the start of a new line, so each
-    first outputs an indent, if that's given.
-
-      Function name            Output
-      =============            ======
-      simple(i, v, tc)         value,\n
-      key-simple(i, k, v, tc)  "k": value,\n
-      start-object(i)          {\n
-      key-start-object(i, k)   "k": {\n
-      end-object(i, tc)         },\n
-      start-array(i)           [\n
-      key-start-array(i, k)    "k": [\n
-      end-array(i, tc)          ],\n
-  -->
-  <f:function name='np:simple'>
-    <xsl:param name='value'/>
-    <xsl:param name='trailing-comma'/>
-    <f:result>
-      <xsl:value-of select='concat($value, np:tc($trailing-comma))'/>
-    </f:result>
-  </f:function>
 
   <!--
     The following three return the json-escaped values for simple types
@@ -732,28 +735,40 @@
     performance than passing it down as a parameter.
   -->
   <xsl:template match='o' mode='serialize-jxml-array'>
-    <xsl:value-of select='"{"'/>
+    <xsl:param name='indent' select='""'/>
+
+    <!--<xsl:value-of select='"{"'/>-->
+    <xsl:value-of select='concat($indent, "{", $nlp)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-object'>
+      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='"}"'/>
+    <xsl:value-of select='concat($indent, "}")'/>
     <xsl:if test='position() != last()'>
       <xsl:text>,</xsl:text>
     </xsl:if>    
+    <xsl:value-of select='$nlp'/>
   </xsl:template>
 
   <xsl:template match='o' mode='serialize-jxml-object'>
-    <xsl:value-of select='concat(np:mkey(@k), "{")'/>
+    <xsl:param name='indent' select='""'/>
+
+    <xsl:value-of select='concat($indent, np:mkey(@k), "{", $nlp)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-object'>
+      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='"}"'/>
+    <xsl:value-of select='concat($indent, "}")'/>
     <xsl:if test='position() != last()'>
       <xsl:text>,</xsl:text>
-    </xsl:if>    
+    </xsl:if>
+    <xsl:value-of select='$nlp'/>
   </xsl:template>
 
   <xsl:template match='a' mode='serialize-jxml-array'>
-    <xsl:value-of select='"["'/>
+    <xsl:param name='indent' select='""'/>
+
+    <xsl:value-of select='concat($indent, "[", $nlp)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-array'>
+      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
     <xsl:value-of select='"]"'/>
     <xsl:if test='position() != last()'>
@@ -762,34 +777,23 @@
   </xsl:template>
 
   <xsl:template match='a' mode='serialize-jxml-object'>
-    <xsl:value-of select='concat(np:mkey(@k), "[")'/>
+    <xsl:param name='indent' select='""'/>
+
+    <xsl:value-of select='concat($indent, np:mkey(@k), "[", $nlp)'/>
     <xsl:apply-templates select='*' mode='serialize-jxml-array'>
+      <xsl:with-param name='indent' select='concat($indent, $iu)'/>
     </xsl:apply-templates>
-    <xsl:value-of select='"]"'/>
+    <xsl:value-of select='concat($indent, "]")'/>
     <xsl:if test='position() != last()'>
       <xsl:text>,</xsl:text>
-    </xsl:if>    
+    </xsl:if>
+    <xsl:value-of select='$nlp'/>
   </xsl:template>
 
   <xsl:template match='s|n|b' mode='serialize-jxml-array'>
-    <xsl:variable name='v'>
-      <xsl:choose>
-        <xsl:when test='. = "" or (name(.) != "n" and name(.) != "b")'>
-          <xsl:call-template name='json-escape-with-replace'>
-            <xsl:with-param name="s" select='.'/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select='.'/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:value-of select='np:simple($v, position() != last())'/>
-  </xsl:template>
+    <xsl:param name='indent' select='""'/>
 
-  <!-- FIXME: THIS TAKES TOO LONG -->
-  <xsl:template match='s|n|b' mode='serialize-jxml-object'>
-    <xsl:value-of select="concat('&quot;', @k, '&quot;: ')"/>
+    <xsl:value-of select='$indent'/>
     <xsl:choose>
       <xsl:when test='. = "" or (name(.) != "n" and name(.) != "b")'>
         <xsl:call-template name='json-escape-with-replace'>
@@ -802,7 +806,28 @@
     </xsl:choose>
     <xsl:if test='position() != last()'>
       <xsl:text>,</xsl:text>
-    </xsl:if>    
+    </xsl:if>
+    <xsl:value-of select='$nlp'/>
+  </xsl:template>
+
+  <xsl:template match='s|n|b' mode='serialize-jxml-object'>
+    <xsl:param name='indent' select='""'/>
+
+    <xsl:value-of select="concat($indent, '&quot;', @k, '&quot;: ')"/>
+    <xsl:choose>
+      <xsl:when test='. = "" or (name(.) != "n" and name(.) != "b")'>
+        <xsl:call-template name='json-escape-with-replace'>
+          <xsl:with-param name="s" select='.'/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select='.'/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test='position() != last()'>
+      <xsl:text>,</xsl:text>
+    </xsl:if>
+    <xsl:value-of select='$nlp'/>
   </xsl:template>
 
   <!--=====================================================
@@ -832,6 +857,5 @@
     </xsl:if>
     <xsl:apply-templates select='*' mode='check-jxml'/>
   </xsl:template>
-
 
 </xsl:stylesheet>
