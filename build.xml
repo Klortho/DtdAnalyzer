@@ -2,7 +2,7 @@
 <project name="DtdAnalyzer" basedir="." default="all">
 
   <property name="name" value="DtdAnalyzer"/>
-  <property name="version" value="0.5-dev"/>
+  <property name="version" value="0.5.1"/>
   <property name="project.package" value="gov.ncbi.pmc.dtdanalyzer"/>
   <property name="project.path" value="gov/ncbi/pmc/dtdanalyzer"/>
   <property name="src" value="src"/>
@@ -57,9 +57,9 @@
   <property name="execfiles"
     value="
       dtd2xml2json dtdanalyzer dtdcompare dtddocumentor dtdschematron dtdflatten
-      script/getlibs.sh 
+      script/getlibs.sh
       script/setenv.sh
-      test/xml2json/make-samples.sh 
+      test/xml2json/make-samples.sh
       test/xml2json/test-samples.pl
       test/dtdflatten/test.pl
     "/>

@@ -1,0 +1,24 @@
+{
+  "name": "dtdanalyzer",
+  "version": "0.5.1",
+  "description": "A tool for analyzing and manipulating DTDs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ncbi/DtdAnalyzer.git"
+  },
+  "keywords": [
+    "JATS",
+    "DTD",
+    "XSLT",
+    "XML"
+  ],
+  "author": "NCBI",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/ncbi/DtdAnalyzer/issues"
+  },
+  "homepage": "http://dtd.nlm.nih.gov/ncbi/dtdanalyzer/"
+}

@@ -1,16 +1,9 @@
 # DtdAnalyzer Release Notes
 
-## DtdAnalyzer v0.5-dev
+## Version 0.5.1
 
-### Features
-
-### Enhancements
-
-### Bug fixes
-
-### Performance
-
-### Other
+* Worked on performance of xml2json.xsl
+* npm-ized it 
 
 ## DtdAnalyzer v0.5 - 2015-07-14
 
