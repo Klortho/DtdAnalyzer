@@ -88,12 +88,9 @@
         <xsl:variable name="nm" select="@name"/>
         <element>
             <xsl:copy-of select="@*"/>
-            <content-model>
-                <xsl:copy-of select="content-model/@*"/>
-                <xsl:for-each select="descendant::child">
-                    <xsl:value-of select="concat('&#x00A0;',.,'&#x00A0;')"/>
-                </xsl:for-each>
-            </content-model>
+            <xsl:attribute name="spec" select="content-model/@spec"/>
+            <xsl:attribute name="mini-model" select="content-model/@minified"/>
+            <xsl:attribute name="sp-model" select="content-model/@spaced"/>
             <attribute-model>
                 <xsl:apply-templates select="parent::elements/following-sibling::attributes/attribute/attributeDeclaration[@element=$nm]">
                    <xsl:sort select="parent::attribute/@name"/>

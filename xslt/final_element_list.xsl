@@ -207,11 +207,6 @@
             <xsl:when test="$version[4]">
                 <div style="border:thick solid red;margin:2em 2em 2em 2em;">
                     <h4><xsl:value-of select="$version[4]"/></h4>
-                    
-                    <!--<h4>[[Element: <xsl:value-of select="$element"/>]]</h4>-->
-                    <!--<h4>[[Tagset: <xsl:value-of select="$tagset"/>]]</h4>-->
-                    <!--<h4>[[Version: <xsl:value-of select="$version[1]"/>]]</h4>-->
-                    
                     <xsl:choose>
                         <xsl:when test="declarations/dtd-info[following-sibling::element[@name=$element]][@version=$version[4]]">
                             <xsl:call-template name="write-author-models">               
@@ -225,8 +220,7 @@
                                 <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
                             </div>                            
                         </xsl:otherwise>
-                    </xsl:choose>
-                                        
+                    </xsl:choose> 
                 </div>
                 
                 <xsl:call-template name="write-author-versions">
@@ -275,7 +269,6 @@
             <xsl:when test="$version[4]">
                 <div style="border:thick solid red;margin:2em 2em 2em 2em;">
                     <h4><xsl:value-of select="$version[4]"/></h4>
-                    
                     <xsl:call-template name="write-attributes">
                         <xsl:with-param name="element" select="$element"/>
                         <xsl:with-param name="tagset" select="$tagset"/>
@@ -288,7 +281,6 @@
                     <xsl:with-param name="element" select="$element"/>
                     <xsl:with-param name="tagset" select="$tagset"/>
                 </xsl:call-template>
-                
             </xsl:when>
             <xsl:otherwise/>
         </xsl:choose>
@@ -301,42 +293,51 @@
         <xsl:param name="version"/>
         <xsl:param name="tagset"/>
         <xsl:param name="element"/>
-        <xsl:param name="current-model"/>
+		<xsl:param name="current-model"/>
+		  
+		<xsl:variable name="my-model" select="declarations/element[@name=$element and preceding-sibling::dtd-info[@version=$version[1]]]"/>
         
         <xsl:choose>
-            <xsl:when test="$version">
+            <xsl:when test="$version and $element">
+                
                 <div style="border:thick solid red;margin:2em 2em 2em 2em;">
                     <h4><xsl:value-of select="$version[1]"/></h4>
-                    
-                    <!--<h4>[[Element: <xsl:value-of select="$element"/>]]</h4>-->
-                    <!--<h4>[[Tagset: <xsl:value-of select="$tagset"/>]]</h4>-->
-                    <h4>[[Version: <xsl:value-of select="$version[1]"/>]]</h4>
-                    
                     <xsl:choose>
-                        <xsl:when test="declarations/dtd-info[following-sibling::element[@name=$element]][@version=$version[1]]">
-                              <xsl:call-template name="write-models">             
-                                  <xsl:with-param name="element" select="$element"/>
-                                  <xsl:with-param name="tagset" select="$tagset"/>
-                                  <xsl:with-param name="version" select="$version[1]"/>
-                              </xsl:call-template>
+                        <xsl:when test="$my-model">
+                            <xsl:choose>
+						      <xsl:when test="$current-model=''">
+                                <xsl:call-template name="write-models">             
+                                   <xsl:with-param name="my-model" select="$my-model"/>
+	                            </xsl:call-template>
+						      </xsl:when>
+                              <xsl:when test="$current-model/@mini-model = $my-model/@mini-model">
+                                <xsl:call-template name="write-models">             
+                                   <xsl:with-param name="my-model" select="'UNCHANGED'"/>
+							    </xsl:call-template>
+                              </xsl:when>  
+                              <xsl:otherwise>
+                                <xsl:call-template name="write-models">             
+                                  <xsl:with-param name="my-model" select="$my-model"/>
+	                            </xsl:call-template>
+                              </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
-                            <div style="border:thick solid gray;margin:2em 2em 2em 2em;">9
-                                <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
-                            </div>                            
+                            <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
                         </xsl:otherwise>
-                   </xsl:choose>            
-                                        
+                    </xsl:choose>
                 </div>
                 
                 <xsl:call-template name="write-versions">
                     <xsl:with-param name="version" select="$version[position()!=1]"/>
                     <xsl:with-param name="element" select="$element"/>
                     <xsl:with-param name="tagset" select="$tagset"/>
+					<xsl:with-param name="current-model" select="$my-model"/>
                 </xsl:call-template>
                 
             </xsl:when>
-            <xsl:otherwise/>
+            <xsl:otherwise/>            
+            
         </xsl:choose>
     </xsl:template>  
    
@@ -344,37 +345,9 @@
     <!-- NAMED TEMPLATE: WRITE-MODELS                                                   -->
     <!-- ============================================================================== -->
     <xsl:template name="write-models">
-        <xsl:param name="version"/>
-        <xsl:param name="element"/>
-        <xsl:param name="tagset"/>
-        <xsl:param name="current-model"/>
+        <xsl:param name="my-model"/>
         
-        <xsl:if test="$element and $tagset and $version">
-           <div style="border:thick solid slategray;margin:2em 2em 2em 2em;">
-               
-               <!--<h4>[[Element: <xsl:value-of select="$element"/>]]</h4>-->
-               <h4>[[Version: <xsl:value-of select="$version"/>]]</h4>
-              
-               <xsl:choose>
-                   <xsl:when test="declarations[1]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]">
-                       <h4><xsl:value-of select="declarations[1]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/content-model/@spaced"/></h4>
-                   </xsl:when>
-                   <xsl:when test="declarations[position()=last()]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/content-model = declarations/element[@name=$element][preceding-sibling::dtd-info[@version!=$version]]/content-model">
-                       <h4>CONTENT MODEL UNCHANGED</h4>
-                   </xsl:when>
-                   <xsl:when test="declarations/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/content-model = declarations[1]/element[@name=$element]/content-model">
-                       <h4>CONTENT MODEL UNCHANGED</h4>
-                   </xsl:when>
-                   <xsl:when test="declarations[position()!=last()]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/content-model = declarations/element[@name=$element][preceding-sibling::dtd-info[@version!=$version]]/content-model">
-                       <h4><xsl:value-of select="declarations/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/content-model/@spaced"/></h4>
-                   </xsl:when>
-                   <xsl:otherwise>
-                      <h4><xsl:value-of select="declarations/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/content-model/@spaced"/></h4>
-                   </xsl:otherwise>                       
-               </xsl:choose>
-           </div>
-            
-       </xsl:if>                  
+             <xsl:value-of select="if ($my-model='UNCHANGED') then 'NOT CHANGED' else $my-model/@sp-model"/> 
     </xsl:template>
     
     <!-- ============================================================================== -->
