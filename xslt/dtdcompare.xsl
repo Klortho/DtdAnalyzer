@@ -372,7 +372,7 @@
     <xsl:param name="dtd1-elements"/>
     <xsl:param name="different" select="0"/>
     <xsl:choose>
-      <xsl:when test="count($dtd1-elements) eq 0">
+      <xsl:when test="count($dtd1-elements) = 0">
         <xsl:value-of select="$different"/>
       </xsl:when>
 
