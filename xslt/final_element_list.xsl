@@ -253,7 +253,7 @@
     <!-- ============================================================================== -->
     <xsl:template name="write-author-models">
         <xsl:param name="my-model"/>
-        <xsl:value-of select="if ($my-model='UNCHANGED') then 'NOT CHANGED' else $my-model/@sp-model"/> 
+        <xsl:value-of select="if ($my-model='UNCHANGED') then 'NO CHANGE IN CONTENT MODEL' else $my-model/@sp-model"/> 
     </xsl:template>
     
     <!-- ============================================================================== -->
@@ -279,7 +279,7 @@
                                         <xsl:with-param name="my-model" select="$my-model"/>
                                     </xsl:call-template>
                                 </xsl:when>
-                                <xsl:when test="$current-model/attribute-model = $my-model">
+                                <xsl:when test="$current-model = $my-model">
                                     <xsl:call-template name="write-attributes">             
                                         <xsl:with-param name="my-model" select="'UNCHANGED'"/>
                                     </xsl:call-template>
@@ -292,7 +292,7 @@
                             </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
-                            <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
+                            <h4>ATTRIBUTE MODEL NOT FEATURED IN THIS VERSION</h4> 
                         </xsl:otherwise>
                     </xsl:choose>
                 </div>
@@ -368,7 +368,7 @@
     <!-- ============================================================================== -->
     <xsl:template name="write-models">
         <xsl:param name="my-model"/>
-        <xsl:value-of select="if ($my-model='UNCHANGED') then 'NOT CHANGED' else $my-model/@sp-model"/> 
+        <xsl:value-of select="if ($my-model='UNCHANGED') then 'NO CHANGE IN CONTENT MODEL' else $my-model/@sp-model"/> 
     </xsl:template>
     
     <!-- ============================================================================== -->
@@ -386,7 +386,6 @@
             <xsl:when test="$version and $element">
                 <div style="border:thick solid red;margin:2em 2em 2em 2em;">
                     <h4><xsl:value-of select="$version[1]"/></h4>
-                    
                     <xsl:choose>
                         <xsl:when test="$my-model">
                             <xsl:choose>
@@ -395,7 +394,7 @@
                                         <xsl:with-param name="my-model" select="$my-model"/>
                                     </xsl:call-template>
                                 </xsl:when>
-                                <xsl:when test="$current-model/attribute-model = $my-model">
+                                <xsl:when test="$current-model = $my-model">
                                     <xsl:call-template name="write-attributes">             
                                         <xsl:with-param name="my-model" select="'UNCHANGED'"/>
                                     </xsl:call-template>
@@ -408,7 +407,7 @@
                             </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
-                            <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
+                            <h4>ATTRIBUTE MODEL NOT FEATURED IN THIS VERSION</h4> 
                         </xsl:otherwise>
                     </xsl:choose>
                 </div>
@@ -432,7 +431,7 @@
         <xsl:param name="my-model"/>
         <xsl:choose>
             <xsl:when test="$my-model = 'UNCHANGED'">
-                <h4>NOT CHANGED</h4>
+                <h4>NO CHANGE IN ATTRIBUTE MODEL</h4>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:for-each select="$my-model/attribute">
