@@ -103,7 +103,7 @@
     <!-- ATTRIBUTES/ATTRIBUTE                                                           -->
     <!-- ============================================================================== -->
     <xsl:template match="attribute/attributeDeclaration">
-        <xsl:value-of select="concat('&#x0040;',parent::attribute/@name,'&#x00A0;',@type,'&#x00A0;',@mode,'  ')"/>
+        <xsl:value-of select="concat('&#x0040;',parent::attribute/@name,'&#x00A0;')"/>
         <attribute name="{parent::attribute/@name}" type="{@type}" mode="{@mode}"/>
     </xsl:template>
     

@@ -166,8 +166,8 @@
                     </xsl:choose>
                     
                     
-                   <!-- <h4>ATTRIBUTES:</h4>-->
-                    <!--<xsl:choose>
+                    <h4>ATTRIBUTES:</h4>
+                    <xsl:choose>
                         <xsl:when test="$tagset[1] = 'Journal Article Authoring'">             
                             <xsl:call-template name="write-author-versions-attributes">
                                 <xsl:with-param name="version" select="$versions/version"/>
@@ -182,7 +182,7 @@
                                 <xsl:with-param name="tagset" select="$tagset[1]"/>
                             </xsl:call-template>
                         </xsl:otherwise>
-                    </xsl:choose>-->                    
+                    </xsl:choose>         
                 </div>
                 
                 <xsl:call-template name="write-tag-sets">
@@ -202,23 +202,36 @@
         <xsl:param name="version"/>
         <xsl:param name="element"/>
         <xsl:param name="tagset"/>
+        <xsl:param name="current-model"/>
+        
+        <xsl:variable name="my-model" select="declarations/element[@name=$element and preceding-sibling::dtd-info[@version=$version[4]]]"/>
         
         <xsl:choose>
             <xsl:when test="$version[4]">
                 <div style="border:thick solid red;margin:2em 2em 2em 2em;">
                     <h4><xsl:value-of select="$version[4]"/></h4>
                     <xsl:choose>
-                        <xsl:when test="declarations/dtd-info[following-sibling::element[@name=$element]][@version=$version[4]]">
-                            <xsl:call-template name="write-author-models">               
-                                <xsl:with-param name="element" select="$element"/>
-                                <xsl:with-param name="tagset" select="$tagset"/>
-                                <xsl:with-param name="version" select="$version[4]"/>
-                            </xsl:call-template>
+                        <xsl:when test="$my-model">
+                            <xsl:choose>
+                                <xsl:when test="$current-model=''">
+                                    <xsl:call-template name="write-author-models">             
+                                        <xsl:with-param name="my-model" select="$my-model"/>
+                                    </xsl:call-template>
+                                </xsl:when>
+                                <xsl:when test="$current-model/@mini-model = $my-model/@mini-model">
+                                    <xsl:call-template name="write-author-models">             
+                                        <xsl:with-param name="my-model" select="'UNCHANGED'"/>
+                                    </xsl:call-template>
+                                </xsl:when>  
+                                <xsl:otherwise>
+                                    <xsl:call-template name="write-author-models">             
+                                        <xsl:with-param name="my-model" select="$my-model"/>
+                                    </xsl:call-template>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
-                            <div style="border:thick solid gray;margin:2em 2em 2em 2em;">
-                                <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
-                            </div>                            
+                            <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
                         </xsl:otherwise>
                     </xsl:choose> 
                 </div>
@@ -227,6 +240,7 @@
                     <xsl:with-param name="version" select="$version[position()!=4]"/>
                     <xsl:with-param name="element" select="$element"/>
                     <xsl:with-param name="tagset" select="$tagset"/>
+                    <xsl:with-param name="current-model" select="$my-model"/>
                 </xsl:call-template>
                 
             </xsl:when>
@@ -238,23 +252,8 @@
     <!-- NAMED TEMPLATE: WRITE-AUTHOR-MODELS                                            -->
     <!-- ============================================================================== -->
     <xsl:template name="write-author-models">
-        <xsl:param name="version"/>
-        <xsl:param name="element"/>
-        <xsl:param name="tagset"/>
-        
-        <div style="border:thick solid slategray;margin:2em 2em 2em 2em;">
-            <xsl:choose>
-                <xsl:when test="$element and $tagset and ($version='NLM 2.1')">
-                    <h4><xsl:value-of select="declarations[position()!=1][contains(@relsysid,'articleauthoring')]/element[@name=$element][preceding-sibling::dtd-info[@version='NLM 2.1']]/content-model/@spaced"/></h4>
-                </xsl:when>
-                <xsl:when test="declarations[position()!=1][contains(@relsysid,'articleauthoring')]/element[@name=$element][preceding-sibling::dtd-info[@version!='NLM 2.1']]/content-model/@minified = declarations[position()!=1][contains(@relsysid,'articleauthoring')]/element[@name=$element][preceding-sibling::dtd-info[@version='NLM 2.1']]/content-model/@minified">
-                    <h4>CONTENT MODEL UNCHANGED</h4>
-                </xsl:when>                
-                <xsl:otherwise>
-                    <h4><xsl:value-of select="declarations[position()!=1][contains(@relsysid,'articleauthoring')]/element[@name=$element][preceding-sibling::dtd-info[@version!='NLM 2.1']]/content-model/@spaced"/></h4>
-                </xsl:otherwise>
-            </xsl:choose>
-        </div>
+        <xsl:param name="my-model"/>
+        <xsl:value-of select="if ($my-model='UNCHANGED') then 'NOT CHANGED' else $my-model/@sp-model"/> 
     </xsl:template>
     
     <!-- ============================================================================== -->
@@ -264,22 +263,45 @@
         <xsl:param name="version"/>
         <xsl:param name="element"/>
         <xsl:param name="tagset"/>
+        <xsl:param name="current-model"/>
+        
+        <xsl:variable name="my-model" select="declarations/element[@name=$element and preceding-sibling::dtd-info[@version=$version[4]]]/attribute-model"/>
         
         <xsl:choose>
             <xsl:when test="$version[4]">
                 <div style="border:thick solid red;margin:2em 2em 2em 2em;">
                     <h4><xsl:value-of select="$version[4]"/></h4>
-                    <xsl:call-template name="write-attributes">
-                        <xsl:with-param name="element" select="$element"/>
-                        <xsl:with-param name="tagset" select="$tagset"/>
-                        <xsl:with-param name="version" select="$version[4]"/>
-                    </xsl:call-template>
+                    <xsl:choose>
+                        <xsl:when test="$my-model">
+                            <xsl:choose>
+                                <xsl:when test="$current-model=''">
+                                    <xsl:call-template name="write-attributes">             
+                                        <xsl:with-param name="my-model" select="$my-model"/>
+                                    </xsl:call-template>
+                                </xsl:when>
+                                <xsl:when test="$current-model/attribute-model = $my-model">
+                                    <xsl:call-template name="write-attributes">             
+                                        <xsl:with-param name="my-model" select="'UNCHANGED'"/>
+                                    </xsl:call-template>
+                                </xsl:when>  
+                                <xsl:otherwise>
+                                    <xsl:call-template name="write-attributes">             
+                                        <xsl:with-param name="my-model" select="$my-model"/>
+                                    </xsl:call-template>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </div>
                 
                 <xsl:call-template name="write-author-versions-attributes">
                     <xsl:with-param name="version" select="$version[position()!=4]"/>
                     <xsl:with-param name="element" select="$element"/>
                     <xsl:with-param name="tagset" select="$tagset"/>
+                    <xsl:with-param name="current-model" select="$my-model"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise/>
@@ -346,8 +368,7 @@
     <!-- ============================================================================== -->
     <xsl:template name="write-models">
         <xsl:param name="my-model"/>
-        
-             <xsl:value-of select="if ($my-model='UNCHANGED') then 'NOT CHANGED' else $my-model/@sp-model"/> 
+        <xsl:value-of select="if ($my-model='UNCHANGED') then 'NOT CHANGED' else $my-model/@sp-model"/> 
     </xsl:template>
     
     <!-- ============================================================================== -->
@@ -357,33 +378,46 @@
         <xsl:param name="version"/>
         <xsl:param name="tagset"/>
         <xsl:param name="element"/>
+        <xsl:param name="current-model"/>
+        
+        <xsl:variable name="my-model" select="declarations/element[@name=$element and preceding-sibling::dtd-info[@version=$version[1]]]/attribute-model"/>
         
         <xsl:choose>
-            <xsl:when test="$version">
+            <xsl:when test="$version and $element">
                 <div style="border:thick solid red;margin:2em 2em 2em 2em;">
                     <h4><xsl:value-of select="$version[1]"/></h4>
                     
                     <xsl:choose>
-                        <xsl:when test="declarations/dtd-info[following-sibling::element[@name=$element]][@version=$version[1]]">
-                            <xsl:call-template name="write-attributes">
-                                <xsl:with-param name="element" select="$element"/>
-                                <xsl:with-param name="tagset" select="$tagset"/>
-                                <xsl:with-param name="version" select="$version[1]"/>
-                            </xsl:call-template>
+                        <xsl:when test="$my-model">
+                            <xsl:choose>
+                                <xsl:when test="$current-model=''">
+                                    <xsl:call-template name="write-attributes">             
+                                        <xsl:with-param name="my-model" select="$my-model"/>
+                                    </xsl:call-template>
+                                </xsl:when>
+                                <xsl:when test="$current-model/attribute-model = $my-model">
+                                    <xsl:call-template name="write-attributes">             
+                                        <xsl:with-param name="my-model" select="'UNCHANGED'"/>
+                                    </xsl:call-template>
+                                </xsl:when>  
+                                <xsl:otherwise>
+                                    <xsl:call-template name="write-attributes">             
+                                        <xsl:with-param name="my-model" select="$my-model"/>
+                                    </xsl:call-template>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
-                            <div style="border:thick solid gray;margin:2em 2em 2em 2em;">
-                                <h4>ATTRIBUTE(S) NOT FEATURED IN THIS VERSION</h4> 
-                            </div>                            
+                            <h4>ELEMENT NOT FEATURED IN THIS VERSION</h4> 
                         </xsl:otherwise>
-                    </xsl:choose>                    
-                                       
+                    </xsl:choose>
                 </div>
                
                 <xsl:call-template name="write-version-attributes">
                     <xsl:with-param name="version" select="$version[position()!=1]"/>
                     <xsl:with-param name="element" select="$element"/>
                     <xsl:with-param name="tagset" select="$tagset"/>
+                    <xsl:with-param name="current-model" select="$my-model"/>
                 </xsl:call-template>
                 
             </xsl:when>
@@ -395,50 +429,16 @@
     <!-- NAMED TEMPLATE: WRITE-ATTRIBUTES                                               -->
     <!-- ============================================================================== -->
     <xsl:template name="write-attributes">
-        <xsl:param name="version"/>
-        <xsl:param name="element"/>
-        <xsl:param name="tagset"/>
-        
-        <xsl:if test="$element and $tagset and $version">
-            <div style="border:thick solid slategray;margin:2em 2em 2em 2em;">
-                
-                <!--<h4>[[Tagset: <xsl:value-of select="$tagset"/>]]</h4>-->
-                <!--<h4>[[Element: <xsl:value-of select="$element"/>]]</h4>-->             
-                <!--<h4>[[Version: <xsl:value-of select="$version"/>]]</h4>-->
-                
-                <h4>[[BITS 1.0 attributes:  <xsl:value-of select="declarations[3][contains(@relsysid,'BITS')]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/attribute-model"/>]]</h4>
-                <h4>[[BITS 2.0 attributes:  <xsl:value-of select="declarations[4][contains(@relsysid,'BITS')]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/attribute-model"/>]]</h4>
-                
-                <xsl:choose>
-                    <xsl:when test="declarations[1][contains(@relsysid,'BITS')]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]">
-                        <!--<h4>DEC[1] ATTRIBUTE MODEL</h4>-->
-                        <xsl:for-each select="declarations[1][contains(@relsysid,'BITS')]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/attribute-model/attribute">
-                            <h4><xsl:value-of select="concat('&#x0040;',@name,'&#x00A0;','Type: ',@type,'&#x00A0;','Mode: ',@mode,'&#x000D;')"/></h4>
-                        </xsl:for-each>
-                    </xsl:when>
-                    <xsl:when test="declarations[contains(@relsysid,'BITS')]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/attribute-model = declarations[1][contains(@relsysid,'BITS')]/element[@name=$element]/attribute-model">
-                        <!--<h4>DEC[ANY POSITION] ATTRIBUTE MODEL=DEC[1] ATTRIBUTE MODEL</h4>-->
-                        <h4>ATTRIBUTE MODEL UNCHANGED</h4>
-                    </xsl:when>
-                    <xsl:when test="declarations[contains(@relsysid,'BITS')]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/attribute-model = preceding-sibling::declarations/element[@name=$element]/attribute-model">
-                        <h4>DEC[ANY POSITION] ATTRIBUTE MODEL = PRECEDING-SIBLING::DEC[ANY POSITION] ATTRIBUTE MODEL</h4>
-                        <h4>ATTRIBUTE MODEL UNCHANGED</h4>
-                    </xsl:when>
-                    <!--<xsl:otherwise>
-                        <!-\-<h4>OTHERWISE WRITE OUT ATTRIBUTE MODEL/ATTRIBUTE</h4>-\->
-                        <xsl:for-each select="declarations[contains(@relsysid,'BITS')]/element[@name=$element][preceding-sibling::dtd-info[@version=$version]]/attribute-model/attribute">
-                            <h4><xsl:value-of select="concat('&#x0040;',@name,'&#x00A0;','Type: ',@type,'&#x00A0;','Mode: ',@mode,'&#x000D;')"/></h4>
-                        </xsl:for-each>
-                    </xsl:otherwise>   -->                     
-                </xsl:choose>
-            </div>
-            
-            <xsl:call-template name="write-attributes">
-                <xsl:with-param name="version" select="$version[position()!=1]"/>
-                <xsl:with-param name="element" select="$element"/>
-                <xsl:with-param name="tagset" select="$tagset"/>                
-            </xsl:call-template>
-            
-        </xsl:if>                  
+        <xsl:param name="my-model"/>
+        <xsl:choose>
+            <xsl:when test="$my-model = 'UNCHANGED'">
+                <h4>NOT CHANGED</h4>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:for-each select="$my-model/attribute">
+                    <h4><xsl:value-of select="concat('&#x0040;',@name,'&#x00A0;','Type: ',@type,'&#x00A0;','Mode: ',@mode,'&#x000D;')"/></h4>
+                </xsl:for-each>
+            </xsl:otherwise>
+        </xsl:choose>            
     </xsl:template>
 </xsl:stylesheet>
