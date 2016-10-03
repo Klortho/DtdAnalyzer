@@ -87,14 +87,22 @@
     <xsl:template match="element">
         <xsl:variable name="nm" select="@name"/>
         <element>
-            <xsl:copy-of select="@*"/>
-            <xsl:attribute name="spec" select="content-model/@spec"/>
-            <xsl:attribute name="mini-model" select="content-model/@minified"/>
-            <xsl:attribute name="sp-model" select="content-model/@spaced"/>
+            <xsl:attribute name="name" select="@name"/>            
+            <content-model>
+                <xsl:attribute name="sp-model" select="content-model/@spaced"/>
+                <xsl:value-of select="content-model/@minified"/>
+            </content-model>
             <attribute-model>
-                <xsl:apply-templates select="parent::elements/following-sibling::attributes/attribute/attributeDeclaration[@element=$nm]">
-                   <xsl:sort select="parent::attribute/@name"/>
-                </xsl:apply-templates>
+                <xsl:choose>
+                    <xsl:when test="not(parent::elements/following-sibling::attributes/attribute/attributeDeclaration[@element=$nm])">
+                        <xsl:value-of select="'EMPTY'"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="parent::elements/following-sibling::attributes/attribute/attributeDeclaration[@element=$nm]">
+                            <xsl:sort select="parent::attribute/@name"/>
+                        </xsl:apply-templates>
+                    </xsl:otherwise>
+                </xsl:choose>
             </attribute-model>
         </element>
     </xsl:template>
@@ -103,8 +111,8 @@
     <!-- ATTRIBUTES/ATTRIBUTE                                                           -->
     <!-- ============================================================================== -->
     <xsl:template match="attribute/attributeDeclaration">
-        <xsl:value-of select="concat('&#x0040;',parent::attribute/@name,'&#x00A0;')"/>
-        <attribute name="{parent::attribute/@name}" type="{@type}" mode="{@mode}"/>
+       <xsl:value-of select="concat('&#x0040;',parent::attribute/@name,'&#x00A0;')"/>
+       <attribute name="{parent::attribute/@name}" type="{@type}" mode="{@mode}"/>
     </xsl:template>
     
     <!-- ============================================================================== -->
