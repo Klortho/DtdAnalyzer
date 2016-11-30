@@ -4,8 +4,9 @@
 
 # This is strictly for BITS
 
-xslpath="/pmc/work/peterskm/stash/Projects/dtdanalyzer/DtdAnalyzer/xslt"
-datapath="/pmc/work/peterskm/stash/Projects/dtdanalyzer/analyze"
+xslpath="/pmc/work/peterskm/bitbucket/Projects/dtdanalyzer/DtdAnalyzer/xslt"
+datapath="/pmc/work/peterskm/bitbucket/Projects/dtdanalyzer/analyze"
+webpath="/net/intrawebdev2/export/home/web/public/htdocs/staff/beck/element-list/bits"
 
 cd source
 
@@ -56,7 +57,7 @@ if [ -e bits_elements.xml ]
 
 then
 echo "Converting XML file to HTML"
-java -jar /pmc/JAVA/saxon9b/saxon9.jar -xsl:$xslpath/final_element_list.xsl -s:bits_elements.xml -o:bits_elements.html
+java -jar /pmc/JAVA/saxon9b/saxon9.jar -xsl:$xslpath/final_element_list.xsl -s:bits_elements.xml -o:$webpath/bits_index.html
 
 echo "Remove clean file"
 rm source/bits_elements_clean.xml

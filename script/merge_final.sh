@@ -4,8 +4,9 @@
 
 #Combine all dtdanalyzer files into one XML file
 
-xslpath="/pmc/work/peterskm/stash/Projects/dtdanalyzer/DtdAnalyzer/xslt"
-datapath="/pmc/work/peterskm/stash/Projects/dtdanalyzer/analyze"
+xslpath="/pmc/work/peterskm/bitbucket/Projects/dtdanalyzer/DtdAnalyzer/xslt"
+datapath="/pmc/work/peterskm/bitbucket/Projects/dtdanalyzer/analyze"
+webpath="/net/intrawebdev2/export/home/web/public/htdocs/staff/beck/element-list/nlm_jats"
 
 cd source
 
@@ -68,7 +69,7 @@ if [ -e dtdcombined.xml ]
 
 then
 echo "Converting XML file to HTML"
-java -jar /pmc/JAVA/saxon9b/saxon9.jar -xsl:$xslpath/final_element_list.xsl -s:dtdcombined.xml -o:dtdcombined.html
+java -jar /pmc/JAVA/saxon9b/saxon9.jar -xsl:$xslpath/final_element_list.xsl -s:dtdcombined.xml -o:$webpath/dtdcombined.html
 
 else
 echo "No such file found in this directory"
