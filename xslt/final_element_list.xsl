@@ -260,7 +260,7 @@
                                 <body class="book">
                                     <div id="wrapper">
                                         <div id="head"> 
-                                            <h1 class="main">BITS Element Index</h1>
+                                            <h1 class="main"><a><xsl:attribute name="href"><xsl:value-of select="'http://intrawebdev2/staff/beck/element-list/bits/bits_index.html'"/></xsl:attribute>BITS Element Index</a></h1>
                                         </div>
                                         <div id="nav">
                                             <div class="sidebar">
@@ -295,7 +295,7 @@
                                 <body>
                                     <div id="wrapper">
                                         <div id="head"> 
-                                            <h1 class="main">NLM/JATS Element Index</h1>
+                                            <h1 class="main"><a><xsl:attribute name="href"><xsl:value-of select="'http://intrawebdev2/staff/beck/element-list/nlm_jats/dtdcombined.html'"/></xsl:attribute>NLM/JATS Element Index</a></h1>
                                         </div>
                                         <div id="nav">
                                             <div class="sidebar">
